@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mmtax.business.mapper.BatchTaskRecordMapper">
+
+    <resultMap type="com.mmtax.business.domain.BatchTaskRecord" id="BatchTaskRecordResult">
+        <result property="id"    column="id"    />
+        <result property="batchNo"    column="batch_no"    />
+        <result property="taskTotalNum"    column="task_total_num"    />
+        <result property="taskAmount"    column="task_amount"    />
+        <result property="taskStatus"    column="task_status"    />
+        <result property="taskInfoId"    column="task_info_id"    />
+        <result property="taskName"    column="task_name"    />
+        <result property="taskBeginTime"    column="task_begin_time"    />
+        <result property="taskCompleteTime"    column="task_complete_time"    />
+        <result property="taskRequireCompleteTime"    column="task_require_complete_time"    />
+        <result property="merchantId"    column="merchant_id"    />
+        <result property="providerId"    column="provider_id"    />
+        <result property="reservedFieldOne"    column="reserved_field_one"    />
+        <result property="reservedFieldTwo"    column="reserved_field_two"    />
+        <result property="reservedFieldThree"    column="reserved_field_three"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <select id="listBathTaskRecordInfo" resultType="com.mmtax.business.dto.BatchTaskRecordDTO">
+    SELECT
+        t1.merchant_id as merchantId,
+        t1.task_info_id as taskInfoId,
+        t1.batch_no as batchNo,
+        t1.task_name as taskName,
+        t1.task_total_num as taskTotalNum,
+        t1.task_begin_time as taskBeginTime,
+        t1.task_require_complete_time as taskRequireCompleteTime,
+        t1.task_status as taskStatus
+    FROM tbl_batch_task_record t1
+    where 1 =1 and t1.task_status in (0,1)
+        <if test="merchantId != null and merchantId != ''">
+            and t1.merchant_id = #{merchantId}
+        </if>
+        <if test="batchNo != null and batchNo != ''">
+            and t1.batch_no = #{batchNo}
+        </if>
+        <if test="taskName != null and taskName != ''">
+            and t1.task_name = #{taskName}
+        </if>
+        <if test="taskStatus != null and taskStatus != ''">
+            and t1.task_status = #{taskStatus}
+        </if>
+        <if test="taskBeginStartTime != null and taskBeginStartTime != '' and taskBeginEndTime != null and taskBeginEndTime != ''">
+            AND t1.task_begin_time between concat(#{taskBeginStartTime},' 00:00:00') and concat(#{taskBeginEndTime},' 23:59:59')
+        </if>
+        <if test="taskRequireCompleteStartTime != null and taskRequireCompleteStartTime != '' and taskRequireCompleteEndTime != null and taskRequireCompleteEndTime != ''">
+            AND t1.task_require_complete_time between concat(#{taskRequireCompleteStartTime},' 00:00:00') and concat(#{taskRequireCompleteEndTime},' 23:59:59')
+        </if>
+        order by
+        t1.create_time desc
+        <if test="pageSize != null">
+            limit #{startIndex},#{pageSize}
+        </if>
+    </select>
+
+    <select id="countBathTaskRecord" resultType="java.lang.Integer">
+    SELECT count(*)
+    FROM tbl_batch_task_record t1
+    where 1 =1 and t1.task_status in (0,1)
+        <if test="merchantId != null and merchantId != ''">
+            and t1.merchant_id = #{merchantId}
+        </if>
+        <if test="batchNo != null and batchNo != ''">
+            and t1.batch_no = #{batchNo}
+        </if>
+        <if test="taskName != null and taskName != ''">
+            and t1.task_name = #{taskName}
+        </if>
+        <if test="taskStatus != null and taskStatus != ''">
+            and t1.task_status = #{taskStatus}
+        </if>
+        <if test="taskBeginStartTime != null and taskBeginStartTime != '' and taskBeginEndTime != null and taskBeginEndTime != ''">
+            AND t1.task_begin_time between concat(#{taskBeginStartTime},' 00:00:00') and concat(#{taskBeginEndTime},' 23:59:59')
+        </if>
+        <if test="taskRequireCompleteStartTime != null and taskRequireCompleteStartTime != '' and taskRequireCompleteEndTime != null and taskRequireCompleteEndTime != ''">
+            AND t1.task_require_complete_time between concat(#{taskRequireCompleteStartTime},' 00:00:00') and concat(#{taskRequireCompleteEndTime},' 23:59:59')
+        </if>
+    </select>
+
+    <select id="getBathTaskRecordInfo" resultType="com.mmtax.business.dto.BatchTaskRecordDTO">
+        SELECT
+        t1.merchant_id as merchantId,
+        t1.task_info_id as taskInfoId,
+        t1.batch_no as batchNo,
+        t1.task_name as taskName,
+        t1.task_total_num as taskTotalNum,
+        t1.task_begin_time as taskBeginTime,
+        t1.task_require_complete_time as taskRequireCompleteTime,
+        t1.task_status as taskStatus
+        FROM tbl_batch_task_record t1
+        where 1 =1 and t1.task_status in (0,1)
+        <if test="merchantId != null and merchantId != ''">
+            and t1.merchant_id = #{merchantId}
+        </if>
+        <if test="batchNo != null">
+            and t1.batch_no = #{batchNo}
+        </if>
+        <if test="taskName != null and taskName != ''">
+            and t1.task_name = #{taskName}
+        </if>
+        <if test="taskStatus != null and taskStatus != ''">
+            and t1.task_status = #{taskStatus}
+        </if>
+        <if test="taskBeginStartTime != null and taskBeginStartTime != '' and taskBeginEndTime != null and taskBeginEndTime != ''">
+            AND t1.task_begin_time between concat(#{taskBeginStartTime},' 00:00:00') and concat(#{taskBeginEndTime},' 23:59:59')
+        </if>
+        <if test="taskRequireCompleteStartTime != null and taskRequireCompleteStartTime != '' and taskRequireCompleteEndTime != null and taskRequireCompleteEndTime != ''">
+            AND t1.task_require_complete_time between concat(#{taskRequireCompleteStartTime},' 00:00:00') and concat(#{taskRequireCompleteEndTime},' 23:59:59')
+        </if>
+        order by
+        t1.create_time desc
+    </select>
+
+    <update id="updateTaskRecordStatus">
+        update tbl_batch_task_record
+        set task_status = #{taskStatus},
+        update_time =#{currentTime},
+        task_complete_time = #{currentTime}
+        where id = #{taskRecordId}
+    </update>
+
+    <select id="getTaskInfo" resultType="java.lang.String">
+        select task_info
+        from tbl_merchant_task_info
+        where merchant_id = #{merchantId}
+        and task_id = #{taskId}
+        and del_status = 0
+    </select>
+</mapper>

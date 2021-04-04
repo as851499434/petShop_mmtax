@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mmtax.business.mapper.ChargeFeeRecordMapper">
+    
+    <resultMap type="com.mmtax.business.domain.ChargeFeeRecord" id="ChargeFeeRecordResult">
+        <result property="id"    column="id"    />
+        <result property="payMerchantId"    column="pay_merchant_id"    />
+        <result property="chargeSerialNum"    column="charge_serial_num"    />
+        <result property="chargeFee"    column="charge_fee"    />
+        <result property="status"    column="status"    />
+        <result property="singleServiceRate"    column="single_service_rate"    />
+        <result property="orderSerialNum"    column="order_serial_num"    />
+        <result property="amount"    column="amount"    />
+        <result property="chargeMerchantId"    column="charge_merchant_id"    />
+        <result property="chargeChannel"    column="charge_channel"    />
+        <result property="providerId"    column="provider_id"    />
+        <result property="reservedFieldOne"    column="reserved_field_one"    />
+        <result property="reservedFieldTwo"    column="reserved_field_two"    />
+        <result property="reservedFieldThree"    column="reserved_field_three"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+    <select id="selectByChargeSerialNum" resultMap="ChargeFeeRecordResult">
+        select
+        *
+        from tbl_charge_fee_record
+        where 1 = 1
+        <if test="chargeSerialNum != null">
+            and charge_serial_num = #{chargeSerialNum}
+        </if>
+    </select>
+    <select id="selectByOrderSerialNum" resultMap="ChargeFeeRecordResult">
+        select * from tbl_charge_fee_record
+        where 1 = 1 and order_serial_num = #{orderSerialNum}
+    </select>
+    <select id="selectByOrderSerialNumStatus" resultMap="ChargeFeeRecordResult">
+        select * from tbl_charge_fee_record
+        where 1 = 1 and `status` = #{status}
+        and order_serial_num = #{orderSerialNum}
+    </select>
+    <select id="selectBystatusAndNeedBuDan" resultMap="ChargeFeeRecordResult">
+        select * from tbl_charge_fee_record
+        where `status` = #{status}
+        <if test="orderSerialNum != null">
+            and order_serial_num = #{orderSerialNum}
+        </if>
+        group by order_serial_num
+        HAVING count(order_serial_num) > 1;
+    </select>
+    <select id="selectInitOrProcess" resultMap="ChargeFeeRecordResult">
+        select * from tbl_charge_fee_record
+        where (status = -1 or status = 0)
+        and create_time &lt; #{createTime}
+    </select>
+</mapper>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="include :: header('邮寄地址')"/>
+</head>
+<body class="white-bg">
+<div class="form-content">
+    <!--<h4 class="form-header h4">邮寄地址：</h4>-->
+    <form class="form-horizontal m" th:object="${address}" id="form-address-edit">
+        <input type="hidden" id="id" th:value="*{id}">
+        <div class="form-group">
+            <label class="col-sm-3 control-label">商户名称：</label>
+            <div class="col-sm-7">
+                <input type="text" name="merchantName" id="merchantName" class="form-control" placeholder="请输入商户名称" readonly>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">详细地址：</label>
+            <div class="col-sm-7">
+                <input type="text" name="address" th:value="*{address}" class="form-control" placeholder="请输入详细地址">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">收件人姓名：</label>
+            <div class="col-sm-7">
+                <input type="text" name="addresseeName" th:value="*{addresseeName}" class="form-control" placeholder="请输入收件人姓名">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">联系电话：</label>
+            <div class="col-sm-7">
+                <input type="text" name="mobile" th:value="*{mobile}" class="form-control" placeholder="请输入联系电话">
+            </div>
+        </div>
+    </form>
+</div>
+<div th:include="include::footer"></div>
+<script type="text/javascript">
+    $("input[type='text']").attr("onkeyup",'this.value=this.value.replace(/\\s+/g,\'\')');
+    var merchant = JSON.parse(sessionStorage.getItem("merchant"))
+    $("#merchantName").val(merchant.merchantName)
+    $("#form-address-edit").validate({
+        onkeyup: false,
+        rules:{
+            address:{
+                required:true
+            },
+            addresseeName:{
+                required:true
+            },
+            mobile:{
+                required:true,
+                isPhone:true
+            }
+        }
+    });
+    function submitHandler() {
+        if ($.validate.form()) {
+            var id = $("#id").val()
+            var arr = $("#form-address-edit").serializeArray();
+            arr.push({"name": "id", "value": id});
+
+            var data = {}
+            for (var i = 0;i<arr.length;i++){
+                data[arr[i].name] = arr[i].value
+            }
+            data = JSON.stringify(data)
+            $.ajax({
+                url: "/manager/invoice/updateAddress",
+                data: data,
+                type: "post",
+                datatype:"json",
+                contentType: 'application/json',
+                error : function(request) {
+                    $.modal.alertError("系统错误");
+                },
+                success : function(data) {
+                    $.operate.successCallback(data);
+                }
+            })
+        }
+    }
+</script>
+</body>
+</html>

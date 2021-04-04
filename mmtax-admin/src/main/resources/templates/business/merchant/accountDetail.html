@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="include :: header('账户设置')"/>
+    <link th:href="@{/css/bootstrap-switch.min.css}" rel="stylesheet"/>
+</head>
+<body class="white-bg">
+<div class="form-content">
+    <h4 class="form-header h4" style="margin-left: 20px;">账户设置：</h4>
+    <form class="form-horizontal m" th:object="${config}">
+        <input type="hidden" th:value="*{id}" class="id">
+        <div class="form-group">
+            <label class="col-sm-3 control-label">账户余额提醒开关：</label>
+            <div class="col-sm-5">
+                <label class="toggle-switch switch-solid">
+                    <input type="checkbox" id="balanceRemindSwitch" th:checked="*{balanceRemindSwitch == 'ON' ? true : false}">
+                    <span></span>
+                </label>
+                <!--<input type="hidden" th:value="*{balanceRemindSwitch}" id="balanceRemindSwitch">-->
+                <!--<input type="checkbox" name="test" class="balanceRemindSwitch">-->
+                <!--<i th:class="'ON'==*{balanceRemindSwitch} ?'fa fa-toggle-on text-info fa-2x':'fa fa-toggle-off text-info fa-2x'"-->
+                   <!--onclick=""></i>-->
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">提醒方式：</label>
+            <div class="col-sm-5">
+                <label class="check-box"> <input type="checkbox" th:value="0" th:checked="*{balanceEmailRemindSwitch}=='ON'" name="balanceEmailRemindSwitch"/> 邮件 </label>
+                <label class="check-box"> <input type="checkbox" th:value="1" th:checked="*{balanceSmsRemindSwitch}=='ON'" name="balanceSmsRemindSwitch"/> 短信 </label>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="form-group">
+                <label class="col-sm-3 control-label">银行卡余额提醒阈值：</label>
+                <div class="col-sm-5">
+                    <input type="text" name="bankRemindAmount" th:value="*{bankRemindAmount}" class="form-control" placeholder="请输入文本">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">支付宝余额提醒阈值：</label>
+                <div class="col-sm-5">
+                    <input type="text" name="alipayRemindAmount" th:value="*{alipayRemindAmount}" class="form-control" placeholder="请输入文本">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">微信余额提醒阈值：</label>
+                <div class="col-sm-5">
+                    <input type="text" name="wechatRemindAmount" th:value="*{wechatRemindAmount}" class="form-control" placeholder="请输入文本">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">充值到账提醒：</label>
+                <div class="col-sm-5">
+                    <label class="toggle-switch switch-solid">
+                        <input type="checkbox" id="rechargeRemindSwitch" th:checked="*{rechargeRemindSwitch == 'ON' ? true : false}">
+                        <span></span>
+                    </label>
+                    <!--<input type="hidden" th:value="*{rechargeRemindSwitch}" id="rechargeRemindSwitch">-->
+                    <!--<input type="checkbox" name="test" class="rechargeRemindSwitch">-->
+                    <!--<i th:class="'ON'==*{rechargeRemindSwitch} ?'fa fa-toggle-on text-info fa-2x':'fa fa-toggle-off text-info fa-2x'"-->
+                       <!--onclick=""></i>-->
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">提醒方式：</label>
+                <div class="col-sm-5">
+                    <label class="check-box"> <input type="checkbox" th:value="0" th:checked="*{rechargeEmailRemindSwitch}=='ON'" name="rechargeEmailRemindSwitch"/> 邮件 </label>
+                    <label class="check-box"> <input type="checkbox" th:value="1" th:checked="*{rechargeSmsRemindSwitch}=='ON'" name="rechargeSmsRemindSwitch"/> 短信 </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">备注：</label>
+                <div class="col-sm-5">
+                    <input type="text" name="comment" th:value="*{comment}" class="form-control" placeholder="请输入文本">
+                </div>
+            </div>
+        </div>
+            <!--<div class="form-group">-->
+                <!--<button type="button" class="btn btn-sm btn-success col-sm-offset-3" onclick="submitType()"><i class="fa fa-check "></i>保 存</button>-->
+            <!--</div>-->
+        <h4 class="form-header h4">提醒配置：</h4>
+        <div class="form-group" id="balanceRemindEmail">
+            <label class="col-sm-3 control-label"><span style="color: red;">*</span>预警及提醒类邮件发送范围：</label>
+            <div class="col-sm-5" th:each="email : *{balanceRemindEmailList}">
+                <input type="text" name="balanceRemindEmail" th:value="${email}" class="form-control" placeholder="请输入预警及提醒类邮件发送范围" required style="margin-top: 6px;width: 90%;display: inline-block"><a class="btn btn-success" onclick="addDiv(1)"><i class="fa fa fa-plus"></i></a>
+                <span class="balanceRemindEmail"></span>
+            </div>
+        </div>
+        <div class="form-group" id="rechargeRemindEmail">
+            <label class="col-sm-3 control-label"><span style="color: red;">*</span>账单类邮件发送范围：</label>
+            <div class="col-sm-5" th:each="email : *{rechargeRemindEmailList}">
+                <input type="text" name="rechargeRemindEmail" th:value="${email}" class="form-control" placeholder="请输入账单类邮件发送范围" required style="margin-top: 6px;width: 90%;display: inline-block"><a class="btn btn-success" onclick="addDiv(2)"><i class="fa fa fa-plus"></i></a>
+                <span class="rechargeRemindEmail"></span>
+            </div>
+        </div>
+        <!--<div class="form-group">-->
+            <!--<label class="col-sm-3 control-label">预警及提醒类邮件发送范围：</label>-->
+            <!--<div class="col-sm-9 col-sm-offset-3" th:each="email : *{balanceRemindEmailList}">-->
+                <!--<input type="text" name="balanceRemindEmail" th:value="${email}" class="form-control"-->
+                       <!--placeholder="请输入文本" style="margin-top: 6px;">-->
+            <!--</div>-->
+        <!--</div>-->
+        <!--<div class="form-group">-->
+            <!--<label class="col-sm-3 control-label">账单类邮件发送范围：</label>-->
+            <!--<div class="col-sm-9 col-sm-offset-3" th:each="email : *{rechargeRemindEmailList}">-->
+                <!--<input type="text" name="rechargeRemindEmail" th:value="${email}" class="form-control" placeholder="请输入文本" style="margin-top: 6px;">-->
+            <!--</div>-->
+        <!--</div>-->
+    </form>
+</div>
+<div class="row" style="margin: 20px auto; height: 90px;">
+    <div class="col-sm-offset-4 col-sm-3">
+        <button type="button" class="btn btn-sm btn-success" onclick="submitItem()"><i class="fa fa-check"></i>保 存</button>
+        <button type="button" class="btn btn-sm btn-danger" onclick="closeItem()"><i class="fa fa-reply-all"></i>关 闭</button>
+    </div>
+</div>
+<div th:include="include::footer"></div>
+<script th:src="@{/js/bootstrap-switch.min.js}"></script>
+<script type="text/javascript">
+    $("input[type='text']").attr("onkeyup",'this.value=this.value.replace(/\\s+/g,\'\')');
+    function submitItem() {
+        var balanceRemindSwitch = $("input[id='balanceRemindSwitch']").is(':checked') == true ? 'ON' : 'OFF';
+        var rechargeRemindSwitch = $("input[id='rechargeRemindSwitch']").is(':checked') == true ? 'ON' : 'OFF';
+        var balanceEmailRemindSwitch = $("input[name='balanceEmailRemindSwitch']").prop('checked') == true ? 'ON' : 'OFF'
+        var balanceSmsRemindSwitch = $("input[name='balanceSmsRemindSwitch']").prop('checked') == true ? 'ON' : 'OFF'
+        var rechargeEmailRemindSwitch = $("input[name='rechargeEmailRemindSwitch']").prop('checked') == true ? 'ON' : 'OFF'
+        var rechargeSmsRemindSwitch = $("input[name='rechargeSmsRemindSwitch']").prop('checked') == true ? 'ON' : 'OFF'
+        var bankRemindAmount = $("input[name='bankRemindAmount']").val()
+        var alipayRemindAmount = $("input[name='alipayRemindAmount']").val()
+        var wechatRemindAmount = $("input[name='wechatRemindAmount']").val()
+        var comment = $("input[name='comment']").val()
+        var id = $(".id").val()
+        var balanceRemindEmail = document.querySelectorAll("input[name='balanceRemindEmail']")
+        var rechargeRemindEmail = document.querySelectorAll("input[name='rechargeRemindEmail']")
+        var balanceRemindEmailList = []
+        var rechargeRemindEmailList = []
+        balanceRemindEmail.forEach(function(val,index){
+            balanceRemindEmailList.push(val.value);
+        })
+        rechargeRemindEmail.forEach(function(val,index){
+            rechargeRemindEmailList.push(val.value);
+        })
+        if(balanceRemindEmailList[0] == ''){
+            $.modal.msgWarning("预警及提醒类邮件发送范围不能为空")
+            return
+        }
+        if(rechargeRemindEmailList[0] == ''){
+            $.modal.msgWarning("账单类邮件发送范围不能为空")
+            return
+        }
+        var data = {
+            alipayRemindAmount:alipayRemindAmount,
+            balanceEmailRemindSwitch:balanceEmailRemindSwitch,
+            balanceRemindSwitch:balanceRemindSwitch,
+            balanceSmsRemindSwitch:balanceSmsRemindSwitch,
+            bankRemindAmount:bankRemindAmount,
+            comment:comment,
+            id:id,
+            rechargeEmailRemindSwitch:rechargeEmailRemindSwitch,
+            rechargeRemindSwitch:rechargeRemindSwitch,
+            rechargeSmsRemindSwitch:rechargeSmsRemindSwitch,
+            wechatRemindAmount:wechatRemindAmount,
+            rechargeRemindEmailList:rechargeRemindEmailList,
+            balanceRemindEmailList:balanceRemindEmailList
+        }
+        data = JSON.stringify(data)
+        $.ajax({
+            url: "/manager/merchant/updateAccountConfig",
+            data: data,
+            type: "post",
+            datatype: "json",
+            contentType: 'application/json',
+            beforeSend: function () {
+                $.modal.loading("正在处理中，请稍后...");
+            },
+            success: function(result) {
+                if (typeof callback == "function") {
+                    callback(result);
+                    $.modal.msgSuccess(result.msg);
+                }
+                $.operate.successTabCallback(result);
+            }
+        })
+    }
+    function addDiv(item){
+        if(item == 1) {
+            var addLength = $("#balanceRemindEmail div.col-sm-5").length;
+            var html = '<div class="col-sm-5 col-sm-offset-3" id="' + addLength + '">' +
+                '<input type="text" name="balanceRemindEmail" class="form-control" placeholder="请输入预警及提醒类邮件发送范围" style="margin-top: 6px;width: 90%;display: inline-block"><a class="btn btn-danger" onclick="deleteDiv(' + addLength + ')"><i class="fa fa-remove"></i></a>' +
+                '</div>'
+            $("#balanceRemindEmail").append(html)
+        }else if(item == 2) {
+            var addLength1 = parseInt($("#rechargeRemindEmail div.col-sm-5").length)+1000;
+            var html1 = '<div class="col-sm-5 col-sm-offset-3" id="' + addLength1 + '">' +
+                '<input type="text" name="rechargeRemindEmail" class="form-control" placeholder="请输入账单类邮件发送范围" style="margin-top: 6px;width: 90%;display: inline-block"><a class="btn btn-danger" onclick="deleteDiv1(' + addLength1 + ')"><i class="fa fa-remove"></i></a>' +
+                '</div>'
+            $("#rechargeRemindEmail").append(html1)
+        }
+    }
+    function deleteDiv(index){
+        var addLength = $("#balanceRemindEmail div.col-sm-5").length;
+        $("#balanceRemindEmail div.col-sm-5[id='"+index+"']").remove()
+    }
+    function deleteDiv1(index){
+        var addLength = $("#rechargeRemindEmail div.col-sm-5").length;
+        $("#rechargeRemindEmail div.col-sm-5[id='"+index+"']").remove()
+    }
+</script>
+</body>
+</html>

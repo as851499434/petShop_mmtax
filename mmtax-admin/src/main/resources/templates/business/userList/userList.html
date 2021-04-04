@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="include :: header('用户列表')"/>
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="formId" autocomplete="off">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            名字：<input type="text" name="name"/>
+                        </li>
+                        <li>
+                            商户名称：<input type="text" name="merchantName"/>
+                        </li>
+                        <li>
+                            免验状态：
+                            <select name="status" th:with="type=${@dict.getType('Inspection_status')}">
+                                <option value="">所有</option>
+                                <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                            </select>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.limitSearch()"><i
+                                    class="fa fa-search"></i>&nbsp;搜索</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i
+                                    class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+
+        <div class="btn-group-sm" id="toolbar" role="group">
+
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table" data-mobile-responsive="true"></table>
+        </div>
+    </div>
+</div>
+<div th:include="include :: footer"></div>
+<script th:inline="javascript">
+    var editFlag = [[${@permission.hasPermi('manager:roster:status')}]];
+    var prefix = ctx + "manager/roster";
+    var Inspection = [[${@dict.getType('Inspection_status')}]];
+
+    $(function () {
+        var options = {
+            url: prefix + "/list",
+            modalName: "免验名单",
+            showExport: true,
+            columns: [{
+                checkbox: true
+            },
+                {
+                    field: 'id',
+                    title: '',
+                    visible: false
+                },
+                {
+                    field: 'name',
+                    title: '名字'
+                },
+                {
+                    field: 'idCardNo',
+                    title: '身份证号码'
+                },
+                {
+                    field: 'bankCardNo',
+                    title: '银行卡号'
+                },
+                {
+                    field: 'mobileNo',
+                    title: '手机号码'
+                },
+                {
+                    field: 'country',
+                    title: '国家'
+                },
+                {
+                    field: 'status',
+                    title: '免验状态',
+                    formatter: function (value, row, index) {
+                        return $.table.selectDictLabel(Inspection, row.status);
+                    }
+                },
+                {
+                    field: 'merchantName',
+                    title: '商户名称'
+                },
+                {
+                    field: 'createTime',
+                    title: '申请时间'
+                },
+                {
+                    field: 'updateTime',
+                    title: '审核时间'
+                },
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        var actions = [];
+                        if(row.status == 0) {
+                            actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="shallbe(' + row.id + ')"><i class="fa fa-plus"></i>加入免验名单</a> ');
+                        }else{
+                            actions.push('<a class="btn btn-info btn-xs" disabled="disabled">已加入免验名单</a> ');
+                        }
+                        return actions.join('');
+                    }
+                }]
+        };
+        $.table.init(options);
+    });
+    function shallbe(id) {
+        var rows = $("#bootstrap-table").bootstrapTable('getData');
+        var status
+        for (var i = 0;i<rows.length;i++){
+            if(id == rows[i].id){
+                status = rows[i].status
+            }
+        }
+        $.modal.confirm("是否加入免验名单", function() {
+            $.post("/manager/roster/checkUserStatus",{id:id,status:1},function (data) {
+                $.modal.msgSuccess(data.msg);
+                $.table.refresh()
+            })
+        });
+    }
+</script>
+</body>
+</html>

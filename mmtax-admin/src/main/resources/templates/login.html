@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    
+    <title>后台管理系统首页</title>
+    <link href="../static/css/bootstrap.min.css" th:href="@{/css/bootstrap.min.css}" rel="stylesheet"/>
+    <link rel="stylesheet" href="../static/css/font-awesome.min.css" th:href="@{/css/font-awesome.min.css}">
+    <link href="../static/css/style.css" th:href="@{/css/style.css}" rel="stylesheet"/>
+    <link href="../static/css/login.min.css" th:href="@{/css/login.min.css}" rel="stylesheet"/>
+    <link href="../static/mmtax/css/mmtax-ui.css" th:href="@{/mmtax/css/mmtax-ui.css?v=3.3.0}" rel="stylesheet"/>
+    <!--<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">-->
+    <!--[if lt IE 9]>
+    <meta http-equiv="refresh" content="0;ie.html" />
+    <![endif]-->
+    <link rel="shortcut icon" href="../static/favicon.ico" th:href="@{favicon.ico}"/>
+    <style type="text/css">
+        label.error { position:inherit;  }
+        .signinpanel {
+            top: 30%;
+        }
+    </style>
+    <script>
+        if(window.top!==window.self){window.top.location=window.location};
+    </script>
+</head>
+
+<body class="signin">
+    <div class="login-bg">
+        <div class="signinpanel">
+            <div class="row">
+                <!--<div class="col-sm-7">-->
+                    <!--<div class="signin-info">-->
+                        <!--<div class="logopanel m-b">-->
+                            <!--<h1><img alt="[ 若依 ]" src="../static/mmtax.png" th:src="@{/mmtax.png}"></h1>-->
+                        <!--</div>-->
+                        <!--<div class="m-b"></div>-->
+                        <!--<h4>欢迎使用 <strong>若依 后台管理系统</strong></h4>-->
+                        <!--<ul class="m-b">-->
+                            <!--<li><i class="fa fa-arrow-circle-o-right m-r-xs"></i> SpringBoot</li>-->
+                            <!--<li><i class="fa fa-arrow-circle-o-right m-r-xs"></i> Mybatis</li>-->
+                            <!--<li><i class="fa fa-arrow-circle-o-right m-r-xs"></i> Shiro</li>-->
+                            <!--<li><i class="fa fa-arrow-circle-o-right m-r-xs"></i> Thymeleaf</li>-->
+                            <!--<li><i class="fa fa-arrow-circle-o-right m-r-xs"></i> Bootstrap</li>-->
+                        <!--</ul>-->
+                        <!--<strong>还没有账号？ <a href="#">立即注册&raquo;</a></strong>-->
+                    <!--</div>-->
+                <!--</div>-->
+                <div class="col-sm-12">
+                    <form id="signupForm">
+                        <h4 class="no-margins" style="font-size:18px;">登录：</h4>
+                        <input type="text"     name="username" class="form-control uname"     placeholder="用户名" value="admin"    />
+                        <input type="password" name="password" class="form-control pword"    63 placeholder="密码"   value="123456" />
+                        <!--th:if为真才显示元素-->
+                        <div class="row m-t" th:if="${captchaEnabled==true}">
+                            <div class="col-xs-6">
+                                <input type="text" name="validateCode" class="form-control code" placeholder="验证码" maxlength="5" autocomplete="off">
+                            </div>
+                            <div class="col-xs-6">
+                                <a href="javascript:void(0);" title="点击更换验证码">
+                                    <img th:src="@{captcha/captchaImage(type=${captchaType})}" class="imgcode" width="60%" style="margin-left: 80px"/>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="checkbox-custom" th:classappend="${captchaEnabled==false} ? 'm-t'">
+                            <input type="checkbox" id="rememberme" name="rememberme"> <label for="rememberme">记住我</label>
+                        </div>
+                        <button class="btn btn-success btn-block" id="btnSubmit" data-loading="正在验证登录，请稍后...">登录</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+<script th:inline="javascript"> var ctx = [[@{/}]]; var captchaType = [[${captchaType}]];</script>
+<!-- 全局js -->
+<script src="../static/js/jquery.min.js" th:src="@{/js/jquery.min.js}"></script>
+<script src="../static/js/bootstrap.min.js" th:src="@{/js/bootstrap.min.js}"></script>
+<!-- 验证插件 -->
+<script src="../static/ajax/libs/validate/jquery.validate.min.js" th:src="@{/ajax/libs/validate/jquery.validate.min.js}"></script>
+<script src="../static/ajax/libs/validate/messages_zh.min.js" th:src="@{/ajax/libs/validate/messages_zh.min.js}"></script>
+<script src="../static/ajax/libs/layer/layer.min.js" th:src="@{/ajax/libs/layer/layer.min.js}"></script>
+<script src="../static/ajax/libs/blockUI/jquery.blockUI.js" th:src="@{/ajax/libs/blockUI/jquery.blockUI.js}"></script>
+    <script src="../static/mmtax/js/mmtax-ui.js" th:src="@{/mmtax/js/mmtax-ui.js?v=3.3.0}"></script>
+<script src="../static/mmtax/login.js" th:src="@{/mmtax/login.js}"></script>
+</body>
+</html>

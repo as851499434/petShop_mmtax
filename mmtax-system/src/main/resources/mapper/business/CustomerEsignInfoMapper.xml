@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mmtax.business.mapper.CustomerEsignInfoMapper">
+    
+    <resultMap type="com.mmtax.business.domain.CustomerEsignInfo" id="CustomerEsignInfoResult">
+        <result property="id"    column="id"    />
+        <result property="thirdPartyUserId"    column="third_party_user_id"    />
+        <result property="name"    column="name"    />
+        <result property="idType"    column="id_type"    />
+        <result property="idNumber"    column="id_number"    />
+        <result property="mobile"    column="mobile"    />
+        <result property="email"    column="email"    />
+        <result property="taxSourceId"    column="tax_source_id"    />
+        <result property="status"    column="status"    />
+        <result property="autoSignStatus"    column="auto_sign_status"    />
+        <result property="accountId"    column="account_id"    />
+        <result property="color"    column="color"    />
+        <result property="type"    column="type"    />
+        <result property="sealStatus"    column="seal_status"    />
+        <result property="fileKey"    column="file_key"    />
+        <result property="sealId"    column="seal_id"    />
+        <result property="merchantId"    column="merchant_id"    />
+        <result property="comment"    column="comment"    />
+        <result property="providerId"    column="provider_id"    />
+        <result property="reservedFieldOne"    column="reserved_field_one"    />
+        <result property="reservedFieldTwo"    column="reserved_field_two"    />
+        <result property="reservedFieldThree"    column="reserved_field_three"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+    <select id="selectByIdCardAndTaxSourceId" resultMap="CustomerEsignInfoResult">
+        select * from tbl_customer_esign_info
+        where id_number = #{idCard}
+        and tax_source_id = #{taxSourceId}
+    </select>
+    <select id="listManagerSignCustomerInfoDTO"
+            parameterType="com.mmtax.business.dto.ManagerSignCustomerInfoQueryDTO"
+            resultType="com.mmtax.business.dto.ManagerSignCustomerInfoDTO">
+        SELECT *
+        FROM(
+            SELECT DISTINCT
+            t.tax_source_id AS taxSourceId,
+            t3.tax_sounrce_company_name AS taxSourceName,
+            t.id,
+            t.`name`,
+            t1.id AS merchantId,
+            t1.merchant_name AS merchantName,
+            t.id_number AS idNumber,
+            t.mobile,
+            t2.send_sign_url_time AS sendTime,
+            t2.sign_time AS signTime,
+            t2.sign_status AS signStatus,
+            t2.create_time AS createTime,
+            t2.comment AS comment,
+            t2.post AS post
+            FROM
+            tbl_cus_link_mer_info t4
+            LEFT JOIN  tbl_customer_esign_info t ON t4.cus_esign_id = t.id
+            LEFT JOIN tbl_merchant_info t1 ON t.merchant_id = t1.id
+            LEFT JOIN tbl_customer_protocol t2 ON t4.cus_esign_id = t2.cus_esign_id AND t4.`merchant_id` = t2.`merchant_id`
+            LEFT JOIN tbl_online_account_config t3 ON t.tax_source_id = t3.tax_sounrce_id
+            WHERE 1=1 and t.status != 2 and t.merchant_id != 0
+            AND t2.expire_status = 0
+            <if test="taxSourceName != null and taxSourceName != ''">
+                AND t3.tax_sounrce_company_name LIKE concat('%', #{taxSourceName}, '%')
+            </if>
+            <if test="name != null and name != ''">
+                AND t.`name` LIKE concat('%', #{name}, '%')
+            </if>
+            <if test="merchantName != null and merchantName != ''">
+                AND t1.merchant_name LIKE concat('%', #{merchantName}, '%')
+            </if>
+            <if test="mobile != null and mobile != ''">
+                AND t.mobile LIKE concat('%', #{mobile}, '%')
+            </if>
+            <if test="signStatus != null">
+                AND t2.sign_status = #{signStatus}
+            </if>
+            <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+                and t2.create_time BETWEEN #{startDate} AND #{endDate}
+            </if>
+            ORDER BY
+            t2.`send_sign_url_time` DESC
+        ) t4
+--         GROUP BY t4.id,t4.merchantId
+        ORDER BY t4.createTime DESC
+    </select>
+
+    <select id="listManagerSignCustomerInfoAgreementDTO"
+            parameterType="com.mmtax.business.dto.ManagerSignCustomerInfoAgreementQueryDTO"
+            resultType="com.mmtax.business.dto.ManagerSignCustomerInfoAgreementDTO">
+        SELECT
+        t.tax_source_id AS taxSourceId,
+        t3.tax_sounrce_company_name AS taxSourceName,
+        t.id,
+        t.`name`,
+        t1.id AS merchantId,
+        t1.merchant_name AS merchantName,
+        t.id_number AS idNumber,
+        t.mobile,
+        t.create_time AS createTime,
+        t2.sign_time AS signTime,
+        t2.expire_status AS expireStatus,
+        t4.id AS esignFlowId,
+        t2.post AS post
+        FROM
+        tbl_cus_link_mer_info t6
+        LEFT JOIN  tbl_customer_esign_info t ON t6.cus_esign_id = t.id
+        LEFT JOIN tbl_merchant_info t1 ON t.merchant_id = t1.id
+        LEFT JOIN tbl_customer_protocol t2 ON t6.cus_esign_id = t2.cus_esign_id AND t6.`merchant_id` = t2.`merchant_id`
+        LEFT JOIN tbl_online_account_config t3 ON t.tax_source_id = t3.tax_sounrce_id
+        LEFT JOIN tbl_esign_flow_doc t5 on t2.con_info_id = t5.contract_info_id
+        LEFT JOIN tbl_esign_flow t4 ON t4.id = t5.esign_flow_id
+        WHERE
+        1 = 1
+        AND t2.sign_status = 2 AND t2.expire_status = 0
+        <if test="taxSourceName != null and taxSourceName != ''">
+            AND t3.tax_sounrce_company_name LIKE concat('%', #{taxSourceName}, '%')
+        </if>
+        <if test="name != null and name != ''">
+            AND t.`name` LIKE concat('%', #{name}, '%')
+        </if>
+        <if test="merchantName != null and merchantName != ''">
+            AND t1.merchant_name LIKE concat('%', #{merchantName}, '%')
+        </if>
+        <if test="mobile != null and mobile != ''">
+            AND t.mobile LIKE concat('%', #{mobile}, '%')
+        </if>
+        <if test="expireStatus != null">
+            AND t2.expire_status = #{expireStatus}
+        </if>
+        <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+            and t2.sign_time BETWEEN #{startDate} AND #{endDate}
+        </if>
+        ORDER BY
+        t.create_time DESC
+    </select>
+
+</mapper>

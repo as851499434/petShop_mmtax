@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mmtax.business.mapper.InvoiceApplyDetailMapper">
+
+    <resultMap type="InvoiceApplyDetail" id="InvoiceApplyDetailResult">
+        <result property="id"    column="id"    />
+        <result property="invoiceApplyId"    column="invoice_apply_id"    />
+        <result property="rechargeRecord"    column="recharge_record"    />
+        <result property="invoiceImg" column="invoice_img"/>
+        <result property="invoiceNo" column="invoice_no"/>
+        <result property="invoiceCode" column="invoice_code"/>
+        <result property="invoiceMonth" column="invoice_month"/>
+        <result property="invoiceTime" column="invoice_time"/>
+        <result property="delStatus" column="del_status"/>
+        <result property="providerId"    column="provider_id"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+    <update id="removeInvoiceRecharge">
+        update
+        tbl_invoice_apply_detail
+        set del_status = 1
+        WHERE
+        recharge_record = #{rechargeId}
+    </update>
+
+    <select id="getListInvoiceImg" resultType="java.lang.String">
+
+        select invoice_img from tbl_invoice_apply_detail where invoice_apply_id = #{invoiceId} and del_status=0
+
+    </select>
+
+</mapper>

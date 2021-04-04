@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="include :: header('服务费补缴记录')"/>
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="formId" autocomplete="off">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            收款户名：<input type="text" name="payeeName"/>
+                        </li>
+                        <li class="select-time">
+                            <label>创建时间： </label>
+                            <input type="text" class="time-input" id="startTime" placeholder="开始时间" name="startDate"/>
+                            <span>-</span>
+                            <input type="text" class="time-input" id="endTime" placeholder="结束时间" name="endDate"/>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.limitSearch()"><i
+                                    class="fa fa-search"></i>&nbsp;搜索</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i
+                                    class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+
+        <!--<div class="btn-group-sm" id="toolbar" role="group">-->
+        <!--<a class="btn btn-primary btn-edit disabled" onclick="$.operate.infoTab()"-->
+        <!--shiro:hasPermission="manager:trxOrder:detail">-->
+        <!--<i class="fa fa-edit"></i> 详情-->
+        <!--</a>-->
+        <!--</div>-->
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table" data-mobile-responsive="true"></table>
+        </div>
+    </div>
+</div>
+<th:block th:include="include :: footer"/>
+<script th:inline="javascript">
+    var statusData = [[${@dict.getType('make_up_status')}]];
+    layui.use('laydate',function () {
+        var laydate = layui.laydate;
+        var startDate = laydate.render({
+            elem: '#startTime',
+            type: 'date',
+            format: 'yyyy-MM-dd',
+            done: function(value, date){
+                endDate.config.min ={
+                    year:date.year,
+                    month:date.month-1,
+                    date: date.date,
+                    hours: 0,
+                    minutes: 0,
+                    seconds : 0
+                };
+            }
+        });
+        var endDate = laydate.render({
+            elem: '#endTime',
+            type: 'date',
+            format: 'yyyy-MM-dd',
+            done: function(value,date){
+                startDate.config.max={
+                    year:date.year,
+                    month:date.month-1,//注意是month-1，写在date上的话你后边的日期选择不了
+                    date: date.date,
+                    hours: 0,
+                    minutes: 0,
+                    seconds : 0
+                }
+            }
+        });
+    })
+    var prefix = ctx + "manager/trxOrder";
+    $(function () {
+        var options = {
+            url: prefix + "/makeUpListTrxOrder",
+            createUrl: prefix + "/add",
+            updateUrl: prefix + "/detail",
+            removeUrl: prefix + "/remove",
+            exportUrl: prefix + "/makeUpListTrxOrderExport",
+            modalName: "服务费补缴记录",
+            showExport: true,
+            columns: [{
+                checkbox: false
+            },
+                {
+                    field: 'id',
+                    title: 'id',
+                    visible: false
+                }, {
+                    field: 'payeeName',
+                    title: '收款户名',
+                }, {
+                    field: 'payeeBankNo',
+                    title: '收款账号'
+                },
+                {
+                    field: 'merchantName',
+                    title: '所属商户',
+                },
+                {
+                    field: 'amount',
+                    title: '商户打款请求（元）',
+                }, {
+                    field: 'chargeMakeUp',
+                    title: '补缴服务费（元）',
+                }, {
+                    field: 'makeUpSerialNum',
+                    title: '服务费补缴流水号',
+                }, {
+                    field: 'orderSerialNum',
+                    title: '订单流水号',
+                },{
+                    field: 'status',
+                    title: '补交状态',
+                    align: "left",
+                    formatter: function (value, row, index) {
+                        return $.table.selectDictLabel(statusData, row.status);
+                    }
+                },{
+                    field: 'createTime',
+                    title: '创建订单时间',
+                },
+            ]
+        };
+        $.table.init(options);
+    });
+</script>
+</body>
+</html>

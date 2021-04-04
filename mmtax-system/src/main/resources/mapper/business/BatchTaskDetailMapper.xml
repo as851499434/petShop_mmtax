@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mmtax.business.mapper.BatchTaskDetailMapper">
+    
+    <resultMap type="com.mmtax.business.domain.BatchTaskDetail" id="BatchTaskDetailResult">
+        <result property="id"    column="id"    />
+        <result property="batchTaskRecordId"    column="batch_task_record_id"    />
+        <result property="batchNo"    column="batch_no"    />
+        <result property="taskSerialNum"    column="task_serial_num"    />
+        <result property="taskInfoId"    column="task_info_id"    />
+        <result property="taskName"    column="task_name"    />
+        <result property="taskNum"    column="task_num"    />
+        <result property="amount"    column="amount"    />
+        <result property="allAmount"    column="all_amount"    />
+        <result property="taskStatus"    column="task_status"    />
+        <result property="taskCompleteTime"    column="task_complete_time"    />
+        <result property="taskRequireCompleteTime"    column="task_require_complete_time"    />
+        <result property="merchantId"    column="merchant_id"    />
+        <result property="taxSourceId"    column="tax_source_id"    />
+        <result property="remark"    column="remark"    />
+        <result property="takeTaskStatus"    column="take_task_status"    />
+        <result property="providerId"    column="provider_id"    />
+        <result property="reservedFieldOne"    column="reserved_field_one"    />
+        <result property="reservedFieldTwo"    column="reserved_field_two"    />
+        <result property="reservedFieldThree"    column="reserved_field_three"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+    <select id="selectByCustomerIdNewTime" resultMap="BatchTaskDetailResult">
+        select *
+        from tbl_batch_task_detail t
+        left join tbl_customer_task t1 on t.id = t1.task_detail_id
+        where t1.customer_id = #{customerId}
+        order by t1.create_time desc
+    </select>
+    <select id="listBatchTaskRecordDetailCompleted" resultType="com.mmtax.business.dto.BatchTaskDetailDTO">
+        SELECT
+        t1.task_serial_num AS taskSerialNum,
+        t1.task_name AS taskName,
+        t1.task_num AS taskNum,
+        t2.name AS name,
+        t2.mobile_no AS mobileNo,
+        t3.tax_sounrce_company_name AS taxSourceName,
+        t1.create_time AS createTime,
+        t1.task_complete_time AS taskCompleteTime
+        FROM tbl_batch_task_detail t1
+        INNER JOIN tbl_customer_task t2 ON t1.id = t2.task_detail_id
+        INNER JOIN tbl_tax_sounrce_company t3 ON t1.tax_source_id = t3.id
+        where 1 =1
+        and t1.task_status = 1
+        <if test="merchantId != null and merchantId != ''">
+            and t1.merchant_id = #{merchantId}
+        </if>
+        <if test="taskSerialNum != null and taskSerialNum != ''">
+            and t1.task_serial_num = #{taskSerialNum}
+        </if>
+        <if test="taskName != null and taskName != ''">
+            and t1.task_name = #{taskName}
+        </if>
+        <if test="name != null and name != ''">
+            and t2.name = #{name}
+        </if>
+        <if test="taskBeginStartTime != null and taskBeginStartTime != '' and taskBeginEndTime != null and taskBeginEndTime != ''">
+            AND t1.create_time between concat(#{taskBeginStartTime},' 00:00:00') and concat(#{taskBeginEndTime},' 23:59:59')
+        </if>
+        <if test="taskCompleteStartTime != null and taskCompleteStartTime != '' and taskCompleteEndTime != null and taskCompleteEndTime != ''">
+            AND t1.task_complete_time between concat(#{taskCompleteStartTime},' 00:00:00') and concat(#{taskCompleteEndTime},' 23:59:59')
+        </if>
+        order by
+        t1.create_time desc
+        <if test="pageSize != null">
+            limit #{startIndex},#{pageSize}
+        </if>
+    </select>
+
+    <select id="countBatchTaskRecordDetailCompleted" resultType="java.lang.Integer">
+        SELECT count(*)
+        FROM tbl_batch_task_detail t1
+        INNER JOIN tbl_customer_task t2 ON t1.task_info_id = t2.task_detail_id
+        INNER JOIN tbl_tax_sounrce_company t3 ON t1.tax_source_id = t3.id
+        where 1 =1
+        and t1.task_status = 1
+        <if test="merchantId != null and merchantId != ''">
+            and t1.merchant_id = #{merchantId}
+        </if>
+        <if test="taskSerialNum != null and taskSerialNum != ''">
+            and t1.task_serial_num = #{taskSerialNum}
+        </if>
+        <if test="taskName != null and taskName != ''">
+            and t1.task_name = #{taskName}
+        </if>
+        <if test="name != null and name != ''">
+            and t2.name = #{name}
+        </if>
+        <if test="taskBeginStartTime != null and taskBeginStartTime != '' and taskBeginEndTime != null and taskBeginEndTime != ''">
+            AND t1.create_time between concat(#{taskBeginStartTime},' 00:00:00') and concat(#{taskBeginEndTime},' 23:59:59')
+        </if>
+        <if test="taskCompleteStartTime != null and taskCompleteStartTime != '' and taskCompleteEndTime != null and taskCompleteEndTime != ''">
+            AND t1.task_complete_time between concat(#{taskCompleteStartTime},' 00:00:00') and concat(#{taskCompleteEndTime},' 23:59:59')
+        </if>
+    </select>
+
+    <select id="batchTaskRecordDetailCompletedList" resultType="com.mmtax.business.dto.BatchTaskDetailDTO">
+        SELECT
+        t1.task_serial_num AS taskSerialNum,
+        t1.task_name AS taskName,
+        t1.task_num AS taskNum,
+        t2.name AS name,
+        t2.mobile_no AS mobileNo,
+        t3.tax_sounrce_company_name AS taxSourceName,
+        t1.create_time AS createTime,
+        t1.task_complete_time AS taskCompleteTime
+        FROM tbl_batch_task_detail t1
+        INNER JOIN tbl_customer_task t2 ON t1.task_info_id = t2.task_detail_id
+        INNER JOIN tbl_tax_sounrce_company t3 ON t1.tax_source_id = t3.id
+        where 1 =1
+        and t1.task_status = 1
+        <if test="merchantId != null and merchantId != ''">
+            and t1.merchant_id = #{merchantId}
+        </if>
+        <if test="taskSerialNum != null and taskSerialNum != ''">
+            and t1.task_serial_num = #{taskSerialNum}
+        </if>
+        <if test="taskName != null and taskName != ''">
+            and t1.task_name = #{taskName}
+        </if>
+        <if test="name != null and name != ''">
+            and t2.name = #{name}
+        </if>
+        <if test="taskBeginStartTime != null and taskBeginStartTime != '' and taskBeginEndTime != null and taskBeginEndTime != ''">
+            AND t1.create_time between concat(#{taskBeginStartTime},' 00:00:00') and concat(#{taskBeginEndTime},' 23:59:59')
+        </if>
+        <if test="taskCompleteStartTime != null and taskCompleteStartTime != '' and taskCompleteEndTime != null and taskCompleteEndTime != ''">
+            AND t1.task_complete_time between concat(#{taskCompleteStartTime},' 00:00:00') and concat(#{taskCompleteEndTime},' 23:59:59')
+        </if>
+        order by
+        t1.create_time desc
+    </select>
+    <select id="queryTaskDetail"
+            resultType="com.mmtax.business.dto.CustomerTaskDetailDTO">
+        SELECT
+        -- 分块1
+        t1.`task_status` AS taskStatus,
+        t2.`task_begin_time` AS taskBeginTime,
+        t2.`task_require_complete_time` AS taskRequireCompleteTime,
+        t1.task_complete_time AS taskCompleteTime,
+        -- 分块2
+        t1.`task_serial_num` AS taskSerialNum,
+        t1.`task_name` AS taskName,
+        -- t3.`task_info` AS task_info,
+        -- t2.`task_begin_time` ,
+        -- t2.`task_require_complete_time` ,
+        t1.`task_num` AS taskNum,
+        t1.`all_amount` AS allMount,
+        t1.`amount` AS amount,
+        -- 分块3
+         t5.merchant_name AS merchantName,
+         t4.tax_sounrce_company_name AS taxSounrceCompanyName,
+         -- 提供页面需要的其他查询条件
+         t5.id AS merchantId,
+         t1.task_info_id AS taskInfoId
+        FROM `tbl_batch_task_detail` t1
+        LEFT JOIN `tbl_batch_task_record` t2 ON t1.`batch_task_record_id` = t2.id
+        LEFT JOIN tbl_tax_sounrce_company t4 ON t1.`tax_source_id`  = t4.id
+        LEFT JOIN  tbl_merchant_info t5 ON t5.id = t2.`merchant_id`
+         WHERE t1.id= #{customerTaskId}
+    </select>
+
+    <update id="updateTaskDetailStatus">
+        update tbl_batch_task_detail
+        set task_status = #{taskStatus},
+        update_time =#{currentTime},
+        task_complete_time = #{currentTime}
+        where id = #{taskDetailId}
+    </update>
+
+    <select id="countTaskDetailCompleted" resultType="java.lang.Integer">
+    select
+        count(*)
+    FROM tbl_batch_task_detail t1
+    where 1=1
+    <if test="takeTaskStatus != null ">
+        and t1.take_task_status = #{takeTaskStatus}
+    </if>
+    <if test="taskStatus != null ">
+        and t1.task_status = #{taskStatus}
+    </if>
+    <if test="batchNo != null and batchNo != ''">
+        and t1.batch_no =  #{batchNo}
+    </if>
+    </select>
+
+    <select id="getSumAmountTaskDetail" resultType="java.math.BigDecimal">
+        select
+        IFNULL(sum(all_amount),0)
+        FROM tbl_batch_task_detail
+        where 1=1
+        <if test="takeTaskStatus != null ">
+            and take_task_status = #{takeTaskStatus}
+        </if>
+        <if test="taskStatus != null and taskStatus != ''">
+            and task_status = #{taskStatus}
+        </if>
+        <if test="batchNo != null and batchNo != ''">
+            and batch_no =  #{batchNo}
+        </if>
+    </select>
+
+    <select id="countOrderCompleted" resultType="java.lang.Integer">
+        select
+        count(*)
+        from tbl_customer_task t1
+        join tbl_batch_task_detail t2 on t1.task_detail_id = t2.id
+        join tbl_trx_order t3 on t3.task_record_batch_no = t2.batch_no
+        where 1=1
+            and t2.take_task_status = 1
+            and t2.batch_no =  #{batchNo}
+            and t1.certificate_no = #{certificateNo}
+            and t3.customer_id = #{customerId}
+        <if test="orderStatus != null and orderStatus != ''">
+            and t3.order_status =  #{orderStatus}
+        </if>
+    </select>
+
+    <select id="getSumAmountCompletedOrder" resultType="java.math.BigDecimal">
+        select
+        IFNULL(sum(t3.amount),0)
+        from tbl_customer_task t1
+        join tbl_batch_task_detail t2 on t1.task_detail_id = t2.id
+        join tbl_trx_order t3 on t3.task_record_batch_no = t2.batch_no
+        where 1=1
+            and t2.take_task_status = 1
+            and t2.batch_no =  #{batchNo}
+            and t1.certificate_no = #{certificateNo}
+            and t3.customer_id = #{customerId}
+        <if test="orderStatus != null and orderStatus != ''">
+            and t3.order_status =  #{orderStatus}
+        </if>
+    </select>
+
+    <select id="getAllAmountByBathcNoAndCertificateNo" resultType="java.math.BigDecimal">
+        SELECT t1.`all_amount`
+        FROM tbl_batch_task_detail t1
+        LEFT JOIN tbl_customer_task t2 ON t1.`id` = t2.task_detail_id
+        WHERE 1 = 1
+        <if test="batchNo != null and batchNo != ''">
+            and t1.batch_no = #{batchNo}
+        </if>
+        <if test="certificateNo != null and certificateNo != ''">
+            and t2.certificate_no = #{certificateNo}
+        </if>
+
+    </select>
+
+    <select id="queryBatchTaskDetailByBathcNoAndCertificateNo" resultMap="BatchTaskDetailResult">
+        SELECT *
+        FROM tbl_batch_task_detail t1
+        LEFT JOIN tbl_customer_task t2 ON t1.`id` = t2.task_detail_id
+        WHERE 1 = 1
+        <if test="batchNo != null and batchNo != ''">
+            and t1.batch_no = #{batchNo}
+        </if>
+        <if test="certificateNo != null and certificateNo != ''">
+            and t2.certificate_no = #{certificateNo}
+        </if>
+    </select>
+</mapper>

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="include :: header('账户返点信息')"/>
+    <style>
+        .boxs{
+            display: flex;
+            -webkit-box-pack: justify;
+            -ms-flex-pack: justify;
+            justify-content: space-around;
+            background: #fff;
+            padding: 30px 40px;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-shadow: 1px 1px 3px rgba(0,0,0,.2);
+            padding: 10px;
+        }
+        .line{
+            width: 1px;
+            height:50px;
+            background: #ddd;
+        }
+    </style>
+</head>
+<body class="white-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12" style="padding: 0px;">
+            <div class="boxs">
+                <div class="boxcon">
+                    <p class='title'>返点结余（总计）</p>
+                    <p class='boxcon' th:text="${amount.usableAccumulatedReturnAmount}"></p>
+                </div>
+                <i class="line"></i>
+                <div class="boxcon">
+                    <p class='title'>返点累计</p>
+                    <p class='boxcon' th:text="${amount.usableAccumulatedReturnAmount}"></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12 search-collapse">
+            <form id="formId">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            <label>审核状态：</label>
+                            <select name="paymentChannel" th:with="type=${@dict.getType('pay_channel')}">
+                                <option value="">所有</option>
+                                <option th:each="dict : ${type}" th:text="${dict.dictLabel}"
+                                        th:value="${dict.dictValue}">
+                                </option>
+                            </select>
+                        </li>
+                        <li>
+                            <label>交易状态：</label>
+                            <select name="paymentChannel" th:with="type=${@dict.getType('pay_channel')}">
+                                <option value="">所有</option>
+                                <option th:each="dict : ${type}" th:text="${dict.dictLabel}"
+                                        th:value="${dict.dictValue}">
+                                </option>
+                            </select>
+                        </li>
+                        <li class="select-time">
+                            <label>创建时间： </label>
+                            <input type="text" class="time-input" id="startTime" placeholder="开始时间"
+                                   name="startDate"/>
+                            <span>-</span>
+                            <input type="text" class="time-input" id="endTime" placeholder="结束时间" name="endDate"/>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.limitSearch()"><i
+                                    class="fa fa-search"></i>&nbsp;搜索</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i
+                                    class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+        <div class="col-sm-12 select-table table-striped" style="padding: 10px">
+            <table id="bootstrap-table" data-mobile-responsive="true"></table>
+        </div>
+    </div>
+</div>
+<div th:include="include::footer"></div>
+<script th:inline="javascript">
+    var prefix = ctx + "manager/account";
+    layui.use('laydate',function () {
+        var laydate = layui.laydate;
+        var startDate = laydate.render({
+            elem: '#startTime',
+            type: 'date',
+            format: 'yyyy-MM-dd',
+            done: function(value, date){
+                endDate.config.min ={
+                    year:date.year,
+                    month:date.month-1,
+                    date: date.date,
+                    hours: 0,
+                    minutes: 0,
+                    seconds : 0
+                };
+            }
+        });
+        var endDate = laydate.render({
+            elem: '#endTime',
+            type: 'date',
+            format: 'yyyy-MM-dd',
+            done: function(value,date){
+                startDate.config.max={
+                    year:date.year,
+                    month:date.month-1,//注意是month-1，写在date上的话你后边的日期选择不了
+                    date: date.date,
+                    hours: 0,
+                    minutes: 0,
+                    seconds : 0
+                }
+            }
+        });
+    })
+    var information = JSON.parse(sessionStorage.getItem("information"))
+    $(function () {
+        var options = {
+            url: prefix+ '/deductionFlow',
+            queryParams: getParams,
+            modalName: "交易订单",
+            showExport: false,
+            showSearch: false,
+            showRefresh: false,
+            showColumns: false,
+            showToggle: false,
+            columns: [
+                {
+                    field: '',
+                    title: '代征主体'
+                },
+                {
+                    field: '',
+                    title: '商户平台'
+                },
+                {
+                    field: 'orderSerialNum',
+                    title: '流水号'
+                },
+                {
+                    field: '',
+                    title: '业务摘要'
+                },
+                {
+                    field: '',
+                    title: '账务类型'
+                },
+                {
+                    field: '',
+                    title: '入账类型'
+                },
+                {
+                    field: 'paymentAmount',
+                    title: '入账金额'
+                },
+                {
+                    field: 'inAccountTime',
+                    title: '入账时间'
+                }
+            ]
+        };
+        $.table.init(options);
+        function getParams(params) {
+            var temp = {
+                pageSize:       params.limit,
+                pageNum:        params.offset / params.limit + 1,
+                searchValue:    params.search,
+                orderByColumn:  params.sort,
+                endDate:'',
+                merchantId: information.id,
+                orderSerialNum: '',
+                startDate: '',
+                isAsc:          params.order
+            };
+            return temp;
+        }
+    });
+</script>
+<script type="text/javascript">
+</script>
+</body>
+</html>

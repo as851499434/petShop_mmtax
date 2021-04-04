@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mmtax.business.mapper.MakeUpChargeDetailMapper">
+    
+    <resultMap type="com.mmtax.business.domain.MakeUpChargeDetail" id="MakeUpChargeDetailResult">
+        <result property="id"    column="id"    />
+        <result property="makeUpChargeId"    column="make_up_charge_id"    />
+        <result property="orderSerialNum"    column="order_serial_num"    />
+        <result property="orderStatus"    column="order_status"    />
+        <result property="taxRate"    column="tax_rate"    />
+        <result property="charge"    column="charge"    />
+        <result property="taxRateNow"    column="tax_rate_now"    />
+        <result property="chargeNow"    column="charge_now"    />
+        <result property="chargeMakeUp"    column="charge_make_up"    />
+        <result property="providerId"    column="provider_id"    />
+        <result property="reservedFieldOne"    column="reserved_field_one"    />
+        <result property="reservedFieldTwo"    column="reserved_field_two"    />
+        <result property="reservedFieldThree"    column="reserved_field_three"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+    <select id="listMakeUpOrders" resultType="com.mmtax.business.dto.ReturnMakeUpChargeOrderDTO">
+
+        SELECT
+        t3.payee_name as payeeName,
+        t3.payee_bank_card as payeeBankCard,
+        t3.amount as amount,
+        t2.charge_make_up as returnMakeupCharge,
+        t1.make_up_serial_num as returnMakeUpSerialNum,
+        t3.order_serial_num as orderSerialNum,
+        t2.create_time as createTime
+
+        FROM tbl_make_up_charge_detail AS t2
+        LEFT JOIN tbl_make_up_charge AS t1 ON t1.id = t2.make_up_charge_id
+        LEFT JOIN tbl_trx_order AS t3 ON t2.order_serial_num = t3.order_serial_num
+
+        WHERE t3.merchant_id = #{merchantId} and t1.status not in (2,9)
+        <if test="payeeName != null and payeeName != ''">
+            and t2.payee_name like concat('%',#{payeeName},'%')
+        </if>
+        <if test="payeeBankCard != null and payeeBankCard != ''">
+            and t2.payee_bank_card like concat('%',#{payeeBankCard},'%')
+        </if>
+
+        <if test="makeUpSerialNum != null and makeUpSerialNum != ''">
+            and t1.make_up_serial_num like concat('%',#{makeUpSerialNum},'%')
+        </if>
+        <if test="orderSerialNum != null and orderSerialNum != ''">
+            and t1.order_serial_num like concat('%',#{orderSerialNum},'%')
+        </if>
+        <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+            and t1.create_time between concat(#{startDate},' 00:00:00') and concat(#{endDate},' 23:59:59')
+        </if>
+        order by
+        t1.create_time desc
+        <if test="pageSize != null">
+            limit #{startIndex},#{pageSize}
+        </if>
+
+    </select>
+    <select id="countMakeUpOrders" resultType="java.lang.Integer">
+
+        SELECT count(*)
+        FROM tbl_make_up_charge_detail AS t2
+        LEFT JOIN tbl_make_up_charge AS t1 ON t1.id = t2.make_up_charge_id
+        LEFT JOIN tbl_trx_order AS t3 ON t2.order_serial_num = t3.order_serial_num
+
+        WHERE t3.merchant_id = #{merchantId} and t1.status not in (2,9)
+        <if test="payeeName != null and payeeName != ''">
+            and t2.payeeName like concat('%',#{payeeName},'%')
+        </if>
+        <if test="payeeBankCard != null and payeeBankCard != ''">
+            and t2.payeeBankCard like concat('%',#{payeeBankCard},'%')
+        </if>
+        <if test="makeUpSerialNum != null and makeUpSerialNum != ''">
+            and t1.make_up_serial_num like concat('%',#{makeUpSerialNum},'%')
+        </if>
+        <if test="orderSerialNum != null and orderSerialNum != ''">
+            and t1.orderSerialNum like concat('%',#{orderSerialNum},'%')
+        </if>
+        <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+            and t1.create_time between concat(#{startDate},' 00:00:00') and concat(#{endDate},' 23:59:59')
+        </if>
+        order by
+        t1.create_time desc
+    </select>
+    <select id="selectByMakeUpIdAndOrderStatusNotSuccess" resultMap="MakeUpChargeDetailResult">
+        select * from tbl_make_up_charge_detail
+        where make_up_charge_id = #{makeUpId}
+        and order_status != 1
+    </select>
+    <select id="selectByMakeUpId" resultMap="MakeUpChargeDetailResult">
+        select * from tbl_make_up_charge_detail
+        where make_up_charge_id = #{makeUpId}
+    </select>
+</mapper>

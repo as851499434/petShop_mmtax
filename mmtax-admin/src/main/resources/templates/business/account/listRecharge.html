@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('账户列表')"/>
+    <style>
+        .layui-layer[type="iframe"] .layui-layer-btn0{
+            display: none;
+        }
+    </style>
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="formId" autocomplete="off">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            商户名称：<input type="text" name="merchantName"/>
+                        </li>
+                        <li>
+                            商户号：<input type="text" name="merchantCode"/>
+                        </li>
+                        <li>
+                            <label>充值类型：</label>
+                            <select name="rechargeType" th:with="type=${@dict.getType('recharge_type')}">
+                                <option value="">所有</option>
+                                <option th:each="dict : ${type}" th:text="${dict.dictLabel}"
+                                        th:value="${dict.dictValue}">
+                                </option>
+                            </select>
+                        </li>
+                        <li>
+                            <label>状态：</label>
+                            <select name="status" th:with="type=${@dict.getType('top_Up_State')}">
+                                <option value="">所有</option>
+                                <option th:each="dict : ${type}" th:text="${dict.dictLabel}"
+                                        th:value="${dict.dictValue}">
+                                </option>
+                            </select>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.limitSearch()"><i
+                                    class="fa fa-search"></i>&nbsp;搜索</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i
+                                    class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table" data-mobile-responsive="true"></table>
+        </div>
+    </div>
+</div>
+<div th:include="include :: footer"></div>
+<script th:inline="javascript">
+    var prefix = ctx + "manager/account";
+    var topUpState = [[${@dict.getType('top_Up_State')}]];
+    var recharge = [[${@dict.getType('recharge_type')}]];
+    layui.use('laydate',function () {
+        var laydate = layui.laydate;
+        var startDate = laydate.render({
+            elem: '#startTime',
+            type: 'date',
+            format: 'yyyy-MM-dd',
+            done: function(value, date){
+                endDate.config.min ={
+                    year:date.year,
+                    month:date.month-1,
+                    date: date.date,
+                    hours: 0,
+                    minutes: 0,
+                    seconds : 0
+                };
+            }
+        });
+        var endDate = laydate.render({
+            elem: '#endTime',
+            type: 'date',
+            format: 'yyyy-MM-dd',
+            done: function(value,date){
+                startDate.config.max={
+                    year:date.year,
+                    month:date.month-1,//注意是month-1，写在date上的话你后边的日期选择不了
+                    date: date.date,
+                    hours: 0,
+                    minutes: 0,
+                    seconds : 0
+                }
+            }
+        });
+    })
+    $(function () {
+        var options = {
+            url: prefix + "/rechargeList",
+            modalName: "充值列表",
+            showExport: true,
+            columns: [{
+                checkbox: true
+            },
+                {
+                    field: 'id',
+                    title: 'id',
+                    visible:false
+                }, {
+                    field: 'merchantName',
+                    title: '商户名称',
+                }, {
+                    field: 'merchantCode',
+                    title: '商户号'
+                }, {
+                    field: 'contactsMobile',
+                    title: '商户手机号',
+                    visible:false
+                }, {
+                    field: 'userName',
+                    title: '所属销售',
+                    visible:false
+                }, {
+                    field: 'orderSerialNum',
+                    title: '流水号'
+                }, {
+                    field: 'amount',
+                    title: '充值金额'
+                }, {
+                    field: 'rechargeType',
+                    title: '充值类型',
+                    formatter: function (value, row, index) {
+                        return $.table.selectDictLabel(recharge, row.rechargeType);
+                    }
+                }, {
+                    field: 'status',
+                    title: '状态',
+                    formatter: function (value, row, index) {
+                        return $.table.selectDictLabel(topUpState, row.status);
+                    }
+                }, {
+                    field: 'createTime',
+                    title: '入账时间',
+                },
+                ]
+        };
+        $.table.init(options);
+    });
+    function audit(type, id){
+        var params = {
+            id: id
+        }
+        if(type == 1) {
+            params.status = 'SUCCESS'
+        } else {
+            params.status = 'FAIL'
+        }
+        params = JSON.stringify(params)
+        $.ajax({
+            url: '/manager/account/auditRecharge',
+            type: 'post',
+            contentType:'application/json',
+            data: params,
+            success : function(data) {
+                $.modal.msgSuccess(data.msg);
+                $.table.refresh()
+            }
+        })
+    }
+</script>
+</body>
+</html>

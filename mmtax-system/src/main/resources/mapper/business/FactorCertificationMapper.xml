@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mmtax.business.mapper.FactorCertificationMapper">
+
+    <resultMap type="FactorCertification" id="FactorCertificationResult">
+        <result property="id" column="id"/>
+        <result property="orderSerialNum" column="order_serial_num"/>
+        <result property="merchantSerialNum" column="merchant_serial_num"/>
+        <result property="type" column="type"/>
+        <result property="name" column="name"/>
+        <result property="idCardNo" column="id_card_no"/>
+        <result property="bankCardNo" column="bank_card_no"/>
+        <result property="status" column="status"/>
+        <result property="factor_order_id" column="factorOrderId"/>
+        <result property="merchantId" column="merchant_id"/>
+        <result property="providerId" column="provider_id"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+    <select id="getPageMerchantFactorCertification"
+            resultType="com.mmtax.business.dto.MerchantFactorCertificationDTO">
+        select
+        t1.order_serial_num as orderSerialNum,
+        t1.merchant_serial_num as merchantSerialNum,
+        t1.type as type,
+        t1.name as name,
+        t1.id_card_no as idCardNo,
+        t1.bank_card_no as bankCardNo,
+        t1.status as status,
+        t1.create_time as createTime,
+        t1.update_time as updateTime,
+        t2.merchant_name as merchantName
+        from
+        tbl_factor_certification t1,
+        tbl_merchant_info t2
+        where
+        1=1
+        and
+        t1.merchant_id = #{merchantId}
+        and
+        t1.merchant_id = t2.id
+        <if test="factorOrderId != null">
+            and t1.factor_order_id = #{factorOrderId}
+        </if>
+        <if test="name != null and name != ''">
+            and t1.name like concat('%',#{name},'%')
+        </if>
+        <if test="orderSerialNum != null and orderSerialNum != ''">
+            and t1.order_serial_num like concat('%',#{orderSerialNum},'%')
+        </if>
+        <if test="merchantSerialNum != null and merchantSerialNum != ''">
+            and t1.merchant_serial_num like concat('%',#{merchantSerialNum},'%')
+        </if>
+        <if test="idCardNo != null and idCardNo != ''">
+            and t1.id_card_no like concat('%',#{idCardNo},'%')
+        </if>
+        <if test="status != null">
+            and t1.status = #{status}
+        </if>
+        <if test="bankCardNo != null and bankCardNo != ''">
+            and t1.bank_card_no like concat('%',#{bankCardNo},'%')
+        </if>
+        <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+            and t1.create_time between concat(#{startDate},' 00:00:00') and concat(#{endDate},' 23:59:59')
+        </if>
+        order by
+        t1.create_time desc
+        <if test="startIndex != null">
+            limit #{startIndex},#{pageSize}
+        </if>
+    </select>
+    <select id="getCountMerchantFactorCertification" resultType="java.lang.Integer">
+        select
+        count(0)
+        from
+        tbl_factor_certification t1,
+        tbl_merchant_info t2
+        where
+        1=1
+        and
+        t1.merchant_id = #{merchantId}
+        and
+        t1.merchant_id = t2.id
+        <if test="factorOrderId != null">
+            and t1.factor_order_id = #{factorOrderId}
+        </if>
+        <if test="name != null and name != ''">
+            and t1.name like concat('%',#{name},'%')
+        </if>
+        <if test="orderSerialNum != null and orderSerialNum != ''">
+            and t1.order_serial_num like concat('%',#{orderSerialNum},'%')
+        </if>
+        <if test="merchantSerialNum != null and merchantSerialNum != ''">
+            and t1.merchant_serial_num like concat('%',#{merchantSerialNum},'%')
+        </if>
+        <if test="idCardNo != null and idCardNo != ''">
+            and t1.id_card_no like concat('%',#{idCardNo},'%')
+        </if>
+        <if test="status != null">
+            and t1.status = #{status}
+        </if>
+        <if test="bankCardNo != null and bankCardNo != ''">
+            and t1.bank_card_no like concat('%',#{bankCardNo},'%')
+        </if>
+        <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+            and t1.create_time between concat(#{startDate},' 00:00:00') and concat(#{endDate},' 23:59:59')
+        </if>
+    </select>
+</mapper>

@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="include :: header('审核营业执照办理详情')"/>
+    <style>
+        .ImgView {
+            width: 500px;
+            height: 520px;
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            margin-top: -250px;
+            margin-left: -250px;
+            background: #fff;
+            z-index: 199;
+            display: none;
+        }
+        .closeImage{
+            position: absolute;
+            font-size: 36px;
+            top:0px;
+            right: 18px;
+            z-index:1000;
+            cursor:pointer
+        }
+        .bg{
+            width:100%;
+            height: 100%;
+            background:rgba(0,0,0,.5);
+            position: absolute;
+            top: 0px;
+            right: 0px;
+            left: 0px;
+            display: none;
+            z-index: 99;
+        }
+        .license,.contract,.positive,.reverse{
+            background: #fff;
+            position: fixed;
+            z-index: 1000;
+            top:100px;
+            left:50%;
+            margin-left: -250px;
+            display: none;
+        }
+        #img-change,#positive-change,#reverse-change{
+            border: 1px solid #eee;
+            position: relative;
+            left: 50%;
+            margin-left: -150px;
+            z-index: 100;
+        }
+        /*.contract .container{*/
+        /*margin: 30px auto 0 auto;*/
+        /*position: relative;*/
+        /*font-family: 微软雅黑;*/
+        /*font-size: 12px;*/
+        /*width: 750px;*/
+        /*}*/
+        .container {
+            margin: 30px auto 0 auto;
+            position: relative;
+            font-family: 微软雅黑;
+            font-size: 12px;
+            /*width: 750px;*/
+            width: 500px;
+        }
+        form{
+            margin-top: 30px;
+        }
+        div.form-group span:not(.tag){
+            font-size: 12px;
+            color: red;
+            display: inline-block;
+            height: 17px;
+        }
+        span.tag >span.tag-text{
+            color:#fff;
+        }
+        .form-group{
+            margin-bottom: 6px;
+        }
+        .select-time .time-input {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: transparent;
+            outline: none;
+            height: 30px;
+            width: 76%;
+            padding-left: 10px;
+            font-size: 14px;
+        }
+        .select-time label{
+            margin: 0px 10px;
+        }
+
+        #legalPersonIdCardExp +label ,#businessLicenseExp +label{
+            display: block;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 1);
+            border:1px solid #aaa;
+        }
+
+        #legalPersonIdCardExp:checked +label::before,#businessLicenseExp:checked +label::before {
+            display: block;
+            content: "\2714";
+            text-align: center;
+            font-size: 16px;
+            color: #666;
+        }
+        .img-lg {
+            width: 217px;
+            height: 136px;
+        }
+    </style>
+</head>
+<body class="white-bg">
+<div class="form-content">
+    <div class="row">
+
+        <form class="form-horizontal m" th:object="${applyLicenseDetailInfoDTO}" id="form-user-add">
+            <input type="hidden" name="taxSounrceCompanyId" th:value="*{taxSounrceCompanyId}">
+            <input type="hidden" name="taxTypeId" th:value="*{taxTypeId}">
+            <input type="hidden" name="applyId" th:value="*{applyId}">
+            <input type="hidden" name="applyNumber" th:value="*{applyNumber}">
+            <h4 class="form-header h4">身份信息：</h4>
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>姓名：</label>
+                        <div class="col-sm-6">
+                            <input type="text" name="applyName" th:value="*{applyName}" class="form-control" placeholder="请输入文本" readonly>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>身份证号：</label>
+                        <div class="col-sm-6">
+                            <input type="text" name="idCardNumber" th:value="*{idCardNumber}" class="form-control" placeholder="请输入文本" readonly>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="col-sm-6 control-label"><span style="color: red; ">*</span>身份证人像面：</label>
+                        <div class="col-sm-6">
+                            <div class="text-center">
+                                <a href="javascript:onBanner(2)" style="display: block;width: 217px;height: 136px;border: 1px solid #eee;">
+                                    <i class="fa fa fa-plus positive_i" style="font-size: 32px; color: #e5e6e7;line-height: 120px;display: none"></i>
+                                    <img class="img-lg" id="positive" th:src="*{idCardPictureFront}"/>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="col-sm-6 control-label"><span style="color: red; ">*</span>身份证国徽面：</label>
+                        <div class="col-sm-6">
+                            <div class="text-center">
+                                <a href="javascript:onBanner(3)" style="display: block;width: 217px;height: 136px;border: 1px solid #eee;">
+                                    <i class="fa fa fa-plus reverse_i" style="font-size: 32px; color: #e5e6e7;line-height: 120px;display: none"></i>
+                                    <img class="img-lg" id="reverse" th:src="*{idCardPictureBehind}"/>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>手持身份证照片：</label>
+                        <div class="col-sm-5">
+                            <div class="text-center">
+                                <a href="javascript:onBanner(0)" style="display: block;width: 217px;height: 136px;border: 1px solid #eee;">
+                                    <i class="fa fa fa-plus product" style="font-size: 32px; color: #e5e6e7;line-height: 120px;display: none"></i>
+                                    <img class="img-lg" id="businessLicenseImg" th:src="*{idCardPictureFrontWithPeople}"/></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <h4 class="form-header h4">账户信息：</h4>
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>银行卡号：</label>
+                        <div class="col-sm-6">
+                            <input type="text" name="bankNo" th:value="*{bankNo}" class="form-control" placeholder="请输入文本" readonly>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>预留手机号：</label>
+                        <div class="col-sm-6">
+                            <input type="text" name="mobileNumber" th:value="*{mobileNumber}" class="form-control" placeholder="请输入文本" readonly>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <h4 class="form-header h4">税务信息：</h4>
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>税源地：</label>
+                        <div class="col-sm-6">
+                            <select class="form-control select2-multiple" name="taxSourceId" id="taxSource" disabled>
+                                <option value="" >请选择</option>
+                                <!--<option value="3" th:selected="selected">泰宁博瑞</option>-->
+                                <!--<option value="4" th:selected="selected">海南浚聚</option>-->
+                                <!--<option value="5" th:selected="selected">江西启博</option>-->
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>行业类型：</label>
+                        <div class="col-sm-6">
+                            <select class="form-control select2-multiple" id="post" th:field="*{businessType}" disabled>
+                                <option value="">请选择</option>
+                                <option th:each="businessItem:*{businessTypeList}"
+                                        th:value="${businessItem}"
+                                        th:text="${businessItem}"
+                                ></option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>税种选择：</label>
+                        <div class="col-sm-6">
+                            <input type="text" name="merchantCode" th:value="*{taxType}" class="form-control" placeholder="请输入文本" readonly>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>开票类目：</label>
+                        <div class="col-sm-6">
+                            <input type="text" name="invoiceContent" th:value="*{invoiceContent}" class="form-control" placeholder="请输入文本" readonly>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>经营范围：</label>
+                        <div class="col-sm-6">
+                            <input type="text" name="businessScope" th:value="*{businessScope}" class="form-control" placeholder="请输入文本" readonly>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>个税政策：</label>
+                        <div class="col-sm-6">
+                            <input type="text" name="taxPerson" th:value="*{taxPerson}" class="form-control" placeholder="请输入文本" readonly>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>营业执照名称：</label>
+                        <div class="col-sm-6">
+                            <input type="text" name="businessLicenseName" th:value="*{businessLicenseName}" class="form-control" placeholder="请输入文本" readonly>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>经营场所：</label>
+                        <div class="col-sm-6">
+                            <input type="text" name="premises" th:value="*{premises}" class="form-control" placeholder="请输入文本" readonly>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <h4 class="form-header h4">协议：</h4>
+            <div class="row">
+                <div class="col-sm-3"><a class="btn btn-success" onclick="checkAgreement()">下载查看C端协议</a></div>
+            </div>
+            <h4 class="form-header h4">审核：</h4>
+            <div class="row">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">审核结果：</label>
+                    <div class="col-sm-9" style="padding-top: 5px">
+                        <input type="radio" name="invoiceIds" value="1" checked style="margin:0 8px 0 0;width: 18px;height: 18px;vertical-align: middle"/>
+                        <label>审核通过</label>
+                        <input type="radio" name="invoiceIds" value="2" style="margin:0 8px 0 20px;width: 18px;height: 18px;vertical-align: middle" />
+                        <label>驳回申请</label>
+                    </div>
+                </div>
+                <div class="form-group" id="reason" style="display: none">
+                    <label class="col-sm-3 control-label"><span style="color: red; ">*</span>驳回理由：</label>
+                    <div class="col-sm-5">
+                        <input type="text" name="remark" checked autocomplete="off" class="form-control" placeholder="请输入驳回理由">
+                        <span class="remark"></span>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="row" style="margin: 20px auto; height: 90px;line-height: 90px;">
+        <div class="col-sm-offset-5 col-sm-3">
+            <button type="button" class="btn btn-sm btn-danger" onclick="closeItem()"><i class="fa fa-reply-all"></i>关 闭</button>
+            <button type="button" class="btn btn-sm btn-success" onclick="submitItem()"><i class="fa fa-check"></i>保 存</button>
+        </div>
+    </div>
+    <div class="license">
+        <div class="container" style="text-align: center">
+            <input type="file" id="file" style="display: none" onchange="filechange(event)" accept="image/*" disabled/>
+            <img width="300px" height="300px" id="licenseImg">
+            <i class="fa fa fa-plus banner" style="font-size: 112px; color: #e5e6e7;position: absolute;left:210px;bottom:90px;z-index:-1"></i>
+        </div>
+        <div class="row" style="margin: 40px auto;">
+            <div class="col-sm-offset-4 col-sm-10">
+                <button type="button" class="btn btn-sm btn-primary" onclick="submitLicenseImg()"><i class="fa fa-check"></i>保 存</button>&nbsp;
+                <button type="button" class="btn btn-sm btn-danger" onclick="closeImgItem()"><i class="fa fa-reply-all"></i>关 闭 </button>
+            </div>
+        </div>
+    </div>
+    <div class="positive">
+        <div class="container">
+            <input type="file" id="cardFront" style="display: none" onchange="filechange2(event)" accept="image/*" disabled/>
+            <img width="300px" height="300px" id="positive-change">
+            <i class="fa fa fa-plus banner" style="font-size: 112px; color: #e5e6e7;position: relative;left: 42px;bottom: -24px;"></i>
+        </div>
+        <div class="row" style="margin: 40px auto;">
+            <div class="col-sm-offset-4 col-sm-10">
+                <button type="button" class="btn btn-sm btn-primary" onclick="submitImg(2)"><i class="fa fa-check"></i>保 存</button>&nbsp;
+                <button type="button" class="btn btn-sm btn-danger" onclick="closeImgItem()"><i class="fa fa-reply-all"></i>关 闭 </button>
+            </div>
+        </div>
+    </div>
+    <div class="reverse">
+        <div class="container">
+            <input type="file" id="cardBack" style="display: none" onchange="filechange3(event)" accept="image/*" disabled/>
+            <img width="300px" height="300px" id="reverse-change">
+            <i class="fa fa fa-plus banner" style="font-size: 112px; color: #e5e6e7;position: relative;left: 42px;bottom: -24px;"></i>
+        </div>
+        <div class="row" style="margin: 40px auto;">
+            <div class="col-sm-offset-4 col-sm-10">
+                <button type="button" class="btn btn-sm btn-primary" onclick="submitImg(3)"><i class="fa fa-check"></i>保 存</button>&nbsp;
+                <button type="button" class="btn btn-sm btn-danger" onclick="closeImgItem()"><i class="fa fa-reply-all"></i>关 闭 </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg"></div>
+    <div class="ImgView">
+        <span onclick="closePictures()" class="closeImage">x</span>
+        <div style="width: 420px;height: 420px;position: relative;top:40px;left:40px">
+            <img class="img-lg" id="viewImgBox" style="width: 100%;height: 100%;text-align: center"/>
+        </div>
+        <div style="position: relative;bottom: -55px;text-align: center;">
+            <button type="button" class="btn btn-sm btn-warning" onclick="deleteImg()"><i class="fa fa-remove"></i>删 除</button>&nbsp;
+            <button type="button" class="btn btn-sm btn-danger" onclick="closePictures()"><i class="fa fa-reply-all"></i>关 闭 </button>
+        </div>
+    </div>
+</div>
+<div th:include="include::footer"></div>
+<script type="text/javascript">
+    var prefix = "/manager/merchant"
+
+    //点击 驳回申请
+    $("input[name='invoiceIds'][value='2']").click(function () {
+        $("#reason").css('display','block')
+        $("input[name='remark']")[0].value = ''
+    })
+    $("input[name='invoiceIds'][value='1']").click(function () {
+        $("#reason").css('display','none')
+        $("input[name='remark']")[0].value = ''
+    })
+
+    //进入页面获取默认得到的税源地
+    function getTaxSource(id){
+        $.get("/appletspublic/perMerchant/getDownDropTaxSource",function (data) {
+            var opl = $("#taxSource option")
+            opl.remove()
+            if (data.code ===0){
+                var html = '<option value="" >请选择</option>'
+                data.data.forEach(function (item) {
+                    if (item.id == id) {
+                        html += '<option value="' + item.id + '" selected="selected">' + item.taxSounrceCompanyName + '</option>'
+                    } else {
+                        html += '<option value="' + item.id + '">' + item.taxSounrceCompanyName + '</option>'
+                    }
+                })
+                $("#taxSource").append(html)
+            }
+        })
+    }
+    getTaxSource($("input[name='taxSounrceCompanyId']").val())
+    function submitItem() {
+        if ($.validate.form()) {
+            var applyNumber = JSON.parse(sessionStorage.getItem("applyInfo")).applyNumber
+            var orderStatus = $("input[name='invoiceIds']:checked").val();
+            var data = {
+                applyId: $("input[name='applyId']").val(),
+                applyNumber: applyNumber,
+                orderStatus: orderStatus,
+                remark: $("input[name='remark']").val()
+            }
+            data = JSON.stringify(data)
+            $.ajax({
+                url: "/business/personalMerchant/checkPersonalMerchantInfo",
+                data: data,
+                type: "post",
+                datatype: "json",
+                contentType: 'application/json',
+                success: function (result) {
+                    if (typeof callback == "function") {
+                        callback(result);
+                        $.modal.msgSuccess("提交成功");
+                    }
+                    $.operate.successTabCallback(result);
+                }
+            })
+        }
+    }
+    // 下载协议
+    function  checkAgreement() {
+        var applyNumber = $("input[name='applyNumber']").val()
+        $.get("/business/personalMerchant/getCTerminalSign?applyNumber="+applyNumber,function (data) {
+            if (data.code === 0) {
+                window.location.href = data.data.docs[0].fileUrl
+            } else {
+                $.modal.msgWarning(data.msg)
+                return
+            }
+        })
+    }
+    function onBanner(type) {
+        // if(type == 0) {
+        //     $(".license").css("display","block")
+        // }else if(type == 1){
+        //     $(".contract").css("display","block")
+        // }else if(type == 2){
+        //     $(".positive").css("display","block")
+        // }else{
+        //     $(".reverse").css("display","block")
+        // }
+        // $(".bg").css("display","block")
+        // var height = document.body.scrollHeight
+        // $(".bg").css("height",height)
+    }
+    $("#positive-change").click(function () {
+        $("#cardFront").click();
+    })
+    $("#reverse-change").click(function () {
+        $("#cardBack").click();
+    })
+    $("#licenseImg").click(function () {
+        $("#file").click();
+    })
+    $("#contractImg").click(function () {
+        $("#contract").click();
+    })
+    var imgURL;
+    var files;
+    var options = {
+        imgSrc:""
+    }
+    var filechange=function(event){
+        files = event.target.files, file;
+        if (files && files.length > 0) {
+            file = files[0];
+            if(file.size > 1024 * 1024 * 2) {
+                alert('图片大小不能超过 2MB!');
+                return false;
+            }
+            var URL = window.URL || window.webkitURL;
+            imgURL = URL.createObjectURL(file);
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                imgURL = e.target.result;
+                if((imgURL).indexOf("image/")==-1){
+                    $.modal.alertWarning("文件格式错误，请上传图片类型,如：JPG，PNG后缀的文件。");
+                } else {
+                    options.imgSrc = e.target.result
+                    if(options.imgSrc.indexOf("data:image/x-icon")!=-1) {
+                        options.imgSrc = options.imgSrc.replace("image/x-icon", "image/png")
+                    }
+                }
+            }
+            $("#licenseImg").attr("src",imgURL);
+            reader.readAsDataURL(file);
+        }
+    };
+    var filechange1=function(event){
+        files = event.target.files, file;
+        if (files && files.length > 0) {
+            file = files[0];
+            if(file.size > 1024 * 1024 * 2) {
+                alert('图片大小不能超过 2MB!');
+                return false;
+            }
+            var URL = window.URL || window.webkitURL;
+            imgURL = URL.createObjectURL(file);
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                imgURL = e.target.result;
+                if((imgURL).indexOf("image/")==-1){
+                    $.modal.alertWarning("文件格式错误，请上传图片类型,如：JPG，PNG后缀的文件。");
+                } else {
+                    options.imgSrc = e.target.result
+                    if(options.imgSrc.indexOf("data:image/x-icon")!=-1) {
+                        options.imgSrc = options.imgSrc.replace("image/x-icon", "image/png")
+                    }
+                }
+            }
+            $("#contractImg").attr("src",imgURL);
+            reader.readAsDataURL(file);
+        }
+    };
+    var filechange2=function(event){
+        files = event.target.files, file;
+        if (files && files.length > 0) {
+            file = files[0];
+            if(file.size > 1024 * 1024 * 2) {
+                alert('图片大小不能超过 2MB!');
+                return false;
+            }
+            var URL = window.URL || window.webkitURL;
+            imgURL = URL.createObjectURL(file);
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                imgURL = e.target.result;
+                if((imgURL).indexOf("image/")==-1){
+                    $.modal.alertWarning("文件格式错误，请上传图片类型,如：JPG，PNG后缀的文件。");
+                } else {
+                    options.imgSrc = e.target.result
+                    if(options.imgSrc.indexOf("data:image/x-icon")!=-1) {
+                        options.imgSrc = options.imgSrc.replace("image/x-icon", "image/png")
+                    }
+                }
+            }
+            $("#positive-change").attr("src",imgURL);
+            reader.readAsDataURL(file);
+        }
+    };
+    var filechange3=function(event){
+        files = event.target.files, file;
+        if (files && files.length > 0) {
+            file = files[0];
+            if(file.size > 1024 * 1024 * 2) {
+                alert('图片大小不能超过 2MB!');
+                return false;
+            }
+            var URL = window.URL || window.webkitURL;
+            imgURL = URL.createObjectURL(file);
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                imgURL = e.target.result;
+                if((imgURL).indexOf("image/")==-1){
+                    $.modal.alertWarning("文件格式错误，请上传图片类型,如：JPG，PNG后缀的文件。");
+                } else {
+                    options.imgSrc = e.target.result
+                    if(options.imgSrc.indexOf("data:image/x-icon")!=-1) {
+                        options.imgSrc = options.imgSrc.replace("image/x-icon", "image/png")
+                    }
+                }
+            }
+            $("#reverse-change").attr("src",imgURL);
+            reader.readAsDataURL(file);
+        }
+    };
+    function getBlob() {
+        var imageData = options.imgSrc;
+        if(imageData!="") {
+            if(imageData.indexOf("data:image/png;base64,")==0) {
+                var b64 = imageData.replace('data:image/png;base64,', '');
+            }else if(imageData.indexOf("data:image/jpeg;base64,")==0){
+                var b64 = imageData.replace('data:image/jpeg;base64,', '');
+            }else {
+                var b64 = imageData.replace('data:image/jpg;base64,', '');
+            }
+            var binary = atob(b64);
+            var array = [];
+            for (var i = 0; i < binary.length; i++) {
+                array.push(binary.charCodeAt(i));
+            }
+            return new Blob([new Uint8Array(array)], {type: 'image/png'});
+        }
+    }
+    function submitImg(type) {
+        var img = getBlob()
+        if (img == undefined) {
+            $.modal.msgWarning("请选择图片")
+            return
+        }
+        var formdata = new FormData();
+        formdata.append("file", img);
+        $.ajax({
+            url: ctx + "common/uploadIdCard",
+            data: formdata,
+            type: "post",
+            processData: false,
+            contentType: false,
+            success: function (result) {
+                if (type == 1) {
+                    var html = '<img class="img-lg" src="'+result.url+'"/></a>'
+                    $(".AddImg").before(html);
+                    $(".contract").css("display","none")
+                } else if (type == 2) {
+                    $('#positive').attr('src', result.url);
+                    $('#positive').attr('alt', result.fileName);
+                    $(".positive").css("display", "none")
+                } else {
+                    $('#reverse').attr('src', result.url);
+                    $('#reverse').attr('alt', result.fileName);
+                    $(".reverse").css("display", "none")
+                }
+                $(".bg").css("display", "none")
+
+            }
+        })
+    }
+    function submitLicenseImg() {
+        var img = getBlob()
+        if (img == undefined) {
+            $.modal.msgWarning("请选择图片")
+            return
+        }
+        var formdata = new FormData();
+        formdata.append("file", img);
+        $.ajax({
+            url: ctx + "common/uploadLicense",
+            data: formdata,
+            type: "post",
+            processData: false,
+            contentType: false,
+            success: function (result) {
+                $("#businessLicenseImg").attr("src", result.url)
+                $(".license").css("display", "none")
+                $(".bg").css("display", "none")
+
+            }
+        })
+    }
+    function closeImgItem() {
+        $(".bg").css("display","none")
+        $(".license").css("display","none")
+        $(".contract").css("display","none")
+        $(".reverse").css("display", "none")
+        $(".positive").css("display", "none")
+    }
+    $("#ImgurlBox>img").on("click",function () {
+        var height = document.body.scrollHeight
+        $(".bg").css("display","block")
+        $(".ImgView").css("display","block")
+        $(".bg").css("height",height)
+        $("#viewImgBox").attr("src",$(this)[0].src)
+    })
+    function closePictures() {
+        $(".bg").css("display","none")
+        $(".ImgView").css("display","none")
+    }
+    function deleteImg() {
+        var ImgList = $("#ImgurlBox>img")
+        var ImgUrl = $("#viewImgBox").attr("src")
+        for (var i = 0;i<ImgList.length;i++){
+            if(ImgUrl == ImgList[i].src){
+                $("#ImgurlBox>img")[i].remove()
+                $(".bg").css("display","none")
+                $(".ImgView").css("display","none")
+            }
+        }
+    }
+</script>
+</body>
+</html>

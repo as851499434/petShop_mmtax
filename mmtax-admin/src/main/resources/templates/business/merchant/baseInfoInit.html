@@ -1,0 +1,2683 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="include :: header('合作信息')"/>
+    <link th:href="@{/css/jquery.tagsinput-revisited.css}" rel="stylesheet"/>
+    <link th:href="@{/css/default.css}" rel="stylesheet"/>
+    <style>
+        .bg{
+            width:100%;
+            height: 100%;
+            background:rgba(0,0,0,.5);
+            position: absolute;
+            top: 0px;
+            right: 0px;
+            left: 0px;
+            display: none;
+            z-index: 99;
+        }
+        .license,.contract,.positive,.reverse{
+            background: #fff;
+            position: fixed;
+            z-index: 1000;
+            top:100px;
+            left:50%;
+            margin-left: -250px;
+            display: none;
+        }
+        #img-change,#positive-change,#reverse-change{
+            border: 1px solid #eee;
+            position: relative;
+            left: 50%;
+            margin-left: -150px;
+            z-index: 100;
+        }
+        /*.contract .container{*/
+        /*margin: 30px auto 0 auto;*/
+        /*position: relative;*/
+        /*font-family: 微软雅黑;*/
+        /*font-size: 12px;*/
+        /*width: 750px;*/
+        /*}*/
+        .container {
+            margin: 30px auto 0 auto;
+            position: relative;
+            font-family: 微软雅黑;
+            font-size: 12px;
+            /*width: 750px;*/
+            width: 500px;
+        }
+        form{
+            margin-top: 30px;
+        }
+        div.form-group span:not(.tag){
+            font-size: 12px;
+            color: red;
+            display: inline-block;
+            height: 20px;
+        }
+        span.tag >span.tag-text{
+            color:#fff;
+        }
+        .form-group{
+            margin-bottom: 6px;
+        }
+        .select-time .time-input {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: transparent;
+            outline: none;
+            height: 30px;
+            width: 36%;
+            padding-left: 10px;
+            font-size: 14px;
+        }
+        .select-time label{
+            margin: 0px 10px;
+        }
+
+        #legalPersonIdCardExp +label ,#businessLicenseExp +label{
+            display: block;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 1);
+            border:1px solid #aaa;
+        }
+        #balanceEmailRemindSwitch +label{
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 1);
+            border:1px solid #aaa;
+        }
+        #legalPersonIdCardExp:checked +label::before,#businessLicenseExp:checked +label::before {
+            display: block;
+            content: "\2714";
+            text-align: center;
+            font-size: 16px;
+            color: #666;
+        }
+        #balanceEmailRemindSwitch:checked +label::before{
+            display: block;
+            content: "\2714";
+            text-align: center;
+            font-size: 16px;
+            color: #666;
+        }
+    </style>
+</head>
+<body class="white-bg">
+<div class="form-content">
+    <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" class="active"><a href="#params" role="tab" data-toggle="tab">基本信息</a></li>
+        <li role="presentation"><a href="#cooperation" role="tab" data-toggle="tab">商户信息</a></li>
+        <li role="presentation"><a href="#merchant" role="tab" data-toggle="tab">合作信息</a></li>
+        <!--派单信息-->
+        <li role="presentation" id="dispatch"><a href="#dispatchContent" role="tab" data-toggle="tab">派单信息</a></li>
+        <li role="presentation"><a href="#address" role="tab" data-toggle="tab">发票信息</a></li>
+        <li role="presentation"><a href="#invoice" role="tab" data-toggle="tab">账户设置</a></li>
+    </ul>
+    <div class="tab-content">
+        <div role="tabpanel" class="tab-pane active" id="params">
+            <div class="">
+                <form id="form1" class="form-horizontal" data-toggle="validator" role="form">
+                    <div class="row">
+                        <h4 class="form-header h4" style="margin-left: 40px">基本信息：</h4>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label"><span style="color: red; ">*</span>商户名称：</label>
+                                <div class="col-sm-8">
+                                    <input name="merchantName" placeholder="请输入商户名称" class="form-control" type="text" autocomplete="off" required>
+                                    <span class="merchantName"> </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label">归属销售：</label>
+                                <div class="col-sm-8">
+                                    <div class="input-group" style="width: 100%">
+                                        <select name="belongSaler" class="form-control m-b" th:with="type=${@dict.getType('Its_sales')}">
+                                            <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                                        </select>
+                                    </div>
+                                    <!--<input name="belongSaler" autocomplete="off" placeholder="请输入归属商户" class="form-control" type="text">-->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label">所属代理商：</label>
+                                <div class="col-sm-8">
+                                    <input name="agentNumber" placeholder="请输入所属代理商编号" class="form-control" type="text" autocomplete="off">
+                                    <span class="agentNumber"> </span>
+                                    <!--<input name="belongSaler" autocomplete="off" placeholder="请输入归属商户" class="form-control" type="text">-->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label"><span style="color: red; ">*</span>手机号码：</label>
+                                <div class="col-sm-8">
+                                    <input name="contactsMobile" autocomplete="off" placeholder="请输入手机号码" class="form-control" type="text" maxlength="11" required>
+                                    <span class="contactsMobile"> </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label"><span style="color: red; ">*</span>邮箱：</label>
+                                <div class="col-sm-8">
+                                    <input name="email" id="email" autocomplete="off" class="form-control email" type="text" placeholder="请输入邮箱" required>
+                                    <span class="email"> </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label"><span style="color: red; ">*</span>登录密码：</label>
+                                <div class="col-sm-8">
+                                    <input name="password" placeholder="请输入登录密码" autocomplete="off" class="form-control" type="password" th:value="${@config.getKey('sys.user.initPassword')}" required>
+                                    <span class="password"> </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label">用户状态：</label>
+                                <div class="col-sm-8">
+                                    <label class="toggle-switch switch-solid">
+                                        <input type="checkbox" id="status" checked>
+                                        <span></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="col-xs-4 control-label">岗位：</label>
+                                <div class="col-xs-8">
+                                    <select id="post" class="form-control select2-multiple" name="job" multiple>
+                                        <option></option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="col-xs-4 control-label">税源地商户：</label>
+                                <div class="col-xs-8">
+                                    <select class="form-control select2-multiple" name="taxSourceId" id="taxSourceId">
+                                        <option value="">请选择</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <h4 class="form-header h4" style="margin-left: 40px">其他信息：</h4>
+                            <div class="form-group">
+                                <label class="col-xs-2 control-label">备注：</label>
+                                <div class="col-xs-10">
+                                    <textarea name="remark" autocomplete="off" class="form-control" rows="3"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div role="tabpanel" class="tab-pane" id="cooperation">
+            <div class="">
+                <form class="form-horizontal" id="form2" data-toggle="validator" role="form">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <h4 class="form-header h4">企业信息：</h4>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label"><span style="color: red; ">*</span>企业名称：</label>
+                                <div class="col-sm-5">
+                                    <input name="companyName" autocomplete="off" placeholder="请输入企业名称" class="form-control" type="text" required>
+                                    <span class="companyName"></span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label"><span style="color: red; ">*</span>法人名字：</label>
+                                <div class="col-sm-5">
+                                    <input name="legalPersonName" autocomplete="off" placeholder="请输入法人名字" class="form-control" type="text" required>
+                                    <span class="legalPersonName"></span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label"><span style="color: red; ">*</span>法人手机号：</label>
+                                <div class="col-sm-5">
+                                    <input name="legalPersonMobile" autocomplete="off" placeholder="请输入法人手机号" class="form-control" type="text" required>
+                                    <span class="legalPersonMobile"></span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label"><span style="color: red; ">*</span>法人身份证正面照：</label>
+                                <div class="col-sm-5">
+                                    <div class="text-center">
+                                        <a href="javascript:onBanner(2)" style="display: block;width: 120px;height: 120px;border: 1px solid #eee;">
+                                            <i class="fa fa fa-plus positive_i" style="font-size: 32px; color: #e5e6e7;line-height: 120px;"></i>
+                                            <img class="img-lg" id="positive" style="display: none"/>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label"><span style="color: red; ">*</span>法人身份证反面照：</label>
+                                <div class="col-sm-5">
+                                    <div class="text-center">
+                                        <a href="javascript:onBanner(3)" style="display: block;width: 120px;height: 120px;border: 1px solid #eee;">
+                                            <i class="fa fa fa-plus reverse_i" style="font-size: 32px; color: #e5e6e7;line-height: 120px;"></i>
+                                            <img class="img-lg" id="reverse" style="display: none"/>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label"><span style="color: red; ">*</span>法人身份证号：</label>
+                                <div class="col-sm-5">
+                                    <input name="legalPersonIdCardNo" autocomplete="off" placeholder="请输入法人身份证号" class="form-control" type="text" required>
+                                    <span class="legalPersonIdCardNo"></span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label check-box"><span style="color: red; ">*</span>法人身份证有效期：</label>
+                                <div class="col-sm-7 select-time ">
+                                    <input type="text" class="time-input" id="startTime" placeholder="开始时间"
+                                           name="startDate" autocomplete="off"/>
+                                    <span>-</span>
+                                    <input type="text" class="time-input" id="endTime" placeholder="结束时间" name="legalPersonIdCardExp" autocomplete="off"/>
+                                    <!--<label class="">-->
+                                    <input name="role" style="display: none" type="checkbox" th:value="1" th:text="永久有效" id="legalPersonIdCardExp" onclick="checkCardExp(this)">
+                                    <label for="legalPersonIdCardExp"></label>
+                                    <!--</label>-->
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-xs-3 control-label">所属行业：</label>
+                                <div class="col-xs-5">
+                                    <select class="form-control select2-multiple" name="industry" th:with="type=${@dict.getType('industry_code')}">
+                                        <option>请选择</option>
+                                        <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label"><span style="color: red; ">*</span>营业执照注册号：</label>
+                            <div class="col-sm-5">
+                                <input name="businessLicenseCode" autocomplete="off" placeholder="请输入营业执照注册号" class="form-control" type="text" required>
+                                <span class="businessLicenseCode"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label"><span style="color: red; ">*</span>营业执照影印件：</label>
+                            <div class="col-sm-8">
+                                <div class="text-center">
+                                    <a href="javascript:onBanner(0)" style="display: block;width: 120px;height: 120px;border: 1px solid #eee;">
+                                        <i class="fa fa fa-plus license_i" style="font-size: 32px; color: #e5e6e7;line-height: 120px;"></i>
+                                        <img class="img-lg" id="license_img" style="display: none"/>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label check-box"><span style="color: red; ">*</span>营业执照有效期：</label>
+                            <div class="col-sm-7 select-time ">
+                                <input type="text" class="time-input" placeholder="开始时间"
+                                       name="startDate" id="start" autocomplete="off"/>
+                                <span>-</span>
+                                <input type="text" class="time-input" placeholder="结束时间" name="businessLicenseExp" id="end" autocomplete="off"/>
+                                <input name="role" type="checkbox" th:value="1" style="display: none;" th:text="永久有效" id="businessLicenseExp" onclick="checkLicenseExp(this)">
+                                <label for="businessLicenseExp"></label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label"><span style="color: red; ">*</span>商户经营地址：</label>
+                            <div class="col-sm-5">
+                                <input name="merchantAddress" autocomplete="off" placeholder="请输入商户经营地址" class="form-control" type="text" required>
+                                <span class="merchantAddress"></span>
+                            </div>
+                        </div>
+                        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>纳税人类型：</label>
+                        <div class="col-sm-9" style="padding-top: 5px">
+                            <input type="radio"  name="taxpayerType" id="merchantGeneralTaxpayer" value="0" style="margin:0 8px 0 0;width: 18px;height: 18px;vertical-align: middle" />
+                            <label>一般纳税人</label>
+                            <input type="radio"  name="taxpayerType" id="merchantSmallScaleTaxpayer" value="1" style="margin:0 8px 0 20px;width: 18px;height: 18px;vertical-align: middle" />
+                            <label>小规模纳税人</label>
+                        </div>
+<!--                        <div class="col-sm-9" >-->
+<!--                            <label class="radio-box"> <input type="radio" id="merchantGeneralTaxpayer" name="taxpayerType" value="0" /> 一般纳税人 </label>-->
+<!--                            <label class="radio-box"> <input type="radio" id="merchantSmallScaleTaxpayer" name="taxpayerType" value="1" /> 小规模纳税人 </label>-->
+<!--                        </div>-->
+                        <h4 class="form-header h4">联系信息：</h4>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label"><span style="color: red; ">*</span>联系人姓名：</label>
+                            <div class="col-sm-5">
+                                <input name="contacts" autocomplete="off" placeholder="请输入联系人姓名" class="form-control" type="text" required>
+                                <span class="contacts"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label"><span style="color: red; ">*</span>联系人手机号：</label>
+                            <div class="col-sm-5">
+                                <input name="contactsMobile" autocomplete="off" id="contactsMobile" readonly placeholder="请输入联系人手机号" class="form-control" type="text" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label"><span style="color: red; ">*</span>联系人邮箱：</label>
+                            <div class="col-sm-5">
+                                <input name="email" autocomplete="off" id="contactsEamil" placeholder="请输入联系人邮箱" class="form-control" type="text" required readonly>
+                                <!--<span class="contactsEamil"></span>-->
+                            </div>
+                        </div>
+                        <div class="form-group" id="invoiceEmail">
+                            <label class="col-sm-3 control-label"><span style="color: red;">*</span>接收报税文件邮箱：</label>
+                            <div class="col-sm-5">
+                                <input type="text" name="invoiceEmail" id="invoice_email" autocomplete="off" class="form-control" placeholder="请输入接收报税文件邮箱" style="margin-top: 6px;width: 90%;display: inline-block"><a class="btn btn-success" onclick="addDiv(3)"><i class="fa fa fa-plus"></i></a>
+                                <span class="invoiceEmail"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label"><span style="color: red; ">*</span>联系地址：</label>
+                            <div class="col-sm-5">
+                                <input name="contactsAddress" autocomplete="off" placeholder="请输入联系地址" class="form-control" type="text" required>
+                                <span class="contactsAddress"></span>
+                            </div>
+                        </div>
+                        <h4 class="form-header h4">结算信息：</h4>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label"><span style="color: red; ">*</span>开户名称：</label>
+                            <div class="col-sm-5">
+                                <input name="accountName" autocomplete="off" placeholder="请输入开户名称" class="form-control" type="text" required>
+                                <span class="accountName"> </span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label"><span style="color: red; ">*</span>开户账户：</label>
+                            <div class="col-sm-5">
+                                <input name="accountNo" autocomplete="off" placeholder="请输入开户账户" class="form-control"
+                                       type="text" required>
+                                <span class = "accountNo" ></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label"><span style="color: red; ">*</span>开户银行：</label>
+                            <div class="col-sm-5" id="merchantInfo">
+                                <input name="bankName" autocomplete="off" placeholder="请输入开户银行" class="form-control" type="text" required>
+                                <span class="bankName"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label"><span style="color: red; ">*</span>银行代码：</label>
+                            <div class="col-sm-5">
+                                <select name="bankCode" class="form-control select2-multiple" th:with="type=${@dict.getType('bank_code')}">
+                                    <option>请选择</option>
+                                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                                </select>
+                                <!--<input name="bankCode" autocomplete="off" placeholder="请输入银行代码" class="form-control" type="text" required>-->
+                                <!--<span class="bankCode"></span>-->
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label"><span style="color: red; ">*</span>提现银行卡开户行行号：</label>
+                            <div class="col-sm-5">
+                                <input name="settBankcardNo" autocomplete="off" placeholder="请输入提现银行卡开户行行号" class="form-control" type="text" required>
+                                <span class="settBankcardNo"></span>
+                            </div>
+                        </div>
+                        <h4 class="form-header h4">客户支持：</h4>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label"><span style="color: red; ">*</span>客户经理：</label>
+                            <div class="col-sm-5">
+                                <input name="customerManager" autocomplete="off" placeholder="请输入客户经理" class="form-control" type="text" required>
+                                <span class="customerManager"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label"><span style="color: red; ">*</span>客户经理手机号：</label>
+                            <div class="col-sm-5">
+                                <input name="customerManagerMobile" autocomplete="off" placeholder="请输入客户经理手机号" class="form-control" type="text" required>
+                                <span class="customerManagerMobile"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label"><span style="color: red; ">*</span>客户经理邮箱：</label>
+                            <div class="col-sm-5">
+                                <input name="email" autocomplete="off" id="customerManager-eamil" placeholder="请输入客户经理邮箱" class="form-control" type="text" required>
+                                <span class="customerManager-eamil"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label"><span style="color: red; ">*</span>客户签约经理：</label>
+                            <div class="col-sm-5">
+                                <input name="successCustomerManager" autocomplete="off" placeholder="请输入客户签约经理" class="form-control" type="text" required>
+                                <span class="successCustomerManager"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label"><span style="color: red; ">*</span>手机号：</label>
+                            <div class="col-sm-5">
+                                <input name="successCustomerManagerMobile" autocomplete="off" placeholder="请输入手机号" class="form-control" type="text" required>
+                                <span class="successCustomerManagerMobile"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label"><span style="color: red; ">*</span>邮箱：</label>
+                            <div class="col-sm-5">
+                                <input name="successCustomerEmail" autocomplete="off" placeholder="请输入邮箱" class="form-control" type="text" required>
+                                <span class="successCustomerEmail"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label"><span style="color: red; ">*</span>商务支持：</label>
+                            <div class="col-sm-5">
+                                <input name="businessSupport" id="businessSupport" autocomplete="off" placeholder="请填写商务支持邮箱" class="form-control" type="text" required>
+                                <span class="businessSupport"></span>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div role="tabpanel" class="tab-pane" id="merchant">
+            <div class="">
+                <form class="form-horizontal" id="form3" data-toggle="validator" role="form">
+                    <h4 class="form-header h4" style="margin-left: 40px">基本信息：</h4>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label"><span style="color: red; ">*</span>商户名称：</label>
+                        <div class="col-sm-3">
+                            <input class="form-control" id="merchantName" name="merchantName" type="text" value="" placeholder="请输入商户名称" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">代征主体：</label>
+                        <div class="col-sm-3">
+                            <input class="mainSubject form-control" name="mainSubject" type="text" placeholder="请输入代征主体" readonly>
+                            <!--<select class="form-control select2-multiple" name="mainSubject" id="mainSubject">-->
+                            <!--<option>请选择</option>-->
+                            <!--</select>-->
+                        </div>
+                    </div>
+                    <h4 class="form-header h4" style="margin-left: 40px">C端签约配置：</h4>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>签约开关：</label>
+                        <div class="col-sm-9" style="padding-top: 5px">
+                            <input type="radio" name="signSwitch" value="1" style="margin:0 8px 0 0;width: 18px;height: 18px;vertical-align: middle"/>
+                            <label>开</label>
+                            <input type="radio" name="signSwitch" value="0" checked style="margin:0 8px 0 20px;width: 18px;height: 18px;vertical-align: middle"/>
+                            <label>关</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>静默签署开关：</label>
+                        <div class="col-sm-9" style="padding-top: 5px">
+                            <input type="radio" name="silentSignSwitch" value="1" style="margin:0 8px 0 0;width: 18px;height: 18px;vertical-align: middle"/>
+                            <label>开</label>
+                            <input type="radio" name="silentSignSwitch" value="0" checked style="margin:0 8px 0 20px;width: 18px;height: 18px;vertical-align: middle"/>
+                            <label>关</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>签约类型：</label>
+                            <div class="col-sm-7" style="padding-top: 5px">
+                                <input type="radio" name="signingType" value="0" style="margin:0 8px 0 0;width: 18px;height: 18px;vertical-align: middle"/>
+                                <label>微信签约</label>
+                                <input type="radio" name="signingType" value="1" style="margin:0 8px 0 20px;width: 18px;height: 18px;vertical-align: middle" />
+                                <label>线上签约</label>
+                                <input type="radio" name="signingType" value="3" style="margin:0 8px 0 20px;width: 18px;height: 18px;vertical-align: middle" />
+                                <label>线上签约(可打款)</label>
+                                <input type="radio" name="signingType" value="2" checked style="margin:0 8px 0 20px;width: 18px;height: 18px;vertical-align: middle" />
+                                <label>纸质签约</label>
+                            </div>
+
+                    </div>
+                    <!--签约岗位-->
+                    <div class="form-group" id="workPost" style="display: none;">
+                        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>签约岗位选择：</label>
+                        <div class="col-sm-4" style="display: flex;justify-content: left"id="post1">
+                            <select class="form-control select2-multiple" name="postSubject" style="margin-right: 15px">
+                                <option value="">请选择</option>
+                            </select>
+                            <a class="btn btn-success" style="height: 34px" onclick="addDiv(6)"><i class="fa fa fa-plus"></i></a>
+                        </div>
+                    </div>
+
+                    <h4 class="form-header h4" style="margin-left: 40px">合作信息：</h4>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>打款核算误差：</label>
+                        <div class="col-sm-9">
+                            <label class="radio-box"> <input type="radio" name="paymentAdjustType" value="0" checked/> 手动调整 </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>结算类型：</label>
+                        <div class="col-sm-9">
+                            <label class="radio-box"> <input type="radio" name="settleType" value="0" checked/> 智能结算 </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>业务类型：</label>
+                        <div class="col-sm-9">
+                            <label class="radio-box"> <input type="radio" name="businessType" value="0" checked/> 报税业务 </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>打款模式：</label>
+                        <div class="col-sm-9">
+                            <label class="radio-box"> <input type="radio" name="moneyModel" value="0" /> 普通模式 </label>
+                            <label class="radio-box"> <input type="radio" name="moneyModel" value="1" checked/> 自动模式 </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>服务费付费模式：</label>
+                        <div class="col-sm-9">
+                            <label class="radio-box"> <input type="radio" name="paymentModel" value="0" checked/> 实时付费 </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>付费要求：</label>
+                        <div class="col-sm-5">
+                            <input type="text" name="paymentRequirement" autocomplete="off" class="form-control" placeholder="请输入付费要求" required>
+                            <span class="paymentRequirement"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>商户服务费率：</label>
+                        <div class="col-sm-5">
+                            <input type="text" name="singleServiceRate" autocomplete="off" class="form-control" placeholder="请输入商户服务费率" required>
+                            <span class="singleServiceRate"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">大额费率开关：</label>
+                        <div class="col-sm-9">
+                            <label class="toggle-switch switch-solid">
+                                <input type="checkbox" id="bigRateSwitch">
+                                <span></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group" id="singleServiceBigRate" style="display: none;">
+                        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>商户大额服务费率：</label>
+                        <div class="col-sm-5">
+                            <input type="text" name="singleServiceBigRate" autocomplete="off" class="form-control" placeholder="请输入商户大额服务费率" required>
+                            <span class="singleServiceBigRate"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>套餐类型：</label>
+                        <div class="col-sm-5">
+                            <!--<input type="number" name="mealInfoId" class="form-control" placeholder="请输入套餐类型">-->
+                            <select name="mealInfoId" class="form-control m-b">
+                                <option value="">请选择</option>
+                                <option value="01">套餐1</option>
+                                <option value="02">套餐2</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>用户服务费开关：</label>
+                        <div class="col-sm-9">
+                            <label class="radio-box"> <input type="radio" name="rateSwitch" value="0" /> 关闭 </label>
+                            <label class="radio-box"> <input type="radio" name="rateSwitch" value="1" checked/> 开启 </label>
+                        </div>
+                    </div>
+                    <!--用户服务费扣费模式-->
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>用户服务费扣费模式：</label>
+                        <div class="col-sm-9">
+                            <label class="radio-box"> <input type="radio" name="inOrOutDeduction" value="1" checked/> 外扣 </label>
+                            <label class="radio-box"> <input type="radio" name="inOrOutDeduction" value="0" /> 内扣 </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>打款渠道：</label>
+                        <div class="col-sm-9" style="height: 37px">
+                            <input type="checkbox" name="bankChannel" style="margin: 10px 0 0;width: 20px;height: 20px;vertical-align: middle"/>
+                            <span style="color: #676a6c;font-size: 16px;margin-left: 3px;vertical-align: bottom">银行卡付款</span>
+                            <input type="checkbox" name="alipayChannel" style="margin: 10px 0 0;width: 20px;height: 20px;vertical-align: middle"/>
+                            <span style="color: #676a6c;font-size: 16px;margin-left: 3px;vertical-align: bottom">支付宝付款</span>
+                            <input type="checkbox" name="wechatChannel" disabled style="margin: 10px 0 0;width: 20px;height: 20px;vertical-align: middle"/>
+                            <span style="color: #676a6c;font-size: 16px;margin-left: 3px;vertical-align: bottom">微信付款</span>
+                        </div>
+                    </div>
+                    <div class="form-group" id="bankSingleQuota" style="display: none">
+                        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>银行卡渠道用户单笔限额（元）：</label>
+                        <div class="col-sm-5">
+                            <input type="number" name="bankSingleQuota" autocomplete="off" class="form-control" placeholder="请输入用户单笔限额" required>
+                            <span class="bankSingleQuota"></span>
+                        </div>
+                    </div>
+                    <div class="form-group" id="alipaySingleQuota" style="display: none">
+                        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>支付宝渠道用户单笔限额（元）：</label>
+                        <div class="col-sm-5">
+                            <input type="number" name="alipaySingleQuota" autocomplete="off" class="form-control" placeholder="请输入用户单笔限额" required>
+                            <span class="alipaySingleQuota"></span>
+                        </div>
+                    </div>
+                    <div class="form-group" id="wechatSingleQuota" style="display: none">
+                        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>微信渠道用户单笔限额（元）：</label>
+                        <div class="col-sm-5">
+                            <input type="number" name="wechatSingleQuota" autocomplete="off" class="form-control" placeholder="请输入用户单笔限额" required>
+                            <span class="wechatSingleQuota"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>是否为需要推广商户：</label>
+                        <div class="col-sm-9">
+                            <label class="radio-box"> <input type="radio" name="promotionSwitch" value="1" /> 是 </label>
+                            <label class="radio-box"> <input type="radio" name="promotionSwitch" value="0" checked/> 否 </label>
+                        </div>
+                    </div>
+                    <!--派单商户-->
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>是否为派单商户：</label>
+                        <div class="col-sm-9" style="padding-top: 5px">
+                            <input type="radio" name="sendOrderSwitch" value="1" style="margin:0 8px 0 0;width: 18px;height: 18px;vertical-align: middle"/>
+                            <label>是</label>
+                            <input type="radio" name="sendOrderSwitch" value="0" checked style="margin:0 8px 0 20px;width: 18px;height: 18px;vertical-align: middle" />
+                            <label>否</label>
+                        </div>
+                    </div>
+
+                    <!--派单模式-->
+                    <div class="form-group" id="dispatchMode" style="display: none;">
+                        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>派单模式：</label>
+                        <div class="col-sm-9">
+                            <label class="radio-box"> <input type="radio" name="sendOrderMode" value="0" /> 手动 </label>
+                            <label class="radio-box"> <input type="radio" name="sendOrderMode" value="1" checked/> 自动 </label>
+                        </div>
+                    </div>
+                    <!--异步通知开关 -->
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>异步通知开关：</label>
+                        <div class="col-sm-9">
+                            <label class="radio-box"> <input type="radio" name="asynSwitch" value="0" /> 关闭 </label>
+                            <label class="radio-box"> <input type="radio" name="asynSwitch" value="1" checked/> 开启 </label>
+                        </div>
+                    </div>
+                    <!--异步通知是否检验开关 -->
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>异步通知是否验签开关：</label>
+                        <div class="col-sm-9">
+                            <label class="radio-box"> <input type="radio" name="asynSignSwitch" value="0" checked/> 关闭 </label>
+                            <label class="radio-box"> <input type="radio" name="asynSignSwitch" value="1" /> 开启 </label>
+                        </div>
+                    </div>
+
+                    <h4 class="form-header h4" style="margin-left: 40px">报税风险管理配置：</h4>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">全网限额：</label>
+                        <div class="col-sm-9">
+                            <label class="toggle-switch switch-solid">
+                                <input type="checkbox" id="quotaConfig">
+                                <span></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">全网单人累计金额限制：</label>
+                        <div class="col-sm-5">
+                            <input type="text"  name="singleQuotaConfig" autocomplete="off" class="form-control" value="1000000" placeholder="请输入全网单人累计金额限制">
+                            <span class="singleQuotaConfig"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">临时额度：</label>
+                        <div class="col-sm-5">
+                            <input type="text"  name="temporaryQuota" autocomplete="off" class="form-control" value="0" placeholder="请输入临时额度">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">开始日期：</label>
+                        <div class="col-sm-5">
+                            <div class="form-group">
+                                <div class="input-group date"> <span class="input-group-addon" style="font-size: 14px;color:inherit;display: table-cell"><i class="fa fa-calendar"></i></span>
+                                    <input type="text" autocomplete="off" class="form-control time-input" name="temporaryQuotaBegin" id="startDate">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">结束日期：</label>
+                        <div class="col-sm-5">
+                            <div class="form-group">
+                                <div class="input-group date"> <span class="input-group-addon" style="font-size: 14px;color:inherit;display: table-cell"><i class="fa fa-calendar"></i></span>
+                                    <input type="text" autocomplete="off" class="form-control time-input" name="temporaryQuotaEnd" id="endDate">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">单商户日限额：</label>
+                        <div class="col-sm-9">
+                            <label class="toggle-switch switch-solid">
+                                <input type="checkbox" id="singleDayQuota">
+                                <span></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">单商戶累计金额限制：</label>
+                        <div class="col-sm-5">
+                            <input type="text" value="0" autocomplete="off" name="cumulativeQuota" class="form-control" placeholder="请输入单商戶累计金额限制">
+                        </div>
+                    </div>
+                    <h4 class="form-header h4" style="margin-left: 40px">合同信息：</h4>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>合同编号：</label>
+                        <div class="col-sm-5">
+                            <input type="text" name="contractNo" autocomplete="off" class="form-control" placeholder="请输入合同编号" required>
+                            <span class="contractNo"></span>
+                        </div>
+                    </div>
+                    <div class="col-sm-10" style="margin-bottom: 20px">
+                        <div class="text-center">
+                            <a href="javascript:onBanner(1)" class="btn btn-danger">上传合同
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div role="tabpanel" class="tab-pane" id="address">
+            <div class="">
+                <form class="form-horizontal" id="form4" data-toggle="validator" role="form">
+                    <h4 class="form-header h4" style="margin-left: 40px">发票信息：</h4>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>企业名称：</label>
+                        <div class="col-sm-5">
+                            <input type="text" name="companyName" id="companyName" class="form-control" placeholder="请输入文本" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>纳税人类型：</label>
+                        <!--<div class="col-sm-9">-->
+                            <!--<label class="radio-box"> <input type="radio" id="invoiceGeneralTaxpayer" name="taxpayerType"  value="0"/> 一般纳税人 </label>-->
+                            <!--<label class="radio-box"> <input type="radio" id="invoiceSmallScaleTaxpayer" name="taxpayerType"  value="1"/> 小规模纳税人 </label>-->
+                        <!--</div>-->
+                        <div class="col-sm-9" style="padding-top: 5px">
+                            <input type="radio"  name="taxpayerType" id="invoiceGeneralTaxpayer" readonly value="0" style="margin:0 8px 0 0;width: 18px;height: 18px;vertical-align: middle" />
+                            <label>一般纳税人</label>
+                            <input type="radio"  name="taxpayerType" id="invoiceSmallScaleTaxpayer" readonly value="1" style="margin:0 8px 0 20px;width: 18px;height: 18px;vertical-align: middle" />
+                            <label>小规模纳税人</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>纳税人识别号：</label>
+                        <div class="col-sm-5">
+                            <input type="text" name="taxpayerIdentificationNumber" id="taxpayerIdentificationNumber" class="form-control" placeholder="请输入纳税人识别号" autocomplete="off" required>
+                            <span class="taxpayerIdentificationNumber"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>单位注册地址：</label>
+                        <div class="col-sm-5">
+                            <input type="text" name="companyAddress" id="companyAddress" class="form-control" placeholder="请输入单位注册地址" autocomplete="off" required>
+                            <span class="companyAddress"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>单位电话：</label>
+                        <div class="col-sm-5">
+                            <input type="text" name="invoiceMobile" class="form-control" placeholder="请输入单位电话" autocomplete="off" required>
+                            <span class="invoiceMobile"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>开户行：</label>
+                        <div class="col-sm-5" id="invoice_bankName">
+                            <input type="text" name="bankName" id="invoiceBankName" class="form-control" placeholder="请输入开户行" autocomplete="off"  required>
+                            <span class="invoice_bankName"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>银行账号：</label>
+                        <div class="col-sm-5">
+                            <input type="text" name="bankNumber" id="bankNumber" class="form-control" placeholder="请输入银行账号" autocomplete="off"  required>
+                            <span class="bankNumber"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>详细地址：</label>
+                        <div class="col-sm-5">
+                            <input type="text" name="address" id="addressDetail" class="form-control" autocomplete="off" placeholder="请输入详细地址" required>
+                            <span class="address"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>收件人姓名：</label>
+                        <div class="col-sm-5">
+                            <input type="text" name="addresseeName" id="addresseeName" class="form-control" autocomplete="off" placeholder="请输入收件人姓名" required>
+                            <span class="addresseeName"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label"><span style="color: red; ">*</span>联系电话：</label>
+                        <div class="col-sm-5">
+                            <input type="text" name="mobile" id="mobile" class="form-control" autocomplete="off" placeholder="请输入联系电话" required>
+                            <span class="mobile"></span>
+                        </div>
+                    </div>
+                </form>
+                <!--新增开票科目-->
+                <form class="form-horizontal" id="form6" data-toggle="validator" role="form" style="margin-top: 0">
+                    <div class="form-group" id="invoiceSubject">
+                        <label class="col-sm-3 control-label">开票科目：</label>
+                        <div class="col-sm-5" style="display: flex;justify-content: left">
+                            <select class="form-control select2-multiple" name="invoiceSubject" id="selectInvoice">
+                            </select>
+                            <a class="btn btn-success" style="height: 34px" onclick="addDiv(4)"><i class="fa fa fa-plus"></i></a><div style="width:120px;text-align: center;font-size: 12px"><a style="line-height: 50px;color: #56AE85 ">默认开票内容</a></div></div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <!--派单信息-->
+        <div role="tabpanel" class="tab-pane" id="dispatchContent">
+            <div class="">
+                <form class="form-horizontal" id="dispatchForm" data-toggle="validator" role="form">
+                    <h4 class="form-header h4" style="margin-left: 40px">派单信息：</h4>
+                    <div class="form-group task" id="task1">
+                        <label class="col-sm-2 control-label">任务名称：</label>
+                        <div class="col-sm-4" style="display: flex;justify-content: left">
+                            <select class="form-control select2-multiple" name="taskTitle" style="margin-right: 15px" id="taskTitle1">
+                                <option value="">请选择</option>
+                            </select>
+                            <a class="btn btn-success" style="height: 34px" onclick="addDiv(5)"><i class="fa fa fa-plus"></i></a>
+                        </div>
+                    </div>
+                    <div class="form-group intro" id="intro1">
+                        <label class="col-sm-2 control-label">任务简介：</label>
+                        <div class="col-sm-4">
+                            <textarea name="taskContent" autocomplete="off" class="form-control" style="height: 133px;" id="taskContent1"></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div role="tabpanel" class="tab-pane" id="invoice">
+            <div class="">
+                <form class="form-horizontal" id="form5" data-toggle="validator" role="form">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">账户余额提醒开关：</label>
+                        <div class="col-sm-9">
+                            <label class="toggle-switch switch-solid">
+                                <input type="checkbox" id="balanceRemindSwitch">
+                                <span></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">提醒方式：</label>
+                        <div class="col-sm-9">
+                            <label class="check-box"> <input type="checkbox" th:value="0" name="balanceEmailRemindSwitch"/> 邮件 </label>
+                            <label class="check-box"> <input type="checkbox" th:value="1" name="balanceSmsRemindSwitch"/> 短信 </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">银行卡余额提醒阈值：</label>
+                        <div class="col-sm-5">
+                            <input type="text" name="bankRemindAmount" autocomplete="off" class="form-control" value="0" placeholder="请输入银行卡余额提醒阈值">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">支付宝余额提醒阈值：</label>
+                        <div class="col-sm-5">
+                            <input type="text" name="alipayRemindAmount" autocomplete="off" class="form-control" value="0" placeholder="请输入支付宝余额提醒阈值">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">微信余额提醒阈值：</label>
+                        <div class="col-sm-5">
+                            <input type="text" name="wechatRemindAmount" autocomplete="off" class="form-control" value="0" placeholder="请输入微信余额提醒阈值">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">充值到账提醒：</label>
+                        <div class="col-sm-9">
+                            <label class="toggle-switch switch-solid">
+                                <input type="checkbox" id="rechargeRemindSwitch">
+                                <span></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">提醒方式：</label>
+                        <div class="col-sm-9">
+                            <label class="check-box"> <input type="checkbox" th:value="0" name="rechargeEmailRemindSwitch"/> 邮件 </label>
+                            <label class="check-box"> <input type="checkbox" th:value="1" name="rechargeSmsRemindSwitch"/> 短信 </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">备注：</label>
+                        <div class="col-sm-5">
+                            <input type="text" name="comment" autocomplete="off" class="form-control" placeholder="请输入文本">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label"><span style="color: red;">*</span>商户放款权限：</label>
+                        <div class="col-sm-9">
+                            <label class="radio-box"> <input type="radio" name="lendingAuthority" value="ON" /> 开启 </label>
+                            <label class="radio-box"> <input type="radio" name="lendingAuthority" value="OFF" /> 关闭 </label>
+                        </div>
+                    </div>
+                    <div class="form-group" id="balanceRemindEmail">
+                        <label class="col-sm-3 control-label"><span style="color: red;">*</span>预警及提醒类邮件发送范围：</label>
+                        <div class="col-sm-5">
+                            <input type="text" name="balanceRemindEmail" id="balance_remindEmail" autocomplete="off" class="form-control" placeholder="请输入预警及提醒类邮件发送范围" required style="margin-top: 6px;width: 90%;display: inline-block"><a class="btn btn-success" onclick="addDiv(1)"><i class="fa fa fa-plus"></i></a>
+                            <span class="balanceRemindEmail"></span>
+                        </div>
+                    </div>
+                    <div class="form-group" id="rechargeRemindEmail">
+                        <label class="col-sm-3 control-label"><span style="color: red;">*</span>账单类邮件发送范围：</label>
+                        <div class="col-sm-5">
+                            <input type="text" name="rechargeRemindEmail" id="recharge_remindEmail" autocomplete="off" class="form-control" placeholder="请输入账单类邮件发送范围" required style="margin-top: 6px;width: 90%;display: inline-block"><a class="btn btn-success" onclick="addDiv(2)"><i class="fa fa fa-plus"></i></a>
+                            <span class="rechargeRemindEmail"></span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="row" style="margin: 20px auto; height: 90px;">
+                <div class="col-sm-offset-4 col-sm-3">
+                    <button type="button" class="btn btn-sm btn-danger" onclick="closeItem()"><i class="fa fa-reply-all"></i>关 闭</button>
+                    <button type="button" class="btn btn-sm btn-success" onclick="submitAll()"><i class="fa fa-check"></i>保 存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="license">
+        <div class="container">
+            <input type="file" id="file" style="display: none" onchange="filechange(event)" accept="image/*"/>
+            <img width="300px" height="300px" id="img-change">
+            <i class="fa fa fa-plus banner" style="font-size: 112px; color: #e5e6e7;position: relative;left: 42px;bottom: -24px;"></i>
+        </div>
+        <div class="row" style="margin: 40px auto;">
+            <div class="col-sm-offset-4 col-sm-10">
+                <button type="button" class="btn btn-sm btn-primary" onclick="submitImg(0)"><i class="fa fa-check"></i>保 存</button>&nbsp;
+                <button type="button" class="btn btn-sm btn-danger" onclick="closeImgItem()"><i class="fa fa-reply-all"></i>关 闭 </button>
+            </div>
+        </div>
+    </div>
+    <div class="positive">
+        <div class="container">
+            <input type="file" id="cardFront" style="display: none" onchange="filechange2(event)" accept="image/*"/>
+            <img width="300px" height="300px" id="positive-change">
+            <i class="fa fa fa-plus banner" style="font-size: 112px; color: #e5e6e7;position: relative;left: 42px;bottom: -24px;"></i>
+        </div>
+        <div class="row" style="margin: 40px auto;">
+            <div class="col-sm-offset-4 col-sm-10">
+                <button type="button" class="btn btn-sm btn-primary" onclick="submitImg(2)"><i class="fa fa-check"></i>保 存</button>&nbsp;
+                <button type="button" class="btn btn-sm btn-danger" onclick="closeImgItem()"><i class="fa fa-reply-all"></i>关 闭 </button>
+            </div>
+        </div>
+    </div>
+    <div class="reverse">
+        <div class="container">
+            <input type="file" id="cardBack" style="display: none" onchange="filechange3(event)" accept="image/*"/>
+            <img width="300px" height="300px" id="reverse-change">
+            <i class="fa fa fa-plus banner" style="font-size: 112px; color: #e5e6e7;position: relative;left: 42px;bottom: -24px;"></i>
+        </div>
+        <div class="row" style="margin: 40px auto;">
+            <div class="col-sm-offset-4 col-sm-10">
+                <button type="button" class="btn btn-sm btn-primary" onclick="submitImg(3)"><i class="fa fa-check"></i>保 存</button>&nbsp;
+                <button type="button" class="btn btn-sm btn-danger" onclick="closeImgItem()"><i class="fa fa-reply-all"></i>关 闭 </button>
+            </div>
+        </div>
+    </div>
+    <div class="contract">
+        <div class="container" id="ImgBox">
+            <div style="position: relative;display: inline-block;margin-right: 4px;">
+                <input type="file" id="contract" style="display: none" onchange="filechange1(event)" accept="image/*"/>
+                <img width="150px" height="150px" id="contractImg">
+                <i class="fa fa fa-plus banner" style="font-size: 60px; color: #e5e6e7;position: absolute;left: 56px;bottom: 44px;z-index: -1"></i>
+            </div>
+        </div>
+        <div class="row" style="margin: 40px auto;">
+            <div class="col-sm-offset-4 col-sm-10">
+                <button type="button" class="btn btn-sm btn-primary" onclick="submitImg(1)"><i class="fa fa-check"></i>保 存</button>&nbsp;
+                <button type="button" class="btn btn-sm btn-danger" onclick="closeImgItem()"><i class="fa fa-reply-all"></i>关 闭 </button>
+            </div>
+        </div>
+    </div>
+    <div class="bg"></div>
+
+</div>
+<div th:include="include::footer"></div>
+<script th:src="@{/js/jquery.tagsinput-revisited.js}"></script>
+<script th:src="@{/js/validator.js}"></script>
+<script th:src="@{/mmtax/js/changeDispatch.js?v=1.1.5}"></script>
+<script type="text/javascript">
+    layui.use('laydate',function () {
+        var laydate = layui.laydate;
+        var startDate = laydate.render({
+            elem: '#startTime',
+            type: 'date',
+            format: 'yyyy-MM-dd',
+            max: 0,
+            done: function(value, date){
+                endDate.config.min ={
+                    year:date.year,
+                    month:date.month-1,
+                    date: date.date,
+                    hours: 0,
+                    minutes: 0,
+                    seconds : 0
+                };
+            }
+        });
+        var endDate = laydate.render({
+            elem: '#endTime',
+            type: 'date',
+            format: 'yyyy-MM-dd',
+            done: function(value,date){
+                startDate.config.max={
+                    year:date.year,
+                    month:date.month-1,//注意是month-1，写在date上的话你后边的日期选择不了
+                    date: date.date,
+                    hours: 0,
+                    minutes: 0,
+                    seconds : 0
+                }
+            }
+        });
+    })
+    layui.use('laydate',function () {
+        var laydate = layui.laydate;
+        var startDate = laydate.render({
+            elem: '#startDate',
+            type: 'date',
+            format: 'yyyy-MM-dd',
+            done: function(value, date){
+                endDate.config.min ={
+                    year:date.year,
+                    month:date.month-1,
+                    date: date.date,
+                    hours: 0,
+                    minutes: 0,
+                    seconds : 0
+                };
+            }
+        });
+        var endDate = laydate.render({
+            elem: '#endDate',
+            type: 'date',
+            format: 'yyyy-MM-dd',
+            done: function(value,date){
+                startDate.config.max={
+                    year:date.year,
+                    month:date.month-1,//注意是month-1，写在date上的话你后边的日期选择不了
+                    date: date.date,
+                    hours: 0,
+                    minutes: 0,
+                    seconds : 0
+                }
+            }
+        });
+    })
+    layui.use('laydate',function () {
+        var laydate = layui.laydate;
+        var startDate = laydate.render({
+            elem: '#start',
+            type: 'date',
+            format: 'yyyy-MM-dd',
+            max: 0,
+            done: function(value, date){
+                endDate.config.min ={
+                    year:date.year,
+                    month:date.month-1,
+                    date: date.date,
+                    hours: 0,
+                    minutes: 0,
+                    seconds : 0
+                };
+            }
+        });
+        var endDate = laydate.render({
+            elem: '#end',
+            type: 'date',
+            format: 'yyyy-MM-dd',
+            done: function(value,date){
+                startDate.config.max={
+                    year:date.year,
+                    month:date.month-1,//注意是month-1，写在date上的话你后边的日期选择不了
+                    date: date.date,
+                    hours: 0,
+                    minutes: 0,
+                    seconds : 0
+                }
+            }
+        });
+    })
+
+    // 获取商户税源地
+    $.get("/manager/merchant/getTaxSourceCompany",function (data) {
+        var html = ''
+        data.data.forEach(function (item) {
+            html += '<option value="'+item.id+'">'+item.taxSounrceCompanyName+'</option>'
+        })
+        $("#taxSourceId").append(html)
+    })
+    // 获取任务
+    $.post("/manager/taskInfo/selectAllTaskInfo",function (data) {
+        var html = ''
+        data.data.forEach(function (item) {
+            html += '<option value="'+item.id+'">'+item.taskName+'</option>'
+        })
+        $("#taskTitle1").append(html)
+        $("#post1 select").append(html)
+    })
+    // 税源地的change
+    $("#taxSourceId").change(function(){
+        $("input[name='mainSubject']").attr('value',$(this).children('option:selected').text())
+        sessionStorage.setItem('taxSourceId',$(this).children('option:selected').val())
+        var taxSounrceCompanyId = $(this).children('option:selected').val()
+        // 获取开票科目
+        $.post("/manager/invoice/selectContent?taxSounrceCompanyId="+taxSounrceCompanyId,function (data) {
+            var opl = $("#selectInvoice option")
+            opl.remove()
+            if (data.code ===0){
+                var html = '<option value="">请选择</option>'
+                data.rows.forEach(function (item) {
+                    html += '<option value="'+item.invoiceSubjectId+'">'+item.content+'</option>'
+                })
+                $("#selectInvoice").append(html)
+            }
+        })
+        // 重新选取税源地时 移除之前点击添加的开票科目下拉框
+        var len = $("#invoiceSubject .col-sm-offset-3").length
+        if (len > 0) {
+            var domList = []
+            for (var i = 0;i<len;i++) {
+                var addContent = $("#invoiceSubject .col-sm-offset-3")[i]
+                domList.push(addContent)
+            }
+            domList.forEach(function (item) {
+                item.remove()
+            })
+        }
+        if($(this).children('option:selected').val() == 2) {
+            $(".channel").css("display","block")
+        } else {
+            $(".channel").css("display","none")
+            $("input[name='token']").val("")
+            $("input[name='xinbadaUserUuid']").val("")
+        }
+    })
+    selectChange()
+    $.get("/manager/merchant/getSubjectInfo",function (data) {
+        var html = ''
+        data.data.forEach(function (item) {
+            html += '<option value="'+item.subject+'">'+item.subject+'</option>'
+        })
+        $("#mainSubject").append(html)
+    })
+    function checkCardExp(checkbox) {
+        if ( checkbox.checked == true) {
+            $("input[name='legalPersonIdCardExp']").val("9999-12-31")
+        }else{
+            $("input[name='legalPersonIdCardExp']").val("")
+        }
+    }
+    function checkLicenseExp(checkbox) {
+        if ( checkbox.checked == true) {
+            $("input[name='businessLicenseExp']").val("9999-12-31")
+        }else{
+            $("input[name='businessLicenseExp']").val("")
+        }
+    }
+
+    var prefix = "/manager/merchant"
+
+    //打款渠道选择控制渠道用户单笔限额显示隐藏
+    $("input[name='bankChannel']").click(function () {
+        if ($(this).is(":checked")){
+            $("#bankSingleQuota").css('display','block')
+            $("input[name='bankSingleQuota']")[0].value = '49999'
+        } else {
+            $("#bankSingleQuota").css('display','none')
+            $("input[name='bankSingleQuota']")[0].value = ''
+        }
+
+    })
+    $("input[name='alipayChannel']").click(function () {
+        if ($(this).is(":checked")){
+            $("#alipaySingleQuota").css('display','block')
+            $("input[name='alipaySingleQuota']")[0].value = '49999'
+        } else {
+            $("#alipaySingleQuota").css('display','none')
+            $("input[name='alipaySingleQuota']")[0].value = ''
+        }
+
+    })
+    $("input[name='wechatChannel']").click(function () {
+        if ($(this).is(":checked")){
+            $("#wechatSingleQuota").css('display','block')
+            $("input[name='wechatSingleQuota']")[0].value = '49999'
+        } else {
+            $("#wechatSingleQuota").css('display','none')
+            $("input[name='wechatSingleQuota']")[0].value = ''
+        }
+        
+    })
+    $("input[id='bigRateSwitch']").click(function () {
+        if ($(this).is(":checked")) {
+            $("#singleServiceBigRate").css('display','block')
+            $("input[name='singleServiceBigRate']")[0].value = ''
+            $(".singleServiceBigRate").text("")
+        } else {
+            $("#singleServiceBigRate").css('display','none')
+        }
+    })
+    $(function () {
+        //所有输入框不允许输入空格
+        $("input[type='text']").attr("onkeyup",'this.value=this.value.replace(/\\s+/g,\'\')');
+        //  进入新增商户页面判断
+        if ($("input[name='signSwitch']:checked").val() != "0") {
+            $("input[name='signingType'][value='2']").attr("disabled",true)
+        } else {
+            $("input[name='signingType'][value='0']").attr("disabled",true)
+            $("input[name='signingType'][value='1']").attr("disabled",true)
+            $("input[name='signingType'][value='2']").attr("disabled",false)
+            $("input[name='signingType'][value='3']").attr("disabled",true)
+            $("input[name='silentSignSwitch'][value='1']").attr("disabled",true)
+        }
+        if ($("input[name='signingType']:checked").val() != "0") {
+            $("input[name='sendOrderSwitch'][value='1']").attr("disabled",true)
+            $("#dispatch").hide()
+        }
+        //签约类型的点击事件
+        $("input[name='signingType'][value='0']").click(function () {
+            $("input[name='sendOrderSwitch'][value='1']").attr("disabled",false)
+            $("input[name='promotionSwitch'][value='1']").attr("disabled",true)
+            $("input[name='promotionSwitch'][value='0']").prop("checked",true)
+            if ($("input[name='sendOrderSwitch']:checked").val() == "0") {
+                $("#workPost").show()
+            }
+        }) //微信签约
+        $("input[name='signingType'][value='1']").click(function () {
+            $("input[name='sendOrderSwitch'][value='1']").attr("disabled",true)
+            $("input[name='sendOrderSwitch'][value='1']").prop("checked",false)
+            $("input[name='sendOrderSwitch'][value='0']").prop("checked",true)
+            $("input[name='promotionSwitch'][value='1']").attr("disabled",false)
+            $("#dispatchMode").hide()
+            $("#dispatch").hide()
+            $("#workPost").show()
+        }) //线上签约
+        $("input[name='signingType'][value='2']").click(function () {
+            $("input[name='sendOrderSwitch'][value='1']").attr("disabled",true)
+            $("input[name='sendOrderSwitch'][value='1']").prop("checked",false)
+            $("input[name='sendOrderSwitch'][value='0']").prop("checked",true)
+            $("input[name='promotionSwitch'][value='1']").attr("disabled",false)
+            $("#dispatchMode").hide()
+            $("#dispatch").hide()
+        }) //纸质签约
+        $("input[name='signingType'][value='3']").click(function () {
+            $("input[name='sendOrderSwitch'][value='1']").attr("disabled",true)
+            $("input[name='sendOrderSwitch'][value='1']").prop("checked",false)
+            $("input[name='sendOrderSwitch'][value='0']").prop("checked",true)
+            $("input[name='promotionSwitch'][value='1']").attr("disabled",false)
+            $("#dispatchMode").hide()
+            $("#dispatch").hide()
+            $("#workPost").show()
+        }) //线上签约(可打款)
+        //签约开关的点击
+        $("input[name='signSwitch'][value='0']").click(function () {
+            $("input[name='signingType'][value='0']").attr("disabled",true)
+            $("input[name='signingType'][value='1']").attr("disabled",true)
+            $("input[name='signingType'][value='2']").attr("disabled",false)
+            $("input[name='signingType'][value='2']").prop("checked",true)
+            $("input[name='signingType'][value='3']").attr("disabled",true)
+            $("input[name='sendOrderSwitch'][value='1']").attr("disabled",true)
+            $("input[name='silentSignSwitch'][value='1']").attr("disabled",true)
+            $("input[name='silentSignSwitch'][value='0']").prop("checked",true)
+
+        }) //关
+        $("input[name='signSwitch'][value='1']").click(function () {
+            $("input[name='signingType'][value='0']").attr("disabled",false)
+            $("input[name='signingType'][value='1']").attr("disabled",false)
+            $("input[name='signingType'][value='2']").attr("disabled",true)
+            $("input[name='signingType'][value='3']").attr("disabled",false)
+            $("input[name='silentSignSwitch'][value='1']").attr("disabled",false)
+            $("input[name='signingType'][value='1']").prop("checked",true) // 点击签约开关开会默认跳到线上签约
+            $("#workPost").show()
+        }) //开
+        //是否为派单商户的点击
+        $("input[name='sendOrderSwitch'][value='0']").click(function () {
+            $("#dispatch").hide()
+            $("#dispatchMode").hide()
+            $("#workPost").show()
+        }) //否
+        $("input[name='sendOrderSwitch'][value='1']").click(function () {
+            $("#dispatch").show()
+            $("#dispatchMode").show()
+            $("#workPost").hide()
+        }) //是派单商户
+
+        //输入框失焦校验
+        $("input[name='merchantName']").blur(function () {
+            if($(this).val() == ""){$(".merchantName").text("商户名称不能为空")}
+            else if ($(this).val().length > 50){
+                $(".merchantName").text("商户名称不得超过50位")
+                $(this)[0].value = ''
+            }
+            else {
+                $("#merchantName").val($(this).val())
+                var data = JSON.stringify({merchantName:$(this).val()})
+                $.ajax({
+                    url:prefix+ "/checkMerchantName",
+                    data: data,
+                    type: "post",
+                    datatype:"json",
+                    contentType: 'application/json',
+                    success: function(result) {
+                        if(result.code != 0){$(".merchantName").text(result.msg)}
+                        else {$(".merchantName").text("")}
+                    }
+                })
+            }
+
+        })
+        $("input[name='contractNo']").blur(function () {
+            if($(this).val() == ""){$(".contractNo").text("不能为空")}
+            else if ($(this).val().length > 50){
+                $(".contractNo").text("合同编号不得超过50位")
+                $(this)[0].value = ''
+            }
+            else {
+                $(".contractNo").text("")
+            }
+        })
+        $("#merchantGeneralTaxpayer").click(function () {
+            $("#invoiceGeneralTaxpayer").prop('checked',true)
+        })
+        $("#merchantSmallScaleTaxpayer").click(function () {
+            $("#invoiceSmallScaleTaxpayer").prop('checked',true)
+        })
+        $("input[name='settBankcardNo']").blur(function () {
+            if($(this).val() == ""){$(".settBankcardNo").text("不能为空")}
+            else if ($(this).val().length > 50){
+                $(".settBankcardNo").text("提现银行卡开户行行号不得超过50位")
+                $(this)[0].value = ''
+            }
+            else {
+                $(".settBankcardNo").text("")
+            }
+        })
+        $("input[name='legalPersonMobile']").blur(function () {
+            if ($(this).val() == "") {
+                $(".legalPersonMobile").text("请输入11位的手机号")
+            } else if (!(/^1[3456789]\d{9}$/.test($(this).val()))) {
+                $(".legalPersonMobile").text("请输入正确手机号")
+            } else {
+                $(".legalPersonMobile").text("")
+            }
+        })
+        $("input[name='contactsMobile']").blur(function () {
+            if($(this).val() == ""){$(".contactsMobile").text("请输入11位的手机号")}
+            else if(!(/^1[3456789]\d{9}$/.test($(this).val()))){
+                $(".contactsMobile").text("请输入正确手机号")
+                $("input[name='contactsMobile']")[0].value = ''
+            }else {
+                $("#contactsMobile").val($(this).val())
+                $("#mobile").val($(this).val())
+                $(".contactsMobile").text("")
+                // var data = JSON.stringify({contactsMobile:$(this).val()})
+                // $.ajax({
+                //     url:prefix+ "/checkContactsMobile",
+                //     data: data,
+                //     type: "post",
+                //     datatype:"json",
+                //     contentType: 'application/json',
+                //     success: function(result) {
+                //         if(result.code != 0){$(".contactsMobile").text(result.msg); $("input[name='contactsMobile']")[0].value = ''}  // 重复手机号不可填
+                //         else {$(".contactsMobile").text("")}
+                //     }
+                // })
+            }
+        })
+        $("#email").blur(function () {
+            if($(this).val() == ""){$(".email").text("邮箱不能为空")}
+            else if ($(this).val().length > 50){
+                $(".email").text("输入邮箱不得超过50位")
+                $(this)[0].value = ''
+            }else if(!(/^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/.test($(this).val()))){
+                $(".email").text("请输入正确邮箱")
+            }else {
+                $("#contactsEamil").val($(this).val())
+                $("#invoice_email").val($(this).val())
+                $("#balance_remindEmail").val($(this).val())
+                $("#recharge_remindEmail").val($(this).val())
+                var data = JSON.stringify({email:$(this).val()})
+                $.ajax({
+                    url:prefix+ "/checkEmail",
+                    data: data,
+                    type: "post",
+                    datatype:"json",
+                    contentType: 'application/json',
+                    success: function(result) {
+                        if(result.code != 0){$(".email").text(result.msg); $("#email")[0].value = ''}  // 重复邮箱不可填
+                        else {$(".email").text("")}
+                    }
+                })
+            }
+        })
+        $("input[name='password']").blur(function () {
+            if($(this).val() == ""){$(".password").text("密码不能为空")}
+            else if(!(/^[\w]{6,12}$/.test($(this).val()))){
+                $(".password").text("请输入6-12位数字或字母的密码")
+            }
+            else {$(".password").text("")}
+        })
+        $("input[name='accountName']").blur(function () {
+            if($(this).val() == ""){$(".accountName").text("开户名称不能为空")}
+            else if ($(this).val().length > 50){
+                $(".accountName").text("开户名称不得超过50位")
+                $(this)[0].value = ''
+            }
+            else {
+                var data = JSON.stringify({accountName:$(this).val()})
+                $.ajax({
+                    url:prefix+ "/checkAccountName",
+                    data: data,
+                    type: "post",
+                    datatype:"json",
+                    contentType: 'application/json',
+                    success: function(result) {
+                        if(result.code != 0){$(".accountName").text(result.msg);$("input[name='accountName']")[0].value = ''} // 重复开户名称不可填
+                        else {$(".accountName").text("")}
+                    }
+                })
+            }
+        })
+        $("input[name='accountNo']").blur(function () {
+            if($(this).val() == ""){
+                $(".accountNo").text("对公账户不能为空")
+            }else if ($(this).val().length > 50){
+                $(".accountNo").text("对公账户不得超过50位")
+                $(this)[0].value = ''
+            }
+            else {
+                $("#bankNumber").val($(this).val())
+                var data = JSON.stringify({accountNo:$(this).val()})
+                $.ajax({
+                    url:prefix+ "/checkAccountNo",
+                    data: data,
+                    type: "post",
+                    datatype:"json",
+                    contentType: 'application/json',
+                    success: function(result) {
+                        if(result.code != 0){$(".accountNo").text(result.msg);$("input[name='accountNo']")[0].value = ''} //重复开户账户不可填
+                        else {$(".accountNo").text("")}
+                    }
+                })
+            }
+        })
+        $("input[name='businessLicenseCode']").blur(function () {
+            if($(this).val() == ""){$(".businessLicenseCode").text("营业执照编码不能为空")}
+            else if ($(this).val().length != 18){
+                $(".businessLicenseCode").text("请输入18位营业执照编码")
+                $(this)[0].value = ''
+            }
+            else {
+                $("#taxpayerIdentificationNumber").val($(this).val())
+                var data = JSON.stringify({businessLicenseCode:$(this).val()})
+                $.ajax({
+                    url:prefix+ "/checkBusinessLicenseCode",
+                    data: data,
+                    type: "post",
+                    datatype:"json",
+                    contentType: 'application/json',
+                    success: function(result) {
+                        if(result.code != 0){$(".businessLicenseCode").text(result.msg);$("input[name='businessLicenseCode']")[0].value = ''} // 重复营业执照编码不可填
+                        else {$(".businessLicenseCode").text("")}
+                    }
+                })
+            }
+        })
+        $("input[name='companyName']").blur(function () {
+            if($(this).val() == ""){$(".companyName").text("企业名称不能为空")}
+            else if ($(this).val().length < 2){
+                $(".companyName").text("企业名称至少两个字")
+                $(this)[0].value = ''
+            }
+            else if ($(this).val().length > 50){
+                $(".companyName").text("企业名称不得超过50位")
+                $(this)[0].value = ''
+            }
+            else {
+                $("#companyName").val($(this).val())
+                var data = JSON.stringify({companyName:$(this).val()})
+                $.ajax({
+                    url:prefix+ "/checkCompanyName",
+                    data: data,
+                    type: "post",
+                    datatype:"json",
+                    contentType: 'application/json',
+                    success: function(result) {
+                        if(result.code != 0){$(".companyName").text(result.msg);$("input[name='companyName']")[0].value = ''}  // 重复企业名称不可填
+                        else {$(".companyName").text("")}
+                    }
+                })
+            }
+        })
+        $("input[name='legalPersonName']").blur(function () {
+            if($(this).val() == ""){$(".legalPersonName").text("法人名字不能为空")}
+            else if ($(this).val().length > 50){
+                $(".legalPersonName").text("法人姓名不得超过50位")
+                $(this)[0].value = ''
+            }
+            else {$(".legalPersonName").text("")}
+        })
+        $("input[name='contacts']").blur(function () {
+            if($(this).val() == ""){$(".contacts").text("联系人姓名不能为空")}
+            else if ($(this).val().length > 50){
+                $(".contacts").text("联系人姓名不得超过50位")
+                $(this)[0].value = ''
+            }
+            else {
+                $("#addresseeName").val($(this).val())
+                $(".contacts").text("")
+            }
+        })
+        $("#contactsEamil").blur(function () {
+            if($(this).val() == ""){$(".contactsEamil").text("联系人邮箱不能为空")}
+            else if ($(this).val().length > 50){
+                $(".contactsEamil").text("联系人邮箱不得超过50位")
+                $(this)[0].value = ''
+            }
+            else if(!(/^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/.test($(this).val()))){
+                $(".contactsEamil").text("请输入正确邮箱")
+            }
+            else {$(".contactsEamil").text("")}
+        })
+        $("input[name='invoiceEmail']").blur(function () {
+            if($(this).val() == ""){$(".invoiceEmail").text("接收报税文件邮箱不能为空")}
+            else if ($(this).val().length > 50){
+                $(".invoiceEmail").text("接收报税文件邮箱不得超过50位")
+                $(this)[0].value = ''
+            }
+            else if(!(/^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/.test($(this).val()))){
+                $(".invoiceEmail").text("请输入正确邮箱")
+            }
+            else {$(".invoiceEmail").text("")}
+        })
+        $("input[name='contactsAddress']").blur(function () {
+            if($(this).val() == ""){$(".contactsAddress").text("联系地址不能为空")}
+            else if ($(this).val().length > 50){
+                $(".contactsAddress").text("联系地址不得超过50位")
+                $(this)[0].value = ''
+            }
+            else {
+                $("#addressDetail").val($(this).val())
+                console.log("11111")
+                $(".contactsAddress").text("")
+            }
+        })
+        $("#merchantInfo input[name='bankName']").blur(function () {
+            if($(this).val() == ""){$(".bankName").text("开户银行不能为空")}
+            else if ($(this).val().length > 50){
+                $(".bankName").text("开户银行不得超过50位")
+                $(this)[0].value = ''
+            }
+            else {
+                $("#invoiceBankName").val($(this).val())
+                $(".bankName").text("")
+            }
+        })
+        $("input[name='customerManager']").blur(function () {
+            if($(this).val() == ""){$(".customerManager").text("客户经理不能为空")}
+            else if ($(this).val().length > 50){
+                $(".customerManager").text("客户经理姓名不得超过50位")
+                $(this)[0].value = ''
+            }
+            else {$(".customerManager").text("")}
+        })
+        $("input[name='customerManagerMobile']").blur(function () {
+            if($(this).val() == ""){$(".customerManagerMobile").text("客户经理手机号不能为空")}
+            else if(!(/^1[3456789]\d{9}$/.test($(this).val()))){
+                $(".customerManagerMobile").text("请输入正确手机号")
+            }else {$(".customerManagerMobile").text("")}
+        })
+        $("#customerManager-eamil").blur(function () {
+            if($(this).val() == ""){$(".customerManager-eamil").text("客户经理邮箱不能为空")}
+            else if ($(this).val().length > 50){
+                $(".customerManager-eamil").text("客户经理邮箱不得超过50位")
+                $(this)[0].value = ''
+            }
+            else if(!(/^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/.test($(this).val()))){
+                $(".customerManager-eamil").text("请输入正确邮箱")
+            }
+            else {
+                $("#businessSupport").val($(this).val())
+                $(".customerManager-eamil").text("")
+            }
+        })
+        $("input[name='successCustomerManager']").blur(function () {
+            if($(this).val() == ""){$(".successCustomerManager").text("客户签约经理不能为空")}
+            else if ($(this).val().length > 50){
+                $(".successCustomerManager").text("客户签约经理姓名不得超过50位")
+                $(this)[0].value = ''
+            }
+            else {$(".successCustomerManager").text("")}
+        })
+        $("input[name='successCustomerManagerMobile']").blur(function () {
+            if($(this).val() == ""){$(".successCustomerManagerMobile").text("客户签约经理手机号不能为空")}
+            else if(!(/^1[3456789]\d{9}$/.test($(this).val()))){
+                $(".successCustomerManagerMobile").text("请输入正确手机号")
+            } else {$(".successCustomerManagerMobile").text("")}
+        })
+        $("input[name='successCustomerEmail']").blur(function () {
+            if($(this).val() == ""){$(".successCustomerEmail").text("客户签约经理邮箱不能为空")}
+            else if ($(this).val().length > 50){
+                $(".successCustomerEmail").text("客户签约经理邮箱不得超过50位")
+                $(this)[0].value = ''
+            }
+            else if(!(/^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/.test($(this).val()))){
+                $(".successCustomerEmail").text("请输入正确邮箱")
+            }
+            else {$(".successCustomerEmail").text("")}
+        })
+        $("input[name='businessSupport']").blur(function () {
+            if($(this).val() == ""){$(".businessSupport").text("商务支持邮箱不能为空")}
+            else if ($(this).val().length > 50){
+                $(".businessSupport").text("商务支持邮箱不得超过50位")
+                $(this)[0].value = ''
+            }
+            else if(!(/^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/.test($(this).val()))){
+                $(".businessSupport").text("请输入正确邮箱")
+            }
+            else {$(".businessSupport").text("")}
+        })
+        // 银行卡渠道用户单笔限额
+        $("input[name='bankSingleQuota']").blur(function () {
+            if($(this).val() == ""){$(".bankSingleQuota").text("银行卡渠道用户单笔限额不能为空")}
+            else if ($(this).val() > 49999){
+                $(".bankSingleQuota").text("银行卡渠道用户单笔限额不能超过49999");
+                $(this)[0].value = ''
+            } else {$(".bankSingleQuota").text("")}
+        })
+        // 支付宝渠道用户单笔限额
+        $("input[name='alipaySingleQuota']").blur(function () {
+            if($(this).val() == ""){$(".alipaySingleQuota").text("支付宝渠道用户单笔限额不能为空")}
+            else if ($(this).val() > 49999){
+                $(".alipaySingleQuota").text("支付宝渠道用户单笔限额不能超过49999");
+                $(this)[0].value = ''
+            } else {$(".alipaySingleQuota").text("")}
+        })
+        // 微信渠道用户单笔限额
+        $("input[name='wechatSingleQuota']").blur(function () {
+            if($(this).val() == ""){$(".wechatSingleQuota").text("微信渠道用户单笔限额不能为空")}
+            else if ($(this).val() > 49999){
+                $(".wechatSingleQuota").text("微信渠道用户单笔限额不能超过49999");
+                $(this)[0].value = ''
+            } else {$(".wechatSingleQuota").text("")}
+        })
+        $("input[name='singleQuotaConfig']").blur(function () {
+            if($(this).val() > 10000000){
+                $(".singleQuotaConfig").text("最大金额不得超过1千万");
+                $(this)[0].value = ''
+            } else {$(".singleQuotaConfig").text("")}
+        })
+        $("input[name='paymentRequirement']").blur(function () {
+            if($(this).val() == ""){$(".paymentRequirement").text("付费要求不能为空")}
+            else if ($(this).val().length > 30){
+                $(".paymentRequirement").text("最多不能超过30个字")
+                $(this)[0].value = ''
+            }
+            else {$(".paymentRequirement").text("")}
+        })
+        // 商户服务费率
+        $("input[name='singleServiceRate']").blur(function () {
+            if (/^((\d+\.?\d*)|(\d*\.\d+))\%$/.test($(this).val())) {
+                var a = $(this).val().replace('%','');
+                num = a /100
+                if (num <= 0 || num >=1 ){
+                    $(".singleServiceRate").text("输入值应为大于0小于1的数字")
+                    $(this)[0].value = ''
+                }
+                else {
+                    $(this)[0].value = num;
+                    if (!(/^\d+(\.\d{0,5})?$/.test($(this)[0].value))) {
+                        $(".singleServiceRate").text("最多保留小数点后五位")
+                        $(this)[0].value = ''
+                    } else {
+                        $(".singleServiceRate").text("")
+                    }
+                }
+            } else {
+                if($(this).val() == ""){$(".singleServiceRate").text("商户服务费率不能为空")}
+                else {
+                    var num1 = $(this).val()
+                    if (num1 == 0) {
+                        $(".singleServiceRate").text("商户服务费率不得为0")
+                        $(this)[0].value = ''
+                    } else if (!(/^0\.[0-9]\d*$/.test($(this).val()))){
+                        $(".singleServiceRate").text("输入值应为大于0小于1的数字")
+                        $(this)[0].value = ''
+                    } else {
+                        if (!(/^\d+(\.\d{0,5})?$/.test($(this).val()))) {
+                            $(".singleServiceRate").text("最多保留小数点后五位")
+                            $(this)[0].value = ''
+                        } else {
+                            $(".singleServiceRate").text("")
+                        }
+                    }
+                }
+            }
+        })
+        // 大额服务费率校验
+        $("input[name='singleServiceBigRate']").blur(function () {
+            if (/^((\d+\.?\d*)|(\d*\.\d+))\%$/.test($(this).val())) {
+                var a = $(this).val().replace('%','');
+                num = a /100
+                if (num <= 0 || num >=1 ){
+                    $(".singleServiceBigRate").text("大额服务费率应不得小于商户服务费率并且不能大于1")
+                    $(this)[0].value = ''
+                }
+                else {
+                    $(this)[0].value = num;
+                    if (!(/^\d+(\.\d{0,5})?$/.test($(this).val()))) {
+                        $(".singleServiceBigRate").text("最多保留小数点后五位")
+                        $(this)[0].value = ''
+                    } else {
+                        $(".singleServiceBigRate").text("")
+                    }
+                }
+            } else {
+                if($(this).val() == ""){$(".singleServiceBigRate").text("大额服务费率不能为空")}
+                else {
+                    var num2 = $(this).val()
+                    if (num2 == 0) {
+                        $(".singleServiceBigRate").text("商户服务费率不得为0")
+                        $(this)[0].value = ''
+                    } else if (!(/^0\.[0-9]\d*$/.test($(this).val()))) {
+                        $(".singleServiceBigRate").text("输入值应为不小于商户服务费率且不大于1的数字")
+                        $(this)[0].value = ''
+                    } else {
+                        if (!(/^\d+(\.\d{0,5})?$/.test($(this).val()))) {
+                            $(".singleServiceBigRate").text("最多保留小数点后五位")
+                            $(this)[0].value = ''
+                        } else {
+                            $(".singleServiceBigRate").text("")
+                        }
+                    }
+                }
+            }
+        })
+        $("input[name='taxpayerIdentificationNumber']").blur(function () {
+            if($(this).val() == ""){$(".taxpayerIdentificationNumber").text("纳税人识别号不能为空")}
+            else if ($(this).val().length > 50){
+                $(".taxpayerIdentificationNumber").text("纳税人识别号不得超过50位")
+                $(this)[0].value = ''
+            }
+            else {$(".taxpayerIdentificationNumber").text("")}
+        })
+        $("input[name='companyAddress']").blur(function () {
+            if($(this).val() == ""){$(".companyAddress").text("单位注册地址不能为空")}
+            else if ($(this).val().length > 50){
+                $(".companyAddress").text("单位注册地址不得超过50位")
+                $(this)[0].value = ''
+            }
+            else {$(".companyAddress").text("")}
+        })
+        $("input[name='invoiceMobile']").blur(function () {
+            if($(this).val() == ""){$(".invoiceMobile").text("单位电话不能为空")}
+            else if ($(this).val().length > 50){
+                $(".invoiceMobile").text("单位电话不得超过50位")
+                $(this)[0].value = ''
+            }
+            else {$(".invoiceMobile").text("")}
+        })
+        $("#invoice_bankName input[name='bankName']").blur(function () {
+            if($(this).val() == ""){$(".invoice_bankName").text("开户行不能为空")}
+            else if ($(this).val().length > 50){
+                $(".invoice_bankName").text("开户行名称不得超过50位")
+                $(this)[0].value = ''
+            }
+            else {$(".invoice_bankName").text("")}
+        })
+        $("input[name='bankNumber']").blur(function () {
+            if($(this).val() == ""){$(".bankNumber").text("银行账号不能为空")}
+            else if ($(this).val().length > 50){
+                $(".bankNumber").text("银行账号不得超过50位")
+                $(this)[0].value = ''
+            }
+            else {$(".bankNumber").text("")}
+        })
+        $("input[name='address']").blur(function () {
+            if($(this).val() == ""){$(".address").text("详细地址不能为空")}
+            else if ($(this).val().length > 50){
+                $(".address").text("详细地址不得超过50位")
+                $(this)[0].value = ''
+            }
+            else {$(".address").text("")}
+        })
+        $("input[name='addresseeName']").blur(function () {
+            if($(this).val() == ""){$(".addresseeName").text("收件人姓名不能为空")}
+            else if ($(this).val().length > 50){
+                $(".addresseeName").text("收件人姓名不得超过50位")
+                $(this)[0].value = ''
+            }else {$(".addresseeName").text("")}
+        })
+        $("input[name='mobile']").blur(function () {
+            if($(this).val() == ""){$(".mobile").text("联系电话不能为空")}
+            else if(!(/^1[3456789]\d{9}$/.test($(this).val()))){
+                $(".mobile").text("请输入正确手机号")
+            } else {$(".mobile").text("")}
+        })
+
+        $("input[name='balanceRemindEmail']").blur(function () {
+            if($(this).val() == ""){$(".balanceRemindEmail").text("预警及提醒类邮箱不能为空")}
+            else if ($(this).val().length > 50){
+                $(".balanceRemindEmail").text("预警及提醒类邮箱不得超过50位")
+                $(this)[0].value = ''
+            }
+            else {$(".balanceRemindEmail").text("")}
+        })
+        $("input[name='rechargeRemindEmail']").blur(function () {
+            if($(this).val() == ""){$(".rechargeRemindEmail").text("账单类邮箱不能为空")}
+            else if ($(this).val().length > 50){
+                $(".rechargeRemindEmail").text("账单类邮箱不得超过50位")
+                $(this)[0].value = ''
+            }
+            else {$(".rechargeRemindEmail").text("")}
+        })
+        $("input[name='merchantAddress']").blur(function () {
+            if($(this).val() == ""){$(".merchantAddress").text("商户经营地址不能为空")}
+            else if ($(this).val().length > 50){
+                $(".merchantAddress").text("商户经营地址不得超过50位")
+                $(this)[0].value = ''
+            }
+            else {
+                $("#companyAddress").val($(this).val())
+                $(".merchantAddress").text("")
+            }
+        })
+        $("input[name='legalPersonIdCardNo']").blur(function () {
+            if($(this).val() == ""){$(".legalPersonIdCardNo").text("法人身份证号不能为空")}
+            else if(!(/(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/.test($(this).val()))){
+                $(".legalPersonIdCardNo").text("请输入正确身份证号")
+            }else {$(".legalPersonIdCardNo").text("")}
+        })
+        $("input[name='token']").blur(function () {
+            if($(this).val() == ""){$(".token").text("不能为空")}
+            else {$(".token").text("")}
+        })
+        $("input[name='xinbadaUserUuid']").blur(function () {
+            if($(this).val() == ""){$(".xinbadaUserUuid").text("不能为空")}
+            else {$(".xinbadaUserUuid").text("")}
+        })
+    })
+    var imgurl;
+    var ImgBoxUrl = []
+    // 信息填写完成 保存提交
+    function submitAll() {
+        var contractImgUrl = ImgBoxUrl.join(",")
+        var num = $(" input[ name='phonenumber' ] ").val()
+        $(" input[ name='loginName' ] ").attr("value", num)
+        var data1 = $("#form1").serializeArray();
+        var data2 = $("#form2").serializeArray();
+        var license_img = $("#license_img").attr("src")
+        var contactsIdCardFront = $("#positive").attr("src")
+        var contactsIdCardBack = $("#reverse").attr("src")
+        data2.push({"name": "businessLicenseImg", "value": license_img});
+        var data3 = $("#form3").serializeArray();
+        var alipayPee = $("input[name='alipayChannel']").prop("checked") == true ? 'ON' : 'OFF'
+        var bankPee = $("input[name='bankChannel']").prop("checked") == true ? 'ON' : 'OFF'
+        var wechatPee = $("input[name='wechatChannel']").prop("checked") == true ? 'ON' : 'OFF'
+        if (wechatPee == 'OFF') {
+            data3.push({"name": "wechatChannel", "value": "0"})
+        } else {
+            var replacement = {"name": "wechatChannel", "value": "1"}
+            for (var i = 0;i < data3.length;i++) {
+                if (data3[i].name === 'wechatChannel') {
+                    data3[i] = replacement
+                }
+            }
+        }
+        if (alipayPee == 'OFF') {
+            data3.push({"name": "alipayChannel", "value": "0"})
+        } else {
+            var replacement = {"name": "alipayChannel", "value": "1"}
+            for (var i = 0;i < data3.length;i++) {
+                if (data3[i].name === 'alipayChannel') {
+                    data3[i] = replacement
+                }
+            }
+        }
+        if (bankPee == 'OFF') {
+            data3.push({"name": "bankChannel", "value": "0"})
+        } else {
+            var replacement = {"name": "bankChannel", "value": "1"}
+            for (var i = 0;i < data3.length;i++) {
+                if (data3[i].name === 'bankChannel') {
+                    data3[i] = replacement
+                }
+            }
+        }
+        var dispatchData = $("#dispatchForm").serializeArray()
+        var merchantTaskInfoList=[]
+        var listObj={}
+        for (var i = 0; i <$("#dispatchForm select[name='taskTitle']").length ; i++) {
+            listObj = {"taskId":$("#dispatchForm select[name='taskTitle']")[i].selectedOptions[0].value,
+                "taskInfo":$("#dispatchForm textarea[name='taskContent']")[i].value,
+                "taskName":$("#dispatchForm select[name='taskTitle']")[i].selectedOptions[0].innerText
+            }
+            merchantTaskInfoList.push(listObj)
+        }
+        var postObj = {}
+        var taskInfos = []
+        for (var i = 1;i<=$("#workPost select").length;i++){
+            postObj = {"id":$("#workPost div[id='post"+i+"'] select").val(),
+                "taskName":$("#workPost div[id='post"+i+"'] select").find("option:selected").text()
+            }
+            taskInfos.push(postObj)
+        }
+        var paymentAdjustType = $("input[name='paymentAdjustType']:checked").val();
+        var settleType = $("input[name='settleType']:checked").val();
+        var businessType = $("input[name='businessType']:checked").val();
+        var moneyModel = $("input[name='moneyModel']:checked").val();
+        var paymentModel = $("input[name='paymentModel']:checked").val();
+        var rateSwitch = $("input[name='rateSwitch']:checked").val();
+        var inOrOutDeduction = $("input[name='inOrOutDeduction']:checked").val();
+        var promotionSwitch = $("input[name='promotionSwitch']:checked").val();
+        var sendOrderSwitch = $("input[name='sendOrderSwitch']:checked").val();
+        var sendOrderMode = $("input[name='sendOrderMode']:checked").val();
+        var asynSwitch = $("input[name='asynSwitch']:checked").val();
+        var asynSignSwitch = $("input[name='asynSignSwitch']:checked").val();
+        var signSwitch = $("input[name='signSwitch']:checked").val();
+        var silentSignSwitch = $("input[name='silentSignSwitch']:checked").val();
+        var signingType = $("input[name='signingType']:checked").val();
+        var mainSubject = $("input[name='mainSubject']").val()
+        var merchantName = $("input[name='merchantName']").val()
+        var paymentRequirement = $("input[name='paymentRequirement']").val()
+        var singleServiceRate = $("input[name='singleServiceRate']").val()
+        var singleServiceBigRate = $("input[name='singleServiceBigRate']").val() // 大额服务费率
+        var quotaConfig = $("input[id='quotaConfig']").is(':checked') == true ? 'ON' : 'OFF';
+        var singleDayQuota = $("input[id='singleDayQuota']").is(':checked') == true ? 'ON' : 'OFF';
+        var bigRateSwitch = $("input[id='bigRateSwitch']").is(':checked') == true ? '1' : '0'; // 大额费率开关
+        var mealInfoId =  $("select[name='mealInfoId'] option:selected").val()
+        var balanceEmailRemindSwitch = $("input[name='balanceEmailRemindSwitch']").prop('checked') == true ? 'ON' : 'OFF'
+        var balanceSmsRemindSwitch = $("input[name='balanceSmsRemindSwitch']").prop('checked') == true ? 'ON' : 'OFF'
+        var rechargeEmailRemindSwitch = $("input[name='rechargeEmailRemindSwitch']").prop('checked') == true ? 'ON' : 'OFF'
+        var rechargeSmsRemindSwitch = $("input[name='rechargeSmsRemindSwitch']").prop('checked') == true ? 'ON' : 'OFF'
+        var balanceRemindSwitch = $("input[id='balanceRemindSwitch']").is(':checked') == true ? 'ON' : 'OFF';
+        var rechargeRemindSwitch = $("input[id='rechargeRemindSwitch']").is(':checked') == true ? 'ON' : 'OFF';
+        data3.push({"name": "paymentAdjustType", "value": paymentAdjustType});
+        data3.push({"name": "settleType", "value": settleType});
+        data3.push({"name": "businessType", "value": businessType});
+        data3.push({"name": "moneyModel", "value": moneyModel});
+        data3.push({"name": "paymentModel", "value": paymentModel});
+        data3.push({"name": "rateSwitch", "value": rateSwitch});
+        data3.push({"name": "signSwitch", "value": signSwitch});
+        data3.push({"name": "silentSignSwitch", "value": silentSignSwitch});
+        data3.push({"name": "signingType", "value": signingType});
+        data3.push({"name": "mainSubject", "value": mainSubject});
+        data3.push({"name": "merchantName", "value": merchantName});
+        data3.push({"name": "quotaConfig", "value": quotaConfig});
+        data3.push({"name": "singleDayQuota", "value": singleDayQuota});
+        data3.push({"name": "bigRateSwitch", "value": bigRateSwitch}); // 大额费率
+        var data4 = $("#form4").serializeArray();
+        var data5 = $("#form5").serializeArray();
+        var invoiceEmail = document.querySelectorAll("input[name='invoiceEmail']")
+        var invoiceEmails = []
+        invoiceEmail.forEach(function (item) {
+            invoiceEmails.push(item.value)
+        })
+        var invoicemail = invoiceEmails.join(",")
+        var obj1 = {}
+        var obj2 = {}
+        var obj3 = {}
+        var obj4 = {}
+        var obj5 = {}
+        var data6 = $("#form6").serializeArray();
+        var invoiceSubjectIdList = []
+        var list = []
+        for (var i = 0;i<data6.length;i++) {
+            for (var j = i;j<data6.length;j++) {
+                if (data6[i].value === data6[j].value && i!=j) {
+                    $.modal.msgWarning("请勿重复选择同一发票科目")
+                    return
+                } else {
+                    list.push(data6[j].value)
+                }
+            }
+        }
+        for (var k = 0;k<list.length;k++) {
+            if(invoiceSubjectIdList.indexOf(list[k])==-1){
+                invoiceSubjectIdList.push(list[k]);
+            }
+        }
+        for (var i = 0;i<data1.length;i++){
+            obj1[data1[i].name] = data1[i].value
+        }
+        for (var i = 0;i<data2.length;i++){
+            obj2[data2[i].name] = data2[i].value
+        }
+
+        for (var i = 0;i<data3.length;i++){
+            obj3[data3[i].name] = data3[i].value
+        }
+        for (var i = 0;i<data4.length;i++){
+            obj4[data4[i].name] = data4[i].value
+
+        }
+        for (var i = 0;i<data5.length;i++){
+            obj5[data5[i].name] = data5[i].value
+        }
+        var balanceRemindEmail = document.querySelectorAll("input[name='balanceRemindEmail']")
+        var balanceRemindEmails = []
+
+        balanceRemindEmail.forEach(function (item) {
+            balanceRemindEmails.push(item.value)
+        })
+
+        var rechargeRemindEmail = document.querySelectorAll("input[name='rechargeRemindEmail']")
+        var rechargeRemindEmails = []
+        rechargeRemindEmail.forEach(function (item) {
+            rechargeRemindEmails.push(item.value)
+        })
+        // 校验
+        if(obj1.taxSourceId == '请选择'){
+            $.modal.msgWarning("请选择税源地商户")
+            return
+        }
+        if(contactsIdCardFront == undefined){
+            $.modal.msgWarning("请上传法人身份证正面照")
+            return
+        }
+        if(contactsIdCardBack == undefined){
+            $.modal.msgWarning("请上传法人身份证反面照")
+            return
+        }
+        if(obj2.legalPersonIdCardExp ==''){
+            $.modal.msgWarning("请输入法人身份证号有效期")
+            return
+        }
+        if(obj2.businessLicenseExp ==''){
+            $.modal.msgWarning("请输入营业执照有效期")
+            return
+        }
+        if(obj2.taxpayerType == undefined){
+            $.modal.msgWarning("请选择纳税人类型")
+            return
+        }
+        if(signingType == undefined){
+            $.modal.msgWarning("请选择签约类型")
+            return
+        }
+        if(ImgBoxUrl.length == 0){
+            $.modal.msgWarning("请上传合同")
+            return
+        }
+        if(rateSwitch == undefined){
+            $.modal.msgWarning("请选择用户服务费")
+            return
+        }
+        if(alipayPee == "0" && bankPee == "0"){
+            $.modal.msgWarning("请至少选择一种打款渠道")
+            return
+        }
+        if(obj5.lendingAuthority == undefined){
+            $.modal.msgWarning("请选择商户放款权限")
+            return
+        }
+        if (bigRateSwitch == '1' && obj3.singleServiceBigRate == "") {
+            $.modal.msgWarning("商户大额服务费率不能为空")
+            return
+        }
+        if (balanceRemindEmails[0] == '') {
+            $.modal.msgWarning("请最少添加一个预警及提醒类邮件发送邮箱地址")
+            return
+        }
+        if (rechargeRemindEmails[0] == '') {
+            $.modal.msgWarning("请最少添加一个账单类邮件发送范围")
+            return
+        }
+        var address = {
+            address:obj4.address,
+            addresseeName:obj4.addresseeName,
+            mobile:obj4.mobile
+        }
+        var cooperation ={
+            businessType:obj3.businessType,
+            mealInfoId:obj3.mealInfoId,
+            paymentAdjustType:obj3.paymentAdjustType,
+            bankChannel:obj3.bankChannel,
+            alipayChannel:obj3.alipayChannel,
+            wechatChannel:obj3.wechatChannel,
+            paymentModel:obj3.paymentModel,
+            paymentRequirement:obj3.paymentRequirement,
+            rateSwitch:obj3.rateSwitch,
+            promotionSwitch:obj3.promotionSwitch,
+            sendOrderSwitch:obj3.sendOrderSwitch,
+            sendOrderMode:obj3.sendOrderMode,
+            asynSwitch:obj3.asynSwitch,
+            asynSignSwitch:obj3.asynSignSwitch,
+            inOrOutDeduction:obj3.inOrOutDeduction,
+            signSwitch:obj3.signSwitch,
+            bigRateSwitch:obj3.bigRateSwitch,
+            silentSignSwitch:obj3.silentSignSwitch,
+            settleType:obj3.settleType,
+            moneyModel:obj3.moneyModel,
+            signingType:obj3.signingType,
+            bankSingleQuota:obj3.bankSingleQuota,
+            alipaySingleQuota:obj3.alipaySingleQuota,
+            wechatSingleQuota:obj3.wechatSingleQuota,
+            singleServiceRate:obj3.singleServiceRate,
+            singleServiceBigRate:obj3.singleServiceBigRate
+        }
+        var customerSupport = {
+            businessSupport: obj2.businessSupport,
+            customerManager: obj2.customerManager,
+            customerManagerMobile: obj2.customerManagerMobile,
+            email: obj2.email,
+            successCustomerEmail: obj2.successCustomerEmail,
+            successCustomerManager: obj2.successCustomerManager,
+            successCustomerManagerMobile: obj2.successCustomerManagerMobile
+        }
+        var invoiceInfo ={
+            bankName:obj4.bankName, // 发票信息中开户行
+            bankNumber:obj4.bankNumber,
+            companyAddress:obj4.companyAddress,
+            companyName:obj4.companyName,
+            // invoiceContent:obj4.invoiceContent,
+            // invoiceDefaultContent:obj4.invoiceDefaultContent,
+            invoiceMobile:obj4.invoiceMobile,
+            taxpayerIdentificationNumber:obj4.taxpayerIdentificationNumber,
+            taxpayerType:obj2.taxpayerType
+        }
+        var merchantAccountConfig = {
+            alipayRemindAmount:obj5.alipayRemindAmount,
+            balanceEmailRemindSwitch:balanceEmailRemindSwitch,
+            balanceRemindSwitch:balanceRemindSwitch,
+            balanceSmsRemindSwitch:balanceSmsRemindSwitch,
+            bankRemindAmount:obj5.bankRemindAmount,
+            comment:obj5.comment,
+            rechargeEmailRemindSwitch:rechargeEmailRemindSwitch,
+            rechargeRemindSwitch:rechargeRemindSwitch,
+            rechargeSmsRemindSwitch:rechargeSmsRemindSwitch,
+            wechatRemindAmount:obj5.wechatRemindAmount,
+            lendingAuthority:obj5.lendingAuthority,
+            balanceRemindEmails:balanceRemindEmails,
+            rechargeRemindEmails:rechargeRemindEmails
+        }
+        var merchantInfo = {
+            belongSaler:obj1.belongSaler,
+            agentNumber:obj1.agentNumber,
+            businessLicenseCode:obj2.businessLicenseCode,
+            businessLicenseImg:obj2.businessLicenseImg,
+            legalPersonName: obj2.legalPersonName,
+            companyName:obj2.companyName,
+            contactsMobile:obj1.contactsMobile,
+            contractNo:obj3.contractNo,
+            email:obj1.email,
+            merchantName:obj1.merchantName,
+            password:obj1.password,
+            taxpayerType:obj2.taxpayerType,
+            contacts:obj2.contacts,
+            contactsAddress:obj2.contactsAddress,
+            contactsMobile:obj2.contactsMobile,
+            invoiceEmail: invoicemail,
+            contractImgUrl: contractImgUrl,
+            contactsIdCardFront: contactsIdCardFront,
+            contactsIdCardBack: contactsIdCardBack,
+            legalPersonMobile: obj2.legalPersonMobile,
+            legalPersonIdCardNo:obj2.legalPersonIdCardNo,
+            industry:obj2.industry,
+            businessLicenseExp: obj2.businessLicenseExp,
+            merchantAddress: obj2.merchantAddress,
+            legalPersonIdCardExp:obj2.legalPersonIdCardExp,
+            subject:obj3.mainSubject
+        }
+        var riskManagementConfig = {
+            cumulativeQuota: obj3.cumulativeQuota,
+            quotaConfig:obj3.quotaConfig,
+            singleDayQuota:obj3.singleDayQuota,
+            singleQuotaConfig:obj3.singleQuotaConfig,
+            temporaryQuota:obj3.temporaryQuota,
+            temporaryQuotaBegin:obj3.temporaryQuotaBegin,
+            temporaryQuotaEnd:obj3.temporaryQuotaEnd,
+        }
+        var settlementInfo = {
+            accountName: obj2.accountName,
+            accountNo: obj2.accountNo,
+            bankName: obj2.bankName,
+            bankCode: obj2.bankCode,
+            settBankcardNo: obj2.settBankcardNo
+        }
+        var tianJinPaymentInfo = {
+            taxSourceCompanyId:obj1.taxSourceId,
+            token: obj2.token,
+            xinbadaUserUuid: obj2.xinbadaUserUuid
+        }
+        var params = {
+            address:address,
+            cooperation:cooperation,
+            invoiceInfo:invoiceInfo,
+            invoiceSubjectIdList:invoiceSubjectIdList,
+            merchantAccountConfig:merchantAccountConfig,
+            merchantInfo:merchantInfo,
+            riskManagementConfig:riskManagementConfig,
+            customerSupport:customerSupport,
+            settlementInfo:settlementInfo,
+            merchantTaskInfoList:merchantTaskInfoList,
+            taskInfos:taskInfos,
+            tianJinPaymentInfo: tianJinPaymentInfo,
+            taxSourceId: obj1.taxSourceId
+        }
+        params = JSON.stringify(params)
+        $.ajax({
+            url: "/manager/merchant/add",
+            data: params,
+            type: "post",
+            datatype:"json",
+            contentType: 'application/json',
+            beforeSend: function () {
+                $.modal.loading("正在处理中，请稍后...");
+            },
+            success: function(result) {
+                if (typeof callback == "function") {
+                    callback(result);
+                    $.modal.msgSuccess("添加成功");
+                }
+                $.operate.successTabCallback(result);
+            }
+        })
+    }
+    function onBanner(type) {
+        if(type == 0) {
+            $(".license").css("display","block")
+        }else if(type == 1){
+            $(".contract").css("display","block")
+        }else if(type == 2){
+            $(".positive").css("display","block")
+        }else{
+            $(".reverse").css("display","block")
+        }
+        $(".bg").css("display","block")
+        var height = document.body.scrollHeight
+        $(".bg").css("height",height)
+    }
+    $("#img-change").click(function () {
+        $("#file").click();
+    })
+    $("#positive-change").click(function () {
+        $("#cardFront").click();
+    })
+    $("#reverse-change").click(function () {
+        $("#cardBack").click();
+    })
+    $("#contractImg").click(function () {
+        $("#contract").click();
+    })
+    var imgURL;
+    var files;
+    var options = {
+        imgSrc:""
+    }
+    var filechange=function(event){
+        files = event.target.files, file;
+        if (files && files.length > 0) {
+            file = files[0];
+            if(file.size > 1024 * 1024 * 2) {
+                alert('图片大小不能超过 2MB!');
+                return false;
+            }
+            var URL = window.URL || window.webkitURL;
+            imgURL = URL.createObjectURL(file);
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                imgURL = e.target.result;
+                if((imgURL).indexOf("image/")==-1){
+                    $.modal.alertWarning("文件格式错误，请上传图片类型,如：JPG，PNG后缀的文件。");
+                } else {
+                    options.imgSrc = e.target.result
+                    if(options.imgSrc.indexOf("data:image/x-icon")!=-1) {
+                        options.imgSrc = options.imgSrc.replace("image/x-icon", "image/png")
+                    }
+                }
+            }
+            $("#img-change").attr("src",imgURL);
+            reader.readAsDataURL(file);
+        }
+    };
+    var filechange2=function(event){
+        files = event.target.files, file;
+        if (files && files.length > 0) {
+            file = files[0];
+            if(file.size > 1024 * 1024 * 2) {
+                alert('图片大小不能超过 2MB!');
+                return false;
+            }
+            var URL = window.URL || window.webkitURL;
+            imgURL = URL.createObjectURL(file);
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                imgURL = e.target.result;
+                if((imgURL).indexOf("image/")==-1){
+                    $.modal.alertWarning("文件格式错误，请上传图片类型,如：JPG，PNG后缀的文件。");
+                } else {
+                    options.imgSrc = e.target.result
+                    if(options.imgSrc.indexOf("data:image/x-icon")!=-1) {
+                        options.imgSrc = options.imgSrc.replace("image/x-icon", "image/png")
+                    }
+                }
+            }
+            $("#positive-change").attr("src",imgURL);
+            reader.readAsDataURL(file);
+        }
+    };
+    var filechange3=function(event){
+        files = event.target.files, file;
+        if (files && files.length > 0) {
+            file = files[0];
+            if(file.size > 1024 * 1024 * 2) {
+                alert('图片大小不能超过 2MB!');
+                return false;
+            }
+            var URL = window.URL || window.webkitURL;
+            imgURL = URL.createObjectURL(file);
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                imgURL = e.target.result;
+                if((imgURL).indexOf("image/")==-1){
+                    $.modal.alertWarning("文件格式错误，请上传图片类型,如：JPG，PNG后缀的文件。");
+                } else {
+                    options.imgSrc = e.target.result
+                    if(options.imgSrc.indexOf("data:image/x-icon")!=-1) {
+                        options.imgSrc = options.imgSrc.replace("image/x-icon", "image/png")
+                    }
+                }
+            }
+            $("#reverse-change").attr("src",imgURL);
+            reader.readAsDataURL(file);
+        }
+    };
+    var arrImg = []
+    var filechange1=function(event){
+        var htmlImg = ''
+        files = event.target.files, file;
+        arrImg.push(files[0])
+        if (files && files.length > 0) {
+            file = files[0];
+            if(file.size > 1024 * 1024 * 2) {
+                alert('图片大小不能超过 2MB!');
+                return false;
+            }
+            var URL = window.URL || window.webkitURL;
+            imgURL = URL.createObjectURL(file);
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                imgURL = e.target.result;
+                if((imgURL).indexOf("image/")==-1){
+                    $.modal.alertWarning("文件格式错误，请上传图片类型,如：JPG，PNG后缀的文件。");
+                } else {
+                    options.imgSrc = e.target.result
+                    if(options.imgSrc.indexOf("data:image/x-icon")!=-1) {
+                        options.imgSrc = options.imgSrc.replace("image/x-icon", "image/png")
+                    }
+                }
+            }
+            htmlImg += '<img src="'+imgURL+'" width="150" height="150" style="margin: 0px 4px 10px 0px">'
+            $("#ImgBox").prepend(htmlImg)
+            reader.readAsDataURL(file);
+        }
+    };
+    function getBlob() {
+        var imageData = options.imgSrc;
+        if(imageData!="") {
+            if(imageData.indexOf("data:image/png;base64,")==0) {
+                var b64 = imageData.replace('data:image/png;base64,', '');
+            }else if(imageData.indexOf("data:image/jpeg;base64,")==0){
+                var b64 = imageData.replace('data:image/jpeg;base64,', '');
+            }else {
+                var b64 = imageData.replace('data:image/jpg;base64,', '');
+            }
+            var binary = atob(b64);
+            var array = [];
+            for (var i = 0; i < binary.length; i++) {
+                array.push(binary.charCodeAt(i));
+            }
+            return new Blob([new Uint8Array(array)], {type: 'image/png'});
+        }
+    }
+    function submitImg(type) {
+        if(type==0) {
+            var img = getBlob()
+            if (img == undefined) {
+                $.modal.msgWarning("请选择图片")
+                return
+            }
+            var formdata = new FormData();
+            formdata.append("file", img);
+            $.ajax({
+                url: ctx + "common/upload",
+                data: formdata,
+                type: "post",
+                processData: false,
+                contentType: false,
+                success: function(result) {
+                    $(".license").css("display", "none")
+                    $(".license_i").css("display", "none")
+                    $('#license_img').css("display", "block")
+                    $('#license_img').attr('src', result.url);
+                    $('#license_img').attr('alt', result.fileName);
+                    $(".bg").css("display", "none")
+                }
+            })
+        }else if(type == 1){
+            if (arrImg.length == 0) {
+                $.modal.msgWarning("请上传合同")
+                return
+            }
+            ImgBoxUrl = []
+            arrImg.forEach(function (item) {
+                var formdata = new FormData();
+                formdata.append("file", item);
+                $.ajax({
+                    url: ctx + "common/upload",
+                    data: formdata,
+                    type: "post",
+                    processData: false,
+                    contentType: false,
+                    success: function (result) {
+                        $(".contract").css("display", "none")
+                        $(".bg").css("display", "none")
+                        ImgBoxUrl.push(result.url)
+                    }
+                })
+            })
+        }else if(type==2){
+            var img = getBlob()
+            if (img == undefined) {
+                $.modal.msgWarning("请上传身份证正面照")
+                return
+            }
+            var formdata = new FormData();
+            formdata.append("file", img);
+            $.ajax({
+                url: ctx + "common/upload",
+                data: formdata,
+                type: "post",
+                processData: false,
+                contentType: false,
+                success: function(result) {
+                    $('#positive').attr('src', result.url);
+                    $('#positive').attr('alt', result.fileName);
+                    $(".positive").css("display", "none")
+                    $(".positive_i").css("display", "none")
+                    $('#positive').css("display", "block")
+                    $(".bg").css("display", "none")
+                }
+            })
+        }else{
+            var img = getBlob()
+            if (img == undefined) {
+                $.modal.msgWarning("请上传身份证反面照")
+                return
+            }
+            var formdata = new FormData();
+            formdata.append("file", img);
+            $.ajax({
+                url: ctx + "common/upload",
+                data: formdata,
+                type: "post",
+                processData: false,
+                contentType: false,
+                success: function(result) {
+
+                    $('#reverse').attr('src', result.url);
+                    $('#reverse').attr('alt', result.fileName);
+                    $(".reverse").css("display", "none")
+                    $(".reverse_i").css("display", "none")
+                    $('#reverse').css("display", "block")
+                    $(".bg").css("display", "none")
+                }
+            })
+        }
+    }
+    function closeImgItem() {
+        $(".bg").css("display","none")
+        $(".license").css("display","none")
+        $(".contract").css("display","none")
+        $(".positive").css("display","none")
+        $(".reverse").css("display","none")
+    }
+    $('#invoiceContent').tagsInput();
+    var tag = ''
+    $("#invoiceContent_tag").blur(function (){
+        tag = document.getElementById("invoiceContent_tagsinput").innerText
+        $("#invoiceDefaultContent").text("")
+        tag = tag.split("\n")
+        var html = "<option>请选择</option>"
+        tag.forEach(function (value) {
+            html += "<option value='"+value+"'>"+value+"</option>"
+        })
+        $("#invoiceDefaultContent").append(html)
+    })
+    function addDiv(item){
+        if(item == 1) {
+            var addLength = $("#balanceRemindEmail div.col-sm-5").length;
+            var html = '<div class="col-sm-5 col-sm-offset-3" id="' + addLength + '">' +
+                '<input type="text" name="balanceRemindEmail" class="form-control" placeholder="请输入预警及提醒类邮件发送范围" style="margin-top: 6px;width: 90%;display: inline-block"><a class="btn btn-danger" onclick="deleteDiv(' + addLength + ')"><i class="fa fa-remove"></i></a>' +
+                '</div>'
+            $("#balanceRemindEmail").append(html)
+        }else if(item == 2) {
+            var addLength1 = parseInt($("#rechargeRemindEmail div.col-sm-5").length)+1000;
+            var html1 = '<div class="col-sm-5 col-sm-offset-3" id="' + addLength1 + '">' +
+                '<input type="text" name="rechargeRemindEmail" class="form-control" placeholder="请输入账单类邮件发送范围" style="margin-top: 6px;width: 90%;display: inline-block"><a class="btn btn-danger" onclick="deleteDiv1(' + addLength1 + ')"><i class="fa fa-remove"></i></a>' +
+                '</div>'
+            $("#rechargeRemindEmail").append(html1)
+        }else if(item == 4) {
+            var addLength3 = parseInt($("#invoiceSubject div.col-sm-5").length)+3000;
+            var html3 = '<div class="col-sm-5 col-sm-offset-3" id="' + addLength3 + '" style="display: flex;justify-content: left;margin-top: 6px;">' +
+                '<select class="form-control select2-multiple" name="invoiceSubject' + addLength3 + '"><option value="">请选择</option></select><a class="btn btn-danger" onclick="deleteDiv3(' + addLength3 + ')"><i class="fa fa-remove"></i></a>' +
+                '</div>'
+            $("#invoiceSubject").append(html3)
+            var taxSounrceCompanyId = sessionStorage.getItem('taxSourceId')
+            // 添加后获取开票科目
+            $.post("/manager/invoice/selectContent?taxSounrceCompanyId="+taxSounrceCompanyId,function (data) {
+                if (data.code === 0) {
+                    var html = ''
+                    data.rows.forEach(function (item) {
+                        html += '<option value="' + item.invoiceSubjectId + '">' + item.content + '</option>'
+                    })
+                    $("select[name='invoiceSubject" + addLength3 + "']").append(html)
+                }
+            })
+        }else if(item == 5) {
+            // 派单信息增加
+            var taskLen =parseInt($("#dispatchForm div.task").length)+1;
+            if (taskLen > 20){
+                $.modal.msgWarning("最多可添加20条派单信息")
+                return
+            }
+            var taskHtml = '<div class="form-group task" id="task'+ taskLen +'">'+
+                '<label class="col-sm-2 control-label">任务名称：</label>'+
+                '<div class="col-sm-4" style="display: flex;justify-content: left">'+
+                '<select class="form-control select2-multiple" name="taskTitle" style="margin-right: 15px" id="taskTitle'+ taskLen +'">'+
+                '<option value="">请选择</option></select>'+
+                '<a class="btn btn-danger" onclick="deleteTask(' + taskLen + ')"><i class="fa fa-remove"></i></a></div></div>'+
+                '<div class="form-group intro" id="intro'+ taskLen +'"><label class="col-sm-2 control-label">任务简介：</label>'+
+                '<div class="col-sm-4"><textarea name="taskContent" autocomplete="off" class="form-control" style="height: 133px;" id="taskContent'+ taskLen +'"></textarea></div></div>'
+            $("#dispatchForm").append(taskHtml)
+            $.post("/manager/taskInfo/selectAllTaskInfo",function (data) {
+                var html = ''
+                data.data.forEach(function (item) {
+                    html += '<option value="'+item.id+'">'+item.taskName+'</option>'
+                })
+                $("#dispatchForm select[id='taskTitle"+taskLen+"']").append(html)
+            })
+            selectChange()
+        }else if(item == 6) {
+            // 签约岗位选择
+            var postLen =parseInt($("#workPost div.col-sm-4").length)+1
+            var postHtml = '<div class="col-sm-4 col-sm-offset-3" style="display: flex;justify-content: left;margin-top: 6px;" id="post'+ postLen +'">\n' +
+                '                <select class="form-control select2-multiple" name="postSubject" style="margin-right: 15px" >\n' +
+                '                    <option value="">请选择</option>\n' +
+                '                </select>\n' +
+                '                <a class="btn btn-danger" style="height: 34px" onclick="deletePost(' + postLen + ')"><i class="fa fa fa-remove"></i></a>\n' +
+                '            </div>'
+            $("#workPost").append(postHtml)
+            $.post("/manager/taskInfo/selectAllTaskInfo",function (data) {
+                var html = ''
+                data.data.forEach(function (item) {
+                    html += '<option value="'+item.id+'">'+item.taskName+'</option>'
+                })
+                $("#workPost div[id='post"+postLen+"'] select").append(html)
+            })
+        }else{
+            var addLength2 = parseInt($("#invoiceEmail div.col-sm-5").length)+2000;
+            var html2 = '<div class="col-sm-5 col-sm-offset-3" id="' + addLength2 + '">' +
+                '<input type="text" name="invoiceEmail" class="form-control" placeholder="请输入接收报税文件邮箱" style="margin-top: 6px;width: 90%;display: inline-block"><a class="btn btn-danger" onclick="deleteDiv2('+ addLength2 + ')"><i class="fa fa-remove"></i></a>' +
+                '</div>'
+            $("#invoiceEmail").append(html2)
+        }
+    }
+    function deleteDiv(index){
+        var addLength = $("#balanceRemindEmail div.col-sm-5").length;
+        $("#balanceRemindEmail div.col-sm-5[id='"+index+"']").remove()
+    }
+    function deleteDiv1(index){
+        var addLength = $("#rechargeRemindEmail div.col-sm-5").length;
+        $("#rechargeRemindEmail div.col-sm-5[id='"+index+"']").remove()
+    }
+    function deleteDiv2(index){
+        var addLength = $("#invoiceEmail div.col-sm-5").length;
+        $("#invoiceEmail div.col-sm-5[id='"+index+"']").remove()
+    }
+   // 删除开票科目
+   function deleteDiv3(index){
+       var addLength = $("#invoiceSubject div.col-sm-5").length;
+       $("#invoiceSubject div.col-sm-5[id='"+index+"']").remove()
+   }
+    // 删除派单信息
+    function deleteTask(index){
+        $("#dispatchForm div.task[id='task"+index+"']").remove()
+        $("#dispatchForm div.intro[id='intro"+index+"']").remove()
+    }
+    // 删除岗位信息
+    function deletePost(index){
+        $("#workPost div.col-sm-4[id='post"+index+"']").remove()
+    }
+</script>
+</body>
+</html>
+

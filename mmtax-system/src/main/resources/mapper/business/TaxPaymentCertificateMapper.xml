@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mmtax.business.mapper.TaxPaymentCertificateMapper">
+
+    <resultMap type="TaxPaymentCertificate" id="TaxPaymentCertificateResult">
+        <result property="id" column="id"/>
+        <result property="fileName" column="file_name"/>
+        <result property="status" column="status"/>
+        <result property="name" column="name"/>
+        <result property="downloadTime" column="download_time"/>
+        <result property="merchantId" column="merchant_id"/>
+        <result property="providerId" column="provider_id"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <select id="getListMerchantTaxPaymentCertificate"
+            resultType="com.mmtax.business.dto.MerchantTaxPaymentCertificateDTO">
+        select
+        t1.id as id,
+        t1.name as name,
+        t1.download_time as downloadTime,
+        t1.file_name as fileName,
+        t1.status as status,
+        date_format(t1.create_time,'%y-%m') as createTime,
+        t2.merchant_name as merchantName
+        from
+        tbl_tax_payment_certificate t1,
+        tbl_merchant_info t2
+        where
+        1=1
+        and
+        t1.merchant_id =t2.id
+        and
+        t1.merchant_id = #{merchantId}
+        <if test="startDate != null and startDate != null and endDate != null and endDate != ''">
+            and t1.create_time between #{startDate} and #{endDate}
+        </if>
+        order by
+        t1.create_time desc
+        limit #{startIndex},#{pageSize}
+    </select>
+    <select id="getCountMerchantTaxPaymentCertificate"
+            resultType="java.lang.Integer">
+        select
+        count(0)
+        from
+        tbl_tax_payment_certificate t1,
+        tbl_merchant_info t2
+        where
+        1=1
+        and
+        t1.merchant_id =t2.id
+        and
+        t1.merchant_id = #{merchantId}
+        <if test="startDate != null and startDate != null and endDate != null and endDate != ''">
+            and t1.create_time between #{startDate} and #{endDate}
+        </if>
+    </select>
+
+    <select id="getListManagerTaxPaymentCertificate"
+            parameterType="com.mmtax.business.dto.ManagerTaxPaymentCertificateDTO"
+            resultType="com.mmtax.business.dto.ManagerTaxPaymentCertificateDTO">
+        select
+        t1.id as id,
+        t1.file_name as fileName,
+        t2.contacts as contacts,
+        t2.contacts_mobile as contactsMobile,
+        t2.merchant_code as merchantCode,
+        t2.merchant_name as merchantName,
+        t1.create_time as createTime,
+        t1.status as status,
+        t1.name as name
+        from
+        tbl_tax_payment_certificate t1
+        left join
+        tbl_merchant_info t2
+        on t1.merchant_id=t2.id
+        left join
+        sys_user t3
+        on t2.belong_saler=t3.user_id
+        where
+        1=1
+        <if test="merchantName != null and merchantName != ''">
+            and t2.merchant_name like concat('%',#{merchantName},'%')
+        </if>
+        <if test="contactsMobile != null and contactsMobile != ''">
+            and t2.contacts_mobile like concat('%',#{contactsMobile},'%')
+        </if>
+        <if test="saleId != null and saleId != ''">
+            and t2.belong_saler=#{saleId}
+        </if>
+        <if test="saleName != null and saleName != ''">
+            and t3.user_name like concat('%',#{saleName},'%')
+        </if>
+        <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+            and t1.create_time between concat(#{startDate},' 00:00:00') and concat(#{endDate},' 23:59:59')
+        </if>
+        <if test="id != null">
+            and t1.id = #{id}
+        </if>
+
+        <!-- 数据范围过滤 -->
+        ${params.dataScope}
+        order by
+        t1.create_time desc
+    </select>
+    <select id="checkRecordByMonth" resultType="java.lang.Integer">
+        select
+        count(0)
+        from
+        tbl_tax_payment_certificate
+        where
+        1=1
+          and
+        merchant_id = #{merchantId}
+          and
+        create_time between #{startDate} and #{endDate}
+          and status != '2'
+    </select>
+
+</mapper>

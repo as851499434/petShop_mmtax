@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+	<th:block th:include="include :: header('商户转账灵工记录列表')" />
+</head>
+<body class="gray-bg">
+     <div class="container-div">
+		<div class="row">
+			<div class="col-sm-12 search-collapse">
+				<form id="formId">
+					<div class="select-list">
+						<ul>
+							<li>
+								订单流水号：<input type="text" name="orderSerialNum"/>
+							</li>
+							<li>
+								商户名称：<input type="text" name="merchantName"/>
+							</li>
+							<li>
+								灵工姓名：<input type="text" name="customerName"/>
+							</li>
+							<li>
+								<label>打款状态：</label>
+								<select name="status" th:with="type=${@dict.getType('transfer_status')}">
+									<option value="">所有</option>
+									<option th:each="dict : ${type}" th:text="${dict.dictLabel}"
+											th:value="${dict.dictValue}">
+									</option>
+								</select>
+							</li>
+							<li>
+								<label>打款渠道：</label>
+								<select name="paymentChannel" th:with="type=${@dict.getType('pay_channel')}">
+									<option value="">所有</option>
+									<option th:each="dict : ${type}" th:text="${dict.dictLabel}"
+											th:value="${dict.dictValue}">
+									</option>
+								</select>
+							</li>
+							<li class="select-time">
+								<label>创建时间： </label>
+								<input type="text" class="time-input" id="startTime" placeholder="开始时间"
+									   name="startDate" autocomplete="off"/>
+								<span>-</span>
+								<input type="text" class="time-input" id="endTime" placeholder="结束时间" name="endDate" autocomplete="off"/>
+							</li>
+							<li>
+								<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.limitSearch()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+								<a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+							</li>
+						</ul>
+					</div>
+				</form>
+			</div>
+			
+	        <!--<div class="btn-group-sm" id="toolbar" role="group">-->
+				<!--<a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="business:transferOrder:add">-->
+					<!--<i class="fa fa-plus"></i> 添加-->
+				<!--</a>-->
+				<!--<a class="btn btn-primary btn-edit disabled" onclick="$.operate.edit()" shiro:hasPermission="business:transferOrder:edit">-->
+					<!--<i class="fa fa-edit"></i> 修改-->
+				<!--</a>-->
+				<!--<a class="btn btn-danger btn-del btn-del disabled" onclick="$.operate.removeAll()" shiro:hasPermission="business:transferOrder:remove">-->
+					<!--<i class="fa fa-remove"></i> 删除-->
+				<!--</a>-->
+				<!--<a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="business:transferOrder:export">-->
+						<!--<i class="fa fa-download"></i> 导出-->
+				 <!--</a>-->
+			<!--</div>-->
+			<div class="col-sm-12 select-table table-striped">
+				<table id="bootstrap-table" data-mobile-responsive="true"></table>
+			</div>
+		</div>
+	</div>
+    <div th:include="include :: footer"></div>
+    <script th:inline="javascript">
+		var editFlag = [[${@permission.hasPermi('manager:transferOrder:transferOrderDetail')}]];
+		var statusData = [[${@dict.getType('transfer_status')}]];
+		var payChannelData = [[${@dict.getType('pay_channel')}]];
+        var prefix = ctx + "manager/transferOrder";
+        $(function() {
+            var options = {
+                url: prefix + "/list",
+                // createUrl: prefix + "/add",
+                // updateUrl: prefix + "/edit/{id}",
+                // removeUrl: prefix + "/remove",
+				// exportUrl: prefix + "/export",
+                modalName: "商户转账灵工记录",
+		        showExport: true,
+                columns: [{
+		            checkbox: true
+		        },
+				{
+					field : 'id', 
+					title : 'id',
+					visible: false
+				},
+				{
+					field : 'merchantCode',
+					title : '商户号',
+					visible: false
+				},
+				{
+					field : 'merchantName', 
+					title : '商户名称',
+				},
+				{
+					field : 'userName',
+					title : '所属销售',
+				},
+				{
+					field : 'amount', 
+					title : '商户打款请求金额（元）',
+				},
+				{
+					field : 'orderSerialNum',
+					title : '订单流水号',
+				},
+				{
+					field : 'merchantSerialNum',
+					title : '商户订单流水号',
+				},
+				{
+					field : 'createTime',
+					title : '创建时间',
+				},
+				{
+					field: 'status',
+					title: '打款状态',
+					width: '10%',
+					align: "left",
+					formatter: function (value, row, index) {
+						return $.table.selectDictLabel(statusData, row.status);
+					}
+				},
+				{
+					field : 'customerNo',
+					title : '灵工号',
+					visible: false
+				},
+				{
+					field : 'realName',
+					title : '灵工姓名',
+				},
+				{
+					field : 'payeeIdCardNo',
+					title : '灵工身份证号',
+					visible: false
+				},
+				{
+					field : 'payeeBankCard',
+					title : '灵工银行卡号或支付宝账号',
+					visible: false
+				},
+				{
+					field : 'payeeMobile',
+					title : '收款手机号',
+					visible: false
+				},
+				{
+					field : 'paymentChannel',
+					title : '打款渠道',
+					visible: false,
+					formatter: function (value, row, index) {
+						return $.table.selectDictLabel(payChannelData, row.paymentChannel);
+					}
+				},
+		        {
+					title: '操作',
+					align: 'center',
+					formatter: function (value, row, index) {
+						var actions = [];
+						actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="$.operate.transferInfoTab(' + row.id + ')"><i class="fa fa-edit"></i>详情</a> ');
+						return actions.join('');
+					}
+		        }]
+            };
+            $.table.init(options);
+        });
+    </script>
+</body>
+</html>

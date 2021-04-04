@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mmtax.business.mapper.BatchSignRecordMapper">
+    
+    <resultMap type="com.mmtax.business.domain.BatchSignRecord" id="BatchSignRecordResult">
+        <result property="id"    column="id"    />
+        <result property="trxExternalNo"    column="trx_external_no"    />
+        <result property="batchNo"    column="batch_no"    />
+        <result property="signCount"    column="sign_count"    />
+        <result property="actualCount"    column="actual_count"    />
+        <result property="creater"    column="creater"    />
+        <result property="operator"    column="operator"    />
+        <result property="status"    column="status"    />
+        <result property="merchantId"    column="merchant_id"    />
+        <result property="postId"    column="post_id"    />
+        <result property="post"    column="post"    />
+        <result property="providerId"    column="provider_id"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+    <select id="selectByBatchNo" resultMap="BatchSignRecordResult">
+        select * from tbl_batch_sign_record
+        where batch_no = #{batchNo}
+        and merchant_id = #{merchantId}
+    </select>
+
+    <select id="listCustomerBatchSignRecordDTO"
+            resultType="com.mmtax.business.dto.CustomerBatchSignRecordDTO">
+        SELECT
+        t.id,
+        t.batch_no AS batchNo,
+        t.trx_external_no AS trxExternalNo,
+        t.create_time AS createTime,
+        t.sign_count AS signCount,
+        t.actual_count AS actualCount,
+        t.`status`,
+        t.sign_count - t.actual_count AS failCount
+        FROM
+        tbl_batch_sign_record t
+        WHERE
+        1 = 1
+        <if test="merchantId != null and merchantId != ''">
+            AND t.merchant_id = #{merchantId}
+        </if>
+        <if test="status != null">
+            AND t.`status` = #{status}
+        </if>
+        <if test="batchNo != null and batchNo != ''">
+            AND t.batch_no LIKE CONCAT('%',#{batchNo},'%')
+        </if>
+        <if test="startDate != null and endDate != null and startDate != '' and endDate != ''">
+            AND t.create_time BETWEEN #{startDate} AND #{endDate}
+        </if>
+        ORDER BY
+        t.create_time DESC
+        LIMIT #{startIndex},#{pageSize}
+    </select>
+
+    <select id="countCustomerBatchSignRecordDTO" resultType="java.lang.Integer">
+        SELECT
+        IFNULL(COUNT(*),0)
+        FROM
+        tbl_batch_sign_record t
+        WHERE
+        1 = 1
+        <if test="merchantId != null and merchantId != ''">
+            AND t.merchant_id = #{merchantId}
+        </if>
+        <if test="status != null">
+            AND t.`status` = #{status}
+        </if>
+        <if test="batchNo != null and batchNo != ''">
+            AND t.batch_no LIKE CONCAT('%',#{batchNo},'%')
+        </if>
+        <if test="startDate != null and endDate != null and startDate != '' and endDate != ''">
+            AND t.create_time BETWEEN #{startDate} AND #{endDate}
+        </if>
+    </select>
+
+    <select id="listCustomerBatchSignRecordDetailDTO"
+            resultType="com.mmtax.business.dto.CustomerBatchSignRecordDetailDTO">
+            SELECT
+            t2.batch_no AS batchNo,
+            t.tax_source_id AS taxSourceId,
+            t5.tax_sounrce_company_name AS taxSourceName,
+            t4.id,
+            t4.`name`,
+            t.merchant_id AS merchantId,
+            t3.merchant_name AS merchantName,
+            t4.id_number AS idNumber,
+            t4.mobile,
+            t.send_sign_url_time AS sendTime,
+            t.send_sign_url_status AS sendStatus,
+            t.sign_time AS signTime,
+            t.sign_status AS signStatus,
+            t.comment AS comment,
+            t.remark AS remark,
+            t.post,
+            t.create_time AS createTime
+            FROM tbl_customer_protocol t
+            left join tbl_cus_link_mer_info t1 on t.cus_esign_id = t1.cus_esign_id
+            <if test="merchantId != null">
+                AND t1.merchant_id = #{merchantId}
+            </if>
+            left join tbl_merchant_info t3 on t1.merchant_id = t3.id
+            LEFT JOIN tbl_customer_esign_info t4 ON t4.id = t.cus_esign_id
+            left JOIN tbl_tax_sounrce_company t5 ON t.tax_source_id = t5.id
+            left join tbl_batch_sign_record t2 on t.batch_no = t2.batch_no
+            where 1 = 1
+            <if test="merchantId != null">
+                AND t.merchant_id = #{merchantId}
+            </if>
+            <if test="batchId != null">
+                    AND t2.id = #{batchId}
+            </if>
+            ORDER BY
+            t.create_time DESC
+            <if test="startIndex != null">
+                LIMIT #{startIndex},#{pageSize}
+            </if>
+    </select>
+
+    <select id="countCustomerBatchSignRecordDetailDTO" resultType="java.lang.Integer">
+        SELECT
+        IFNULL(COUNT(*),0)
+        FROM
+        tbl_customer_esign_info t
+        LEFT JOIN tbl_merchant_info t1 ON t.merchant_id = t1.id
+        LEFT JOIN tbl_customer_protocol t2 ON t.id = t2.cus_esign_id
+        LEFT JOIN tbl_batch_sign_record t4 ON t2.batch_no = t4.batch_no
+        LEFT JOIN tbl_online_account_config t3 ON t.tax_source_id = t3.tax_sounrce_id
+        WHERE 1 = 1
+        <if test="merchantId != null">
+            AND t.merchant_id = #{merchantId}
+        </if>
+        <if test="batchId != null">
+            AND t4.id = #{batchId}
+        </if>
+    </select>
+
+    <select id="listCustomerSignRecordDetailDTO"
+            resultType="com.mmtax.business.dto.CustomerSignRecordDetailDTO">
+        SELECT *
+        FROM (
+            SELECT *
+            FROM (
+            SELECT distinct
+            t2.batch_no AS batchNo,
+            t.tax_source_id AS taxSourceId,
+            t3.tax_sounrce_company_name AS taxSourceName,
+            t.id,
+            t.`name`,
+            t.merchant_id AS merchantId,
+            t1.merchant_name AS merchantName,
+            t.id_number AS idNumber,
+            t.mobile,
+            t2.send_sign_url_time AS sendTime,
+            t2.send_sign_url_status AS sendStatus,
+            t2.sign_time AS signTime,
+            t2.sign_status AS signStatus,
+            t2.post,
+            t.create_time AS createTime
+            FROM
+            tbl_customer_esign_info t
+            LEFT JOIN tbl_merchant_info t1 ON t.merchant_id = t1.id
+            LEFT JOIN tbl_customer_protocol t2 ON t.id = t2.cus_esign_id
+            LEFT JOIN tbl_online_account_config t3 ON t.tax_source_id = t3.tax_sounrce_id
+            WHERE 1 = 1
+            AND t2.send_sign_url_status = 1
+            <if test="merchantId != null">AND t2.merchant_id = #{merchantId}
+                AND t.name LIKE concat('%',#{name},'%')</if>
+                    <if test="
+            name != null and name != ''"></if>
+                    <if test="mobile != null and mobile != ''">
+                        AND t.mobile LIKE concat('%',#{mobile},'%')
+                    </if>
+
+                    <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+                        AND t2.send_sign_url_time BETWEEN #{startDate} AND #{endDate}
+                    </if>
+                    ORDER BY t2.`send_sign_url_time` DESC
+                ) t4
+                GROUP BY t4.id
+                ORDER BY t4.createTime DESC
+        ) t5
+        where 1 = 1
+        <if test="signStatus != null">
+            AND t5.signStatus = #{signStatus}
+        </if>
+        <if test="startIndex != null">
+            LIMIT #{startIndex},#{pageSize}
+        </if>
+    </select>
+
+    <select id="countCustomerSignRecordDetailDTO"
+            resultType="java.lang.Integer">
+        SELECT  IFNULL(COUNT(*),0)
+        FROM(
+            SELECT *
+                FROM (
+                    SELECT distinct
+                    t2.batch_no AS batchNo,
+                    t.tax_source_id AS taxSourceId,
+                    t3.tax_sounrce_company_name AS taxSourceName,
+                    t.id,
+                    t.`name`,
+                    t.merchant_id AS merchantId,
+                    t1.merchant_name AS merchantName,
+                    t.id_number AS idNumber,
+                    t.mobile,
+                    t2.send_sign_url_time AS sendTime,
+                    t2.send_sign_url_status AS sendStatus,
+                    t2.sign_time AS signTime,
+                    t2.sign_status AS signStatus,
+                    t.create_time AS createTime
+                    FROM
+                    tbl_customer_esign_info t
+                    LEFT JOIN tbl_merchant_info t1 ON t.merchant_id = t1.id
+                    LEFT JOIN tbl_customer_protocol t2 ON t.id = t2.cus_esign_id
+                    LEFT JOIN tbl_online_account_config t3 ON t.tax_source_id = t3.tax_sounrce_id
+                    WHERE 1 = 1
+                    AND t2.send_sign_url_status = 1
+                    <if test="merchantId != null">
+                        AND t2.merchant_id = #{merchantId}
+                    </if>
+                    <if test="name != null and name != ''">
+                        AND t.name LIKE concat('%',#{name},'%')
+                    </if>
+                    <if test="mobile != null and mobile != ''">
+                        AND t.mobile LIKE concat('%',#{mobile},'%')
+                    </if>
+                    <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+                        AND t2.send_sign_url_time BETWEEN #{startDate} AND #{endDate}
+                    </if>
+                    ORDER BY t2.`send_sign_url_time` DESC
+                    ) t4
+        GROUP BY t4.id) t5
+        WHERE 1 = 1
+        <if test="signStatus != null">
+            AND t5.signStatus = #{signStatus}
+        </if>
+    </select>
+
+    <select id="getRushSignDTO"
+            resultType="com.mmtax.business.dto.RushSignDTO">
+        SELECT
+        t.account_id AS rushSignAccountId,
+        t2.flow_id AS flowId
+        FROM
+        tbl_customer_esign_info t
+        LEFT JOIN tbl_customer_protocol t1 on t1.cus_esign_id=t.id and t1.sign_status=1
+        LEFT JOIN tbl_esign_flow_doc t2 on t1.con_info_id=t2.contract_info_id
+        WHERE
+        t.id = #{cusEsignId} and t1.merchant_id = #{merchantId}
+    </select>
+</mapper>

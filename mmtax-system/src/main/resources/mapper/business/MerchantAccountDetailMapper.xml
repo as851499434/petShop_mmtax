@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mmtax.business.mapper.MerchantAccountDetailMapper">
+
+    <resultMap type="MerchantAccountDetail" id="MerchantAccountDetailResult">
+        <result property="id" column="id"/>
+        <result property="paymentAmountBefore" column="payment_amount_before"/>
+        <result property="paymentAmountAfter" column="payment_amount_after"/>
+        <result property="paymentFrozenAmountBefore" column="payment_frozen_amount_before"/>
+        <result property="paymentFrozenAmountAfter" column="payment_frozen_amount_after"/>
+        <result property="paymentUsableAmountBefore" column="payment_usable_amount_before"/>
+        <result property="paymentUsableAmountAfter" column="payment_usable_amount_after"/>
+        <result property="status" column="status"/>
+        <result property="type" column="type"/>
+        <result property="payment_type" column="paymentType"/>
+        <result property="paymentAmount" column="payment_amount"/>
+        <result property="paymentChannel" column="payment_channel"/>
+        <result property="orderSerialNum" column="order_serial_num"/>
+        <result property="merchantId" column="merchant_id"/>
+        <result property="providerId" column="provider_id"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+
+    <select id="getMonthSumPaymentAmount" resultType="java.math.BigDecimal">
+        select sum(amount)
+        from tbl_trx_order
+        where 1=1
+        and merchant_id=#{merchantId}
+        and order_status = '1'
+        and create_time
+        between
+        #{startDate}
+        and
+        #{endDate}
+    </select>
+    <select id="getMonthCountPaymentRecord" resultType="java.lang.Integer">
+        select count(0)
+        from tbl_trx_order
+        where 1=1
+        and merchant_id=#{merchantId}
+        and order_status = '1'
+        and create_time
+        between
+        #{startDate}
+        and
+        #{endDate}
+    </select>
+    <select id="getPayTrend" resultType="com.mmtax.business.dto.PayTrendDTO">
+        SELECT
+        MONTH(create_time) AS  monthNo,
+        SUM(payment_amount) AS paymentAmount
+        FROM
+        tbl_merchant_account_detail
+        WHERE
+        merchant_id=#{merchantId}
+        AND
+        type = #{type}
+        AND status = '1'
+          and
+        create_time
+        BETWEEN
+        #{startDate}
+        AND
+        #{endDate}
+        GROUP BY
+        MONTH(create_time)
+    </select>
+
+    <select id="getListAccountAllRecord" parameterType="com.mmtax.business.dto.ManagerAccountRecordDTO"
+            resultType="com.mmtax.business.dto.ManagerCapitalFlowDTO">
+        SELECT
+        t1.id,
+        t2.merchant_name AS merchantName,
+        t2.merchant_code AS merchantCode,
+        t1.update_time AS accountingTime,
+        t1.create_time AS auditTime,
+        t2.subject as subject,
+        t1.order_serial_num AS orderSerialNum,
+        t1.payment_type AS type,
+        t1.payment_amount AS amount,
+        t1.status AS status,
+        t3.user_name as saleName
+        FROM
+        tbl_merchant_account_detail t1
+        LEFT JOIN
+        tbl_merchant_info t2
+        ON
+        t1.merchant_id = t2.id
+        left join
+        sys_user t3
+        on
+        t2.belong_saler=t3.user_id
+        WHERE
+        1=1 and t1.status = 1
+        <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+            and t1.create_time between concat(#{startDate},' 00:00:00') and concat(#{endDate},' 23:59:59')
+        </if>
+        <if test="orderSerialNum != null and orderSerialNum != ''">
+            and t1.order_serial_num like concat('%',#{orderSerialNum},'%')
+        </if>
+        <if test="type != null and type == 0 ">
+            and t1.payment_type in (0,2)
+        </if>
+        <if test="type != null and type == 1 ">
+            and t1.payment_type = 1
+        </if>
+        <if test="type != null and type == 4 ">
+            and t1.payment_type in (3,4)
+        </if>
+        <if test="type != null and type == 5 ">
+            and t1.payment_type = 5
+        </if>
+        <if test="merchantName != null and merchantName != ''">
+            and t2.merchant_name like concat('%',#{merchantName},'%')
+        </if>
+        <if test="merchantCode != null and merchantCode != ''">
+            and t2.merchant_code like concat('%',#{merchantCode},'%')
+        </if>
+        <if test="saleName != null and saleName != ''">
+            and t3.user_name like concat('%',#{saleName},'%')
+        </if>
+        <if test="saleId != null and saleId != ''">
+            and t2.belong_saler = #{saleId}
+        </if>
+        <!-- 数据范围过滤 -->
+        ${params.dataScope}
+        ORDER by
+        t1.create_time
+        DESC
+    </select>
+    <select id="getCapitalFlow" resultType="com.mmtax.business.dto.MerchantCapitalFlowDTO">
+    SELECT
+    t1.create_time AS createTime,
+    t2.merchant_code AS merchantCode,
+        t2.subject as subject,
+    t1.order_serial_num AS orderSerialNum,
+    t1.type AS type,
+    t1.type AS typeClass,
+    '银行卡余额账户' AS accountType,
+    t1.type AS trxType,
+    t1.payment_amount as amount,
+        t1.payment_usable_amount_after as balance
+    FROM
+    tbl_merchant_account_detail t1
+    LEFT JOIN
+    tbl_merchant_info t2
+    ON
+    t1.merchant_id = t2.id
+    WHERE
+    t1.merchant_id = #{merchantId}
+    <if test="startDate != null and endDate != null and startDate != '' and endDate != ''">
+        and t1.create_time between concat(#{startDate},' 00:00:00') and concat(#{endDate},' 23:59:59')
+    </if>
+
+    <if test="orderSerialNum != null and orderSerialNum != ''">
+        and t1.order_serial_num like concat('%',#{orderSerialNum},'%')
+    </if>
+
+    <if test="type != null">
+        and t1.type = #{type}
+    </if>
+    ORDER BY
+    t1.create_time DESC
+        <if test="startIndex != null">
+            limit #{startIndex},#{pageSize}
+        </if>
+    </select>
+    <select id="countCapitalFlow" resultType="java.lang.Integer">
+        SELECT
+        COUNT(*)
+        FROM
+        tbl_merchant_account_detail t1
+        LEFT JOIN
+        tbl_merchant_info t2
+        ON
+        t1.merchant_id = t2.id
+        WHERE
+        t1.merchant_id = #{merchantId}
+        <if test="startDate != null and endDate != null and startDate != '' and endDate != ''">
+            and t1.create_time between concat(#{startDate},' 00:00:00') and concat(#{endDate},' 23:59:59')
+        </if>
+
+        <if test="orderSerialNum != null and orderSerialNum != ''">
+            and t1.order_serial_num like concat('%',#{orderSerialNum},'%')
+        </if>
+
+        <if test="type != null">
+            and t1.type = #{type}
+        </if>
+    </select>
+    <select id="getListAccountingRecord" parameterType="com.mmtax.business.dto.ManagerAccountingDTO"
+            resultType="com.mmtax.business.dto.ManagerCapitalFlowDTO">
+        SELECT
+        t2.merchant_name AS merchantName,
+        t2.merchant_code AS merchantCode,
+        t1.update_time AS accountingTime,
+        t1.create_time AS auditTime,
+        t2.subject as subject,
+        'system' AS auditor,
+        t1.order_serial_num AS orderSerialNum,
+        t1.type AS type,
+        t1.payment_amount AS amount,
+        t1.status AS status
+        FROM
+        tbl_merchant_account_detail t1
+        LEFT JOIN
+        tbl_merchant_info t2
+        ON
+        t1.merchant_id = t2.id
+        WHERE
+        t1.type
+        IN
+        (1,3,4)
+        AND
+        t1.merchant_id = #{merchantId}
+        <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+            and t1.create_time between concat(#{startDate},' 00:00:00') and concat(#{endDate},' 23:59:59')
+        </if>
+        <if test="orderSerialNum != null and orderSerialNum != ''">
+            and t1.order_serial_num like concat('%',#{orderSerialNum},'%')
+        </if>
+        ORDER by
+        t1.create_time
+        DESC
+    </select>
+    <select id="getChannelPayment" resultType="com.mmtax.business.dto.MerchantChannelPayment">
+        select
+        payment_channel as paymentChannel,
+        sum(amount) as amount
+        from
+        tbl_trx_order
+        where
+        1 = 1
+        and order_status='1'
+        and merchant_id=#{merchantId}
+        <if test="startDate != null and endDate != null and startDate != '' and endDate != ''">
+            and create_time between concat(#{startDate},' 00:00:00') and concat(#{endDate},' 23:59:59')
+        </if>
+        GROUP BY
+        payment_channel
+    </select>
+    <select id="getBackFlow" parameterType="com.mmtax.business.dto.ManagerReturnPointQueryDTO"
+            resultType="com.mmtax.business.dto.MerchantReturnPointListDTO">
+        SELECT
+        t2.merchant_name AS merchantName,
+        t1.create_time AS inAccountTime,
+        t1.order_serial_num AS orderSerialNum,
+        t1.payment_amount AS paymentAmount
+        FROM
+        tbl_merchant_account_detail t1
+        LEFT JOIN
+        tbl_merchant_info t2
+        ON
+        t1.merchant_id = t2.id
+        WHERE
+        t1.type = #{type}
+        <if test="merchantId != null">
+            AND t1.merchant_id = #{merchantId}
+        </if>
+        <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+            AND t1.create_time BETWEEN concat(#{startDate},' 00:00:00') AND concat(#{endDate},' 23:59:59')
+        </if>
+
+        <if test="merchantName != null and merchantName != '' ">
+            AND t2.merchant_name LIKE concat('%',#{merchantName},'%')
+        </if>
+        ORDER BY
+        t1.create_time DESC
+    </select>
+    <select id="getMerchantBackFlow" resultType="com.mmtax.business.dto.MerchantReturnPointListDTO">
+        SELECT
+        create_time AS inAccountTime,
+        order_serial_num AS orderSerialNum,
+        payment_amount AS paymentAmount
+        FROM
+        tbl_merchant_account_detail
+        WHERE
+        merchant_id = #{merchantId}
+        AND
+        type = #{type}
+        <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+            and create_time between concat(#{startDate},' 00:00:00') and concat(#{endDate},' 23:59:59')
+        </if>
+        <if test="status != null">
+            and status = status
+        </if>
+        ORDER BY
+        create_time DESC
+        limit #{startIndex},#{pageSize}
+    </select>
+    <select id="countBackFlow" resultType="java.lang.Integer">
+        SELECT
+        COUNT(*)
+        FROM
+        tbl_merchant_account_detail
+        WHERE
+        merchant_id = #{merchantId}
+        AND
+        type = #{type}
+        <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+            and create_time between concat(#{startDate},' 00:00:00') and concat(#{endDate},' 23:59:59')
+        </if>
+        <if test="status != null">
+            and status = status
+        </if>
+
+    </select>
+    <select id="getIsNullMerchantAccountDetail" resultMap="MerchantAccountDetailResult">
+    SELECT
+	    *
+    FROM
+	    tbl_merchant_account_detail t
+    WHERE
+	    t.payment_type IS NULL
+    ORDER BY
+        t.create_time desc
+        limit 0,2000
+    </select>
+
+</mapper>

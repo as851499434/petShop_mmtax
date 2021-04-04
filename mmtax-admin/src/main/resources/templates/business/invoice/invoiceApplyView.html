@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="include :: header('账户列表信息')"/>
+    <style>
+        .search-collapse{
+            border-radius: 0px;
+            border: 1px solid #3075FC;
+            box-shadow: none;
+            padding: 4px 20px;
+            background: #F1F3F9;
+            border-bottom: none;
+        }
+        #table{
+            width: 100%;
+            line-height: 30px;
+        }
+        #table td>p,#table td>select,#table td>input{
+            margin-top: 10px;
+        }
+        #table, tr, td {
+            border: 1px solid #3075FC;
+        }
+        .right{
+            display: inline-block;
+            border-left: 1px solid #3075fc;
+        }
+        .button{
+            margin-top: 20px;
+            background: #303e5c;
+            line-height: 48px;
+            color:#fff;
+        }
+    </style>
+</head>
+<body class="white-bg">
+<div class="container-div" style="text-align: center">
+    <div class="contentBox">
+        <!--<div class="row">-->
+            <!--<div class="col-sm-12 amount" style="text-align: left"></div>-->
+            <!--<div class="col-sm-12 orderSerialNum" style="text-align: left"></div>-->
+            <!--<div class="col-sm-12 search-collapse">-->
+                <!--<form id="formId">-->
+                    <!--<div class="title select-list">-->
+                        <!--<ul>-->
+                            <!--<li>-->
+                                <!--<select name="invoiceType" id="invoiceType" readonly>-->
+                                    <!--&lt;!&ndash;<option value="0">增值税专用发票</option>&ndash;&gt;-->
+                                    <!--&lt;!&ndash;<option value="1">普通发票</option>&ndash;&gt;-->
+                                <!--</select>-->
+                            <!--</li>-->
+                            <!--<li>-->
+                                <!--<select name="bankName" id="bankName" style="width: 300px;" readonly>-->
+                                    <!--&lt;!&ndash;<option value="0">中国工商银行股份有限公司杭州城西支行</option>&ndash;&gt;-->
+                                <!--</select>-->
+                            <!--</li>-->
+                            <!--<li>-->
+                                <!--<span style="line-height: 30px;">&nbsp; | 发票版面：一百万元版</span>-->
+                            <!--</li>-->
+                        <!--</ul>-->
+                    <!--</div>-->
+                <!--</form>-->
+            <!--</div>-->
+            <!--<div class="col-sm-12" style="padding: 0px;">-->
+                <!--<table id="table" cellspacing="0" cellpadding="0">-->
+                    <!--<tr>-->
+                        <!--<td class="col-sm-3">-->
+                            <!--货物或应税劳务、服务名称-->
+                            <!--<select name="paymentChannel" id="paymentChannel" placeholder="请选择货物或应税劳务、服务名称" style="width:90%;" readonly>-->
+                            <!--</select>-->
+                        <!--</td>-->
+                        <!--<td class="col-sm-1">规格型号-->
+                        <!--</td>-->
+                        <!--<td class="col-sm-1">单位-->
+                            <!--<p>次</p>-->
+                        <!--</td>-->
+                        <!--<td class="col-sm-1">数量-->
+                            <!--<p>1</p>-->
+                        <!--</td>-->
+                        <!--<td class="col-sm-1">单价-->
+                            <!--<p class="unitPrice"></p>-->
+                        <!--</td>-->
+                        <!--<td class="col-sm-1">金额-->
+                            <!--<p class="invoiceAmount"></p>-->
+                        <!--</td>-->
+                        <!--<td class="col-sm-1">税率-->
+                            <!--<p class="taxRate"></p>-->
+                        <!--</td>-->
+                        <!--<td class="col-sm-1">税额-->
+                            <!--<p class="taxAmount"></p>-->
+                        <!--</td>-->
+                        <!--<td class="col-sm-2">含税金额-->
+                            <!--<input type="text" name="invoiceAmount" style="width: 90%;" placeholder="请输入含税金额">-->
+                        <!--</td>-->
+                    <!--</tr>-->
+                <!--</table>-->
+            <!--</div>-->
+            <!--<div class="col-sm-12" style="padding: 0px;border: 1px solid #3075FC;border-top: none;line-height: 40px;">-->
+                <!--<div class="left col-sm-3">合计</div>-->
+                <!--<div class="right col-sm-9 invoiceAmount"></div>-->
+            <!--</div>-->
+            <!--<div class="col-sm-12" style="padding: 0px;border: 1px solid #3075FC;border-top: none;line-height: 40px;">-->
+                <!--<div class="remarks_left col-sm-3">-->
+                    <!--备注-->
+                <!--</div>-->
+                <!--<div class="remarks_right col-sm-9" style="padding: 0px;border-left:1px solid #3075FC;display: inline-block;">-->
+                    <!--<input type="textarea" name="remarks" style="width: 100%;border:none">-->
+                <!--</div>-->
+            <!--</div>-->
+        <!--</div>-->
+        <div class="row" style="margin-top:10px;">
+            <div class="col-sm-12" style="padding: 0px;border: 1px solid #3075FC;line-height: 60px;">
+                <input type="textarea" name="instruction" style="width: 100%;border:none" placeholder="开票说明">
+            </div>
+        </div>
+
+        <div class="row button">
+            <!--<div class="col-sm-6">-->
+                <!--<span>申请开票总金额 ￥20000.00</span>-->
+                <!--<span>发票总价税合计 ￥20000.00</span>-->
+                <!--<span>差额 ￥0.00</span>-->
+            <!--</div>-->
+            <div id="invoiceStatus" style="float: right;margin-right: 20px;">
+                <!--<button type="button" class="btn btn-sm btn-success"><i class="fa fa-check"></i>审核通过</button>-->
+                <button type="button" class="btn btn-sm btn-danger" onclick="shutDownItem()"><i class="fa fa-reply-all"></i>关 闭</button>
+            </div>
+        </div>
+    </div>
+    <div th:include="include::footer"></div>
+</div>
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="width: 650px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">驳回原因</h4>
+            </div>
+            <div style="width: 100%;height: 88px;padding:20px"><input type="text" id="rejected" placeholder="请输入驳回原因" style="width: 100%;height: 48px;"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="enable()">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script th:inline="javascript">
+    var prefix = ctx + "manager/invoice";
+    var id = sessionStorage.getItem("id")
+    var invoiceStatus = sessionStorage.getItem("invoiceStatus")
+    var html = ""
+    if(invoiceStatus == 'POSTED'||invoiceStatus == 'INVALID') {
+    }else if(invoiceStatus == 'REFUSE'){
+    }else {
+        html+='<button type="button" class="btn btn-sm btn-success" onclick="disable()" style="margin-right: 6px;"><i class="fa fa-check"></i>通过</button>'
+        html+='<button type="button" class="btn btn-sm btn-warning" style="margin-right: 6px;" data-toggle="modal" data-target="#myModal" ><i class="fa fa-remove"></i>驳回</button>'
+        html+='<button type="button" class="btn btn-sm btn-warning" data-dismiss="modal" onclick="uploadImg()"><i class="fa fa fa-upload"></i>上传发票扫描件</button>'
+
+    }
+    $("#invoiceStatus").prepend(html)
+    var dataall = {}
+    var invoiceSerialNum;
+    var id;
+    $.get("/manager/invoice/checkInvoiceDetail?invoiceApplyId="+id,function (data) {
+        dataall = data.data
+        invoiceSerialNum = dataall.invoiceCheckDetailDTO.invoiceSerialNum
+        id = dataall.invoiceCheckDetailDTO.id
+        dataall.invoiceSerialNum = invoiceSerialNum
+        dataall.id = id
+        dataall = JSON.stringify(dataall)
+        sessionStorage.setItem("information", dataall);
+        var htmlAll = '<div class="row">\n' +
+            '            <div class="col-sm-12 amount" style="text-align: left"></div>\n' +
+            '            <div class="col-sm-12 orderSerialNum" style="text-align: left"></div>\n' +
+            '            <div class="col-sm-12 taxpayerIdentificationNumber" style="text-align: left"></div>\n' +
+            '            <div class="col-sm-12 search-collapse">\n' +
+            '                <form id="formId">\n' +
+            '                    <div class="title select-list">\n' +
+            '                        <ul>\n' +
+            '                            <li>\n' +
+            '                                <select name="invoiceType" id="invoiceType" readonly>\n' +
+            '                                    <!--<option value="0">增值税专用发票</option>-->\n' +
+            '                                    <!--<option value="1">普通发票</option>-->\n' +
+            '                                </select>\n' +
+            '                            </li>\n' +
+            '                            <li>\n' +
+            '                                <select name="bankName" id="bankName" style="width: 300px;" readonly>\n' +
+            '                                    <!--<option value="0">中国工商银行股份有限公司杭州城西支行</option>-->\n' +
+            '                                </select>\n' +
+            '                            </li>\n' +
+            '                            <li>\n' +
+            '                                <span style="line-height: 30px;">&nbsp; | 发票版面：一百万元版</span>\n' +
+            '                            </li>\n' +
+            '                        </ul>\n' +
+            '                    </div>\n' +
+            '                </form>\n' +
+            '            </div>\n' +
+            '            <div class="col-sm-12" style="padding: 0px;">\n' +
+            '                <table id="table" cellspacing="0" cellpadding="0">\n' +
+            '                    <tr>\n' +
+        '                        <td class="col-sm-3" id="invoiceSerialName">\n' +
+        '                            货物或应税劳务、服务名称\n' +
+        '                        </td>\n' +
+        '                        <td class="col-sm-1">规格型号\n' +
+        '                        </td>\n' +
+        '                        <td class="col-sm-1">单位\n' +
+        '                            <p>次</p>\n' +
+        '                        </td>\n' +
+        '                        <td class="col-sm-1">数量\n' +
+        '                            <p>1</p>\n' +
+        '                        </td>\n' +
+        '                        <td class="col-sm-1" id="unitPrice">单价\n' +
+        '                        </td>\n' +
+        '                        <td class="col-sm-1">金额\n' +
+        '                            <p class="invoiceAmount"></p>\n' +
+        '                        </td>\n' +
+        '                        <td class="col-sm-1" id="taxRate">税率\n' +
+        '                        </td>\n' +
+        '                        <td class="col-sm-1" id="taxAmount">税额\n' +
+        '                        </td>\n' +
+        '                        <td class="col-sm-2" id="invoiceAmount">含税金额\n' +
+        '                        </td>\n' +
+        '                    </tr>\n' +
+            '                </table>\n' +
+            '            </div>\n' +
+            '            <div class="col-sm-12" style="padding: 0px;border: 1px solid #3075FC;border-top: none;line-height: 40px;">\n' +
+            '                <div class="left col-sm-3">合计</div>\n' +
+            '                <div class="right col-sm-9 invoiceAmount"></div>\n' +
+            '            </div>\n' +
+            '            <div class="col-sm-12" style="padding: 0px;border: 1px solid #3075FC;border-top: none;line-height: 40px;">\n' +
+            '                <div class="remarks_left col-sm-3">\n' +
+            '                    备注\n' +
+            '                </div>\n' +
+            '                <div class="remarks_right col-sm-9" style="padding: 0px;border-left:1px solid #3075FC;display: inline-block;">\n' +
+            '                    <input type="textarea" name="remarks" style="width: 100%;border:none">\n' +
+            '                </div>\n' +
+            '            </div>\n' +
+            '        </div>'
+        $(".contentBox").prepend(htmlAll)
+        var invoiceType = data.data.invoiceCheckDetailDTO.invoiceType == 0 ? "增值税专用发票" :"普通发票"
+        var invoiceTypeHtml = "<option value='"+data.data.invoiceCheckDetailDTO.invoiceType+"'>"+invoiceType+"</option>"
+        var bankName = "<option value='"+data.data.invoiceCheckDetailDTO.bankName+"'>中国工商银行股份有限公司杭州城西支行</option>"
+        // var invoiceServiceName = "<option>"+data.data.invoiceCheckDetailDTO.invoiceServiceName+"</option>"
+        var bigArr = data.data.invoiceCheckDetailDTO.serviceAmounts
+        var invoiceSerialName = ''
+        var invoiceAmount = ''
+        var taxAmount = ''
+        var taxRate = ''
+        var unitPrice = ''
+        var amount = 0
+        for (var i = 0;i<bigArr.length;i++){
+            invoiceSerialName+='<select name="paymentChannel" id="paymentChannel" placeholder="请选择货物或应税劳务、服务名称" style="width:90%;" readonly><option>'+bigArr[i].invoiceSerialName+'</option></select>'
+            unitPrice+='<p class="unitPrice">'+bigArr[i].unitPrice+'</p>'
+            taxAmount+='<p class="unitPrice">'+bigArr[i].taxAmount+'</p>'
+            taxRate+='<p class="unitPrice">'+bigArr[i].taxRate+'</p>'
+            invoiceAmount+='<input type="text" name="invoiceAmount" style="width: 90%;" placeholder="请输入含税金额" value="'+bigArr[i].invoiceAmount+'" readonly>'
+            amount += parseInt(bigArr[i].invoiceAmount)
+        }
+        $("#invoiceSerialName").append(invoiceSerialName)
+        $("#invoiceAmount").append(invoiceAmount)
+        $("#taxAmount").append(taxAmount)
+        $("#taxRate").append(taxRate)
+        $("#unitPrice").append(unitPrice)
+        $("input[name='instruction']").val(data.data.invoiceCheckDetailDTO.instruction)
+        // $("input[name='invoiceAmount']").val(data.data.invoiceCheckDetailDTO.invoiceAmount)
+        $("input[name='remarks']").val(data.data.invoiceCheckDetailDTO.remarks)
+        $(".taxAmount").text(data.data.invoiceCheckDetailDTO.taxAmount)
+        $(".taxRate").text(data.data.invoiceCheckDetailDTO.taxRate)
+        $(".unitPrice").text(data.data.invoiceCheckDetailDTO.unitPrice)
+        $(".invoiceAmount").text(amount)
+        $("#bankName").append(bankName)
+        $("#invoiceType").append(invoiceTypeHtml)
+        var html1 = "<span>充值金额：</span>"
+        var html2 = "<span>充值流水：</span>"
+        var html3 = "<span>纳税人识别号：</span><span>"+data.data.taxpayerIdentificationNumber+"</span>"
+        var arr = data.data.rechargeList
+        for (var i = 0;i<arr.length;i++){
+            html1+="<span style='margin-right: 10px'>"+arr[i].amount+"</span>"
+            html2+="<span style='margin-right: 10px'>"+arr[i].orderSerialNum+"</span>"
+        }
+        $(".amount").append(html1)
+        $(".orderSerialNum").append(html2)
+        $(".taxpayerIdentificationNumber").append(html3)
+
+    })
+    /* 用户管理-停用 */
+    function disable() {
+        $.modal.confirm("是否已上传发票扫描件？", function () {
+            var msg = sessionStorage.getItem("msg")
+            if(msg == "操作成功") {
+                $.operate.saveTab(prefix + "/checkInvoice", {"id": id, "invoiceStatus": 'POSTED'});
+                sessionStorage.clear()
+            }else {
+                $.modal.msgWarning("请上传发票扫描件");
+            }
+        })
+    }
+    /* 用户管理启用 */
+    function enable() {
+        var rejected = $("#rejected").val()
+        $.modal.confirm("确定驳回该条发票申请？", function () {
+            $.operate.saveTab(prefix + "/checkInvoice",{"id": id, "invoiceStatus": 'REFUSE',remarks:rejected});
+            sessionStorage.clear()
+        })
+    }
+    function uploadImg() {
+        $.modal.open("上传发票", "/manager/invoice/imgView?imgUrl=" + id);
+    }
+    function shutDownItem() {
+        sessionStorage.clear()
+        closeItem()
+    }
+</script>
+</body>
+</html>

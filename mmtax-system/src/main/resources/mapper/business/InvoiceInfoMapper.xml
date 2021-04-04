@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mmtax.business.mapper.InvoiceInfoMapper">
+    
+    <resultMap type="InvoiceInfo" id="InvoiceInfoResult">
+        <result property="id"    column="id"    />
+        <result property="companyName"    column="company_name"    />
+        <result property="taxpayerType"    column="taxpayer_type"    />
+        <result property="taxpayerIdentificationNumber"    column="taxpayer_identification_number"    />
+        <result property="companyAddress"    column="company_address"    />
+        <result property="invoiceMobile"    column="invoice_mobile"    />
+        <result property="bankName" column="bank_name" />
+        <result property="bankNumber"    column="bank_number"    />
+        <result property="invoiceContent"    column="invoice_content"    />
+        <result property="invoiceDefaultContent"    column="invoice_default_content"    />
+        <result property="merchantId"    column="merchant_id"    />
+        <result property="addressId" column="address_id"/>
+        <result property="providerId"    column="provider_id"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <select id="queryDefaultInvoiceContentBymerchantId" resultType="java.lang.String">
+        SELECT invoice_default_content
+        FROM tbl_invoice_info
+        WHERE merchant_id = #{merchantId}
+
+    </select>
+
+    <update id="updateInvoiceDefaultContentBymerchantId">
+        UPDATE tbl_invoice_info SET invoice_default_content = #{invoiceDefaultContent}
+        WHERE merchant_id = #{merchantId}
+    </update>
+    
+    <select id="checkingInvoice" resultType="com.mmtax.business.dto.CheckingInvoiceDTO">
+        SELECT
+        t1.`company_name` AS companyName,
+        t1.`taxpayer_identification_number` AS taxpayerIdentificationNumber,
+        t1.`bank_number` AS bankNumber,
+        t1.`bank_name` AS bankName,
+        t1.`company_address` AS companyAddress,
+        t2.`mobile` AS mobile,
+        t2.`addressee_name` AS addresseeName,
+        t1.invoice_mobile AS invoiceMobile,
+        t2.address AS address,
+        t2.mobile AS addressMobile
+        FROM tbl_invoice_info AS t1 LEFT JOIN  tbl_address AS t2 ON t1.`merchant_id` = t2.`merchant_id`
+        WHERE t1.`merchant_id` = #{merchantId}
+        ORDER BY t2.`create_time` DESC
+        LIMIT 1
+    </select>
+
+    <select id="getInvoiceIdByMerchantId" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+        SELECT
+        id
+        FROM
+        tbl_invoice_info
+        WHERE
+        merchant_id = #{merchantId}
+    </select>
+    <select id="getInvoiceInfoByMerchantId" resultMap="InvoiceInfoResult">
+        SELECT
+        *
+        FROM
+        tbl_invoice_info
+        WHERE
+        merchant_id = #{merchantId}
+    </select>
+
+</mapper>

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="include :: header('新增税务类型')"/>
+    <link th:href="@{/css/bootstrap-switch.min.css}" rel="stylesheet"/>
+    <style>
+        div.form-group span:not(.tag){
+            font-size: 12px;
+            color: red;
+            display: inline-block;
+            height: 20px;
+        }
+        span.tag >span.tag-text{
+            color:#fff;
+        }
+        .form-group{
+            margin-bottom: 6px;
+        }
+    </style>
+</head>
+<body class="white-bg">
+<div class="form-content">
+    <h4 class="form-header h4">基本信息：</h4>
+    <form class="form-horizontal m" id="form-user-add">
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label class="col-xs-4 control-label"><span style="color: red; ">*</span>税源地：</label>
+                    <div class="col-xs-6">
+                        <select class="form-control select2-multiple" name="taxSourceId" id="taxSourceId">
+                            <option value="">请选择</option>
+                        </select>
+                        <span class="taxSource"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label class="col-xs-4 control-label"><span style="color: red; ">*</span>行业类型：</label>
+                    <div class="col-xs-6">
+                        <input type="text" name="businessType" class="form-control" placeholder="请输入行业类型" autocomplete="off" required>
+                        <span class="businessType"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label class="col-xs-4 control-label"><span style="color: red; ">*</span>核定税种：</label>
+                    <div class="col-xs-6">
+                        <input type="text" name="taxType" class="form-control" placeholder="请输入核定税种" autocomplete="off" required>
+                        <span class="taxType"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="form-group" id="invoiceSubject">
+                    <label class="col-xs-4 control-label"><span style="color: red; ">*</span>开票类目：</label>
+                    <div class="col-xs-7" style="display: flex;justify-content: left">
+                        <input type="text" name="invoiceContent" class="form-control" placeholder="请输入开票类目" autocomplete="off" style="margin-right: 15px;margin-bottom: 20px" required>
+                        <!--<a class="btn btn-success" style="height: 34px" onclick="addInvoice()"><i class="fa fa fa-plus"></i></a>-->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="form-group" id="business">
+                    <label class="col-xs-4 control-label"><span style="color: red; ">*</span>经营范围：</label>
+                    <div class="col-xs-7" style="display: flex;justify-content: left">
+                        <input type="text" name="businessScope" class="form-control" placeholder="请输入经营范围" autocomplete="off" style="margin-right: 15px;margin-bottom: 20px" required>
+                        <!--<a class="btn btn-success" style="height: 34px" onclick="addbusiness()"><i class="fa fa fa-plus"></i></a>-->
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label class="col-xs-4 control-label"><span style="color: red; ">*</span>个税政策：</label>
+                    <div class="col-xs-6">
+                        <input type="text" name="taxPerson" class="form-control" placeholder="请输入个税政策" autocomplete="off" required>
+                        <span class="taxPerson"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </form>
+</div>
+<div class="row" style="margin: 20px auto; height: 90px;">
+    <div class="col-sm-offset-3 col-sm-3">
+        <button type="button" class="btn btn-sm btn-success" onclick="submitItem()"><i class="fa fa-check "></i>保 存</button>
+        <button type="button" class="btn btn-sm btn-danger" onclick="closeItem()"><i class="fa fa-reply-all"></i>关 闭</button>
+    </div>
+</div>
+<div th:include="include::footer"></div>
+<script th:src="@{/js/bootstrap-switch.min.js}"></script>
+<script type="text/javascript">
+    $("input[type='text']").attr("onkeyup",'this.value=this.value.replace(/\\s+/g,\'\')');
+
+    $("#form-user-add").validate({
+        onkeyup: false,
+        rules:{
+            paymentRequirement:{
+                minlength: 1,
+                maxlength: 30
+            },
+            singleServiceRate:{
+                minlength:1,
+                maxlength: 40
+            },
+            singleQuota:{
+                minlength:1,
+                maxlength: 20
+            }
+        },
+        messages: {
+        },
+        focusCleanup: true
+    });
+    // 查询税源地
+    $.get("/manager/merchant/getTaxSourceCompany",function (data) {
+        var html = ''
+        data.data.forEach(function (item) {
+            html += '<option value="'+item.id+'">'+item.taxSounrceCompanyName+'</option>'
+        })
+        $("#taxSourceId").append(html)
+    })
+
+
+    function submitItem() {
+        if ($.validate.form()) {
+            // // 经营范围
+            // var postObj = {}
+            // var postInfos = []
+            // for (var i = 1;i<=$("#workPost select").length;i++){
+            //     if ($("#workPost div[id='post"+i+"'] select").val() == '') {
+            //         postObj = {"taskId":'',
+            //             "taskName":''
+            //         }
+            //     } else {
+            //         postObj = {"taskId":$("#workPost div[id='post"+i+"'] select").val(),
+            //             "taskName":$("#workPost div[id='post"+i+"'] select").find("option:selected").text()
+            //         }
+            //     }
+            //     postInfos.push(postObj)
+            // }
+            // // 开票类目
+            // var merchantTaskInfos=[]
+            // var listObj={}
+            // for (var i = 0; i <$("#dispatchForm select[name='taskTitle']").length ; i++) {
+            //     if($("#dispatchForm select[name='taskTitle']")[i].selectedOptions[0].value == ''){
+            //         listObj = {"taskId":'',
+            //             "taskInfo":'',
+            //             "taskName":''
+            //         }
+            //     } else {
+            //         listObj = {"taskId":$("#dispatchForm select[name='taskTitle']")[i].selectedOptions[0].value,
+            //             "taskInfo":$("#dispatchForm textarea[name='taskContent']")[i].value,
+            //             "taskName":$("#dispatchForm select[name='taskTitle']")[i].selectedOptions[0].innerText
+            //         }
+            //     }
+            //     merchantTaskInfos.push(listObj)
+            // }
+            var data = {
+                businessScope: $("input[name='businessScope']").val(),
+                businessType: $("input[name='businessType']").val(),
+                taxPerson:$("input[name='taxPerson']").val(),
+                invoiceContent:$("input[name='invoiceContent']").val(),
+                taxSounrceCompanyId:$("#taxSourceId option:selected").val(),
+                taxSounrceCompanyName:$("#taxSourceId option:selected").text(),
+                taxType:$("input[name='taxType']").val()
+            }
+            data = JSON.stringify(data)
+            $.ajax({
+                url: "/business/personalMerchant/addTaxTypeInfo",
+                data: data,
+                type: "post",
+                datatype:"json",
+                contentType: 'application/json',
+                success: function(result) {
+                    if(result.code === 0){
+                        $.modal.msgSuccess(result.msg)
+                    }else {
+                        $.modal.msgError(result.msg)
+                    }
+                    $.operate.successTabCallback(result);
+                }
+            })
+        }
+    }
+
+    // 增加开票类目
+    function addInvoice() {
+        var invoiceLen =parseInt($("#invoiceSubject div.col-xs-7").length)+1;
+        var invoiceHtml = '<div class="col-xs-7 col-sm-offset-4" style="display: flex;justify-content: left" id="selectInvoice'+invoiceLen+'">\n' +
+            '<input type="text" class="form-control" placeholder="请输入开票类目" name="invoiceContent'+invoiceLen+'" style="margin-right: 15px;margin-bottom: 20px" required>\n' +
+            '<a class="btn btn-danger" style="height: 34px" onclick="deleteInvoice(' + invoiceLen + ')"><i class="fa fa-remove"></i></a>\n' +
+            '</div>'
+        $("#invoiceSubject").append(invoiceHtml)
+    }
+    // 增加经营范围
+    function addbusiness() {
+        var postLen =parseInt($("#business div.col-xs-7").length)+1
+        var postHtml = '<div class="col-xs-7 col-sm-offset-4" style="display: flex;justify-content: left" id="post'+postLen+'">\n' +
+            '<input type="text" class="form-control" placeholder="请输入经验范围" name="businessScope'+postLen+'" style="margin-right: 15px;margin-bottom: 20px" required>\n' +
+            '<a class="btn btn-danger" style="height: 34px" onclick="deletePost(' + postLen + ')"><i class="fa fa-remove"></i></a>\n' +
+            '</div>'
+        $("#business").append(postHtml)
+        $.post("/manager/taskInfo/selectAllTaskInfo",function (data) {
+            var html = ''
+            data.data.forEach(function (item) {
+                html += '<option value="'+item.id+'">'+item.taskName+'</option>'
+            })
+            $("#business div.col-xs-7[id='post"+postLen+"'] select").append(html)
+        })
+    }
+    // 删除派单信息
+    function deleteInvoice(index){
+        $("#invoiceSubject div.col-xs-7[id='selectInvoice"+index+"']").remove()
+    }
+    function deletePost(index){
+        $("#business div.col-xs-7[id='post"+index+"']").remove()
+    }
+</script>
+</body>
+</html>

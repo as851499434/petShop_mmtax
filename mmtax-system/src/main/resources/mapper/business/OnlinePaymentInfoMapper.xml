@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mmtax.business.mapper.OnlinePaymentInfoMapper">
+    
+    <resultMap type="com.mmtax.business.domain.OnlinePaymentInfo" id="OnlinePaymentInfoResult">
+        <result property="id"    column="id"    />
+        <result property="merchantId"    column="merchant_id"    />
+        <result property="merchantNo"    column="merchant_no"    />
+        <result property="subAccountNo"    column="sub_account_no"    />
+        <result property="taxSourceCompanyId"    column="tax_source_company_id"    />
+        <result property="providerId"    column="provider_id"    />
+        <result property="reservedFieldOne"    column="reserved_field_one"    />
+        <result property="reservedFieldTwo"    column="reserved_field_two"    />
+        <result property="reservedFieldThree"    column="reserved_field_three"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <select id="selectByMerchantId" resultMap="OnlinePaymentInfoResult">
+        select
+        *
+        from tbl_online_payment_info
+        where merchant_id = #{merchantId}
+    </select>
+    <select id="selectByUidOrSubAccount" resultMap="OnlinePaymentInfoResult">
+        select
+        *
+        from tbl_online_payment_info
+        where 1 = 1
+        <if test="uid != null and uid != ''">
+            and merchant_no = #{uid}
+        </if>
+        <if test="subAccount != null and subAccount != ''">
+            and sub_account_no = #{subAccount}
+        </if>
+    </select>
+    <select id="selectByUidOrSubAccountOrTaxSourceId" resultMap="OnlinePaymentInfoResult">
+        select
+        *
+        from tbl_online_payment_info
+        where 1 = 1
+        <if test="uid != null and uid != ''">
+            and merchant_no = #{uid}
+        </if>
+        <if test="subAccount != null and subAccount != ''">
+            and sub_account_no = #{subAccount}
+        </if>
+        <if test="taxSourceId != null">
+            and tax_source_company_id = #{taxSourceId}
+        </if>
+    </select>
+    <select id="listByUidOrSubAccount" resultMap="OnlinePaymentInfoResult">
+        select
+        *
+        from tbl_online_payment_info
+    </select>
+</mapper>

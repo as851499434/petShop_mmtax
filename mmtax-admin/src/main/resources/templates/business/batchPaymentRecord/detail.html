@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="include :: header('批量打款记录')"/>
+    <style>
+        .boxs{
+            display: flex;
+            -webkit-box-pack: justify;
+            -ms-flex-pack: justify;
+            justify-content: space-around;
+            background: #fff;
+            padding: 30px 40px;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-shadow: 1px 1px 3px rgba(0,0,0,.2);
+            padding: 10px;
+        }
+        .line{
+            width: 1px;
+            height:50px;
+            background: #ddd;
+        }
+    </style>
+</head>
+<body class="white-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12" style="padding: 0px;">
+            <div class="boxs">
+                <div class="boxcon">
+                    <p class='title'>通过验证订单（笔 | 元）</p>
+                    <p class='boxcon'><span id="ids1"></span>|<span id="ids2"></span></p>
+                </div>
+                <i class="line"></i>
+                <div class="boxcon">
+                    <p class='title'>失败订单（笔 | 元）</p>
+                    <p class='boxcon'><span id="ids3"></span>|<span id="ids4"></span></p>
+                </div>
+                <i class="line"></i>
+                <div class="boxcon">
+                    <p class='title'>进行中订单（笔 | 元）</p>
+                    <p class='boxcon'><span id="ids8"></span>|<span id="ids9"></span></p>
+                </div>
+                <i class="line"></i>
+                <!--<div class="boxcon">-->
+                    <!--<p class='title'>风险订单（笔 | 元）</p>-->
+                    <!--<p class='boxcon'><span id="ids5"></span>|<span id="ids6"></span></p>-->
+                <!--</div>-->
+                <!--<i class="line"></i>-->
+                <div class="boxcon">
+                    <p class='title'>服务费（元）</p>
+                    <p class='boxcon' style="font-weight:700" id="ids7"></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12 select-table table-striped" style="padding: 10px">
+            <table id="bootstrap-table" data-mobile-responsive="true"></table>
+        </div>
+    </div>
+</div>
+<div th:include="include::footer"></div>
+<script th:inline="javascript">
+</script>
+<script th:inline="javascript">
+    var prefix = ctx + "manager/batchPaymentRecord";
+    var information = JSON.parse(sessionStorage.getItem("information"))
+    var moneychannel = [[${@dict.getType('money_channel')}]];
+    var moneystatus = [[${@dict.getType('trxorder_status')}]];
+    $(function () {
+        var options = {
+            url: prefix+ '/getBatchRecordDetail',
+            queryParams: getParams,
+            modalName: "交易订单",
+            showExport: false,
+            showSearch: false,
+            showRefresh: false,
+            showColumns: false,
+            showToggle: false,
+            columns: [
+                {
+                    field: 'id',
+                    title: 'id',
+                    visible: false
+                },
+                {
+                    field: 'merchantId',
+                    title: '商户id',
+                    visible: false
+                },
+                {
+                    field: 'actualAmount',
+                    title: '实发金额'
+                },
+                {
+                    field: 'amount',
+                    title: '商户打款请求金额'
+                },
+                {
+                    field: 'bankName',
+                    title: '银行名称',
+                    visible: false
+                },
+                {
+                    field: 'batchNo',
+                    title: '批次号',
+                    visible: false
+                },
+                {
+                    field: 'charge',
+                    title: '手续费',
+                    visible: false
+                },
+                {
+                    field: 'merchantSerialNum',
+                    title: '商户订单',
+                    visible: false
+                },
+                {
+                    field: 'orderSerialNum',
+                    title: '订单流水号'
+                },
+                {
+                    field: 'orderStatus',
+                    title: '打款状态',
+                    formatter: function (value, row, index) {
+                        return $.table.selectDictLabel(moneystatus, row.orderStatus);
+                    }
+                },
+                {
+                    field: 'comment',
+                    title: '失败原因',
+                },
+                {
+                    field: 'payeeBankNo',
+                    title: '银行卡号',
+                    visible: false
+                },
+                {
+                    field: 'payeeIdCardNo',
+                    title: '身份证号'
+                },
+                {
+                    field: 'payeeMobile',
+                    title: '手机号',
+                    visible: false
+                },
+                {
+                    field: 'payeeName',
+                    title: '收款户名',
+                    visible: false
+                },
+                {
+                    field: 'paymentChannel',
+                    title: '打款渠道',
+                    formatter: function (value, row, index) {
+                        return $.table.selectDictLabel(moneychannel, row.paymentChannel);
+                    }
+                },
+                {
+                    field: 'createTime',
+                    title: '创建时间'
+                },
+                {
+                    field: 'updateTime',
+                    title: '更新时间'
+                }
+            ]
+        };
+        $.table.init(options);
+        function getParams (params) {
+            var temp = {
+                pageSize : params.limit,
+                pageNum:        params.offset / params.limit + 1,
+                recordId:information.id
+            };
+            return temp;
+        };
+        $.get("/manager/batchPaymentRecord/amountDetail?id="+information.id+"&merchantId="+information.merchantId,function (data) {
+            if(data.code == 0){
+                $("#ids1").text(data.data.successfulOrdersNum)
+                $("#ids2").text(data.data.successfulAmount)
+                $("#ids3").text(data.data.failOrdersNum)
+                $("#ids4").text(data.data.failAmount)
+                $("#ids5").text(data.data.riskOrdersNum)
+                $("#ids6").text(data.data.riskOrderAmount)
+                $("#ids7").text(data.data.serviceAmount)
+                $("#ids9").text(data.data.processAndInitAmount)
+                $("#ids8").text(data.data.processAndInitNum)
+            }
+        })
+    });
+</script>
+</body>
+</html>

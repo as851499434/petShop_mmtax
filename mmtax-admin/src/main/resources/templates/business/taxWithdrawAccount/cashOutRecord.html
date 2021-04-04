@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="include :: header('提现记录')"/>
+    <th:block th:include="include :: layout-latest-css" />
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="formId" autocomplete="off">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            税源地名称：<input type="text" name="taxSourceName"/>
+                        </li>
+                        <li>
+                            账户名称：<input type="text" name="accountName"/>
+                        </li>
+                        <li>
+                            <label>提现状态：</label>
+                            <select name="orderStatus" th:with="type=${@dict.getType('cashout_status')}">
+                                <option value="">所有</option>
+                                <option th:each="dict : ${type}" th:text="${dict.dictLabel}"
+                                        th:value="${dict.dictValue}">
+                                </option>
+                            </select>
+                        </li>
+                        <li class="select-time">
+                            <label>创建时间： </label>
+                            <input type="text" class="time-input" id="startTime" placeholder="开始时间"
+                                   name="startDate"/>
+                            <span>-</span>
+                            <input type="text" class="time-input" id="endTime" placeholder="结束时间" name="endDate"/>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.limitSearch()"><i
+                                    class="fa fa-search"></i>&nbsp;搜索</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i
+                                    class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table" data-mobile-responsive="true"></table>
+        </div>
+    </div>
+</div>
+<th:block th:include="include :: footer"/>
+<script th:inline="javascript">
+    var editFlag = [[${@permission.hasPermi('tax:taxWithdrawAccount:init')}]];
+    var statusData = [[${@dict.getType('cashout_status')}]];
+    layui.use('laydate',function () {
+        var laydate = layui.laydate;
+        var startDate = laydate.render({
+            elem: '#startTime',
+            type: 'date',
+            format: 'yyyy-MM-dd',
+            done: function(value, date){
+                endDate.config.min ={
+                    year:date.year,
+                    month:date.month-1,
+                    date: date.date,
+                    hours: 0,
+                    minutes: 0,
+                    seconds : 0
+                };
+            }
+        });
+        var endDate = laydate.render({
+            elem: '#endTime',
+            type: 'date',
+            format: 'yyyy-MM-dd',
+            done: function(value,date){
+                startDate.config.max={
+                    year:date.year,
+                    month:date.month-1,//注意是month-1，写在date上的话你后边的日期选择不了
+                    date: date.date,
+                    hours: 0,
+                    minutes: 0,
+                    seconds : 0
+                }
+            }
+        });
+    })
+    var prefix = ctx + "tax/taxWithdrawAccount";
+    $(function () {
+        var options = {
+            url: prefix + "/getListTrxOrderOfSource",
+            createUrl: prefix + "/add",
+            updateUrl: prefix + "/detail",
+            removeUrl: prefix + "/remove",
+            exportUrl: prefix + "/export",
+            modalName: "提现记录",
+            showExport: true,
+            columns: [{
+                checkbox: false
+            },
+                {
+                    field: 'id',
+                    title: '',
+                    visible: false
+                }, {
+                    field: 'taxSourceName',
+                    title: '税源地名称',
+                }, {
+                    field: 'accountName',
+                    title: '账户名称'
+                },
+                {
+                    field: 'amount',
+                    title: '提现请求金额（元）',
+                },
+                {
+                    field: 'orderSerialNum',
+                    title: '订单流水号',
+                }, {
+                    field: 'merchantSerialNum',
+                    title: '账户订单流水号',
+                },
+                {
+                    field: 'createTime',
+                    title: '创建时间',
+                }, {
+                    field: 'orderStatus',
+                    title: '提现状态',
+                    width: '10%',
+                    align: "left",
+                    formatter: function (value, row, index) {
+                        return $.table.selectDictLabel(statusData, row.orderStatus);
+                    }
+                },
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        var actions = [];
+                        actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="$.operate.cashOutInfoTab(' + row.id + ')"><i class="fa fa-edit"></i>详情</a> ');
+                        return actions.join('');
+                    }
+                }]
+        };
+        $.table.init(options);
+    });
+</script>
+</body>
+</html>

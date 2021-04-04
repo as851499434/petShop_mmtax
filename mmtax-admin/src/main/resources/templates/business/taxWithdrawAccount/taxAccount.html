@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <style>
+        .layui-layer[type="iframe"] .layui-layer-btn0{
+            display: none;
+        }
+        #balance.form-control{
+            border: none;
+        }
+        .form-control[readonly]{
+            background-color: #fff;
+            cursor: default;
+        }
+    </style>
+    <th:block th:include="include :: header('税源地账户列表')"/>
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="formId" autocomplete="off">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            税源地名称：<input type="text" name="taxSourceName"/>
+                        </li>
+                        <li>
+                            公司简称：<input type="text" name="companyName"/>
+                        </li>
+                        <li></li>
+                        <li class="select-time">
+                            <label>创建时间： </label>
+                            <input type="text" class="time-input" id="startTime" placeholder="开始时间"
+                                   name="startDate"/>
+                            <span>-</span>
+                            <input type="text" class="time-input" id="endTime" placeholder="结束时间" name="endDate"/>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.limitSearch()"><i
+                                    class="fa fa-search"></i>&nbsp;搜索</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i
+                                    class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+
+        <div class="btn-group-sm" id="toolbar" role="group">
+            <a class="btn btn-success" onclick="$.operate.addTab()" shiro:hasPermission="tax:taxWithdrawAccount:withdrawAccountAdd" shiro:hasRole="admin">
+                <i class="fa fa-plus"></i> 添加
+            </a>
+            <a class="btn btn-primary btn-edit disabled" onclick="$.operate.taxInfoTab()"
+               shiro:hasPermission="tax:taxWithdrawAccount:withdrawAccountUpdate" shiro:hasRole="admin">
+                <i class="fa fa-edit"></i> 修改
+            </a>
+            <a class="btn btn-danger btn-del btn-del disabled" onclick="$.operate.deleteTaxAccount()" shiro:hasPermission="tax:taxWithdrawAccount:withdrawAccountDelete" shiro:hasRole="admin">
+                <i class="fa fa-remove"></i> 删除
+            </a>
+            <a class="btn btn-warning" onclick="$.table.exportExcel()"
+               shiro:hasPermission="tax:taxWithdrawAccount:exportWithdrawAccountList" shiro:hasRole="admin">
+                <i class="fa fa-download"></i> 导出
+            </a>
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table" data-mobile-responsive="true"></table>
+        </div>
+    </div>
+</div>
+<div th:include="include :: footer"></div>
+<script th:inline="javascript">
+    var prefix = ctx + "tax/taxWithdrawAccount";
+    layui.use('laydate',function () {
+        var laydate = layui.laydate;
+        var startDate = laydate.render({
+            elem: '#startTime',
+            type: 'date',
+            format: 'yyyy-MM-dd',
+            done: function(value, date){
+                endDate.config.min ={
+                    year:date.year,
+                    month:date.month-1,
+                    date: date.date,
+                    hours: 0,
+                    minutes: 0,
+                    seconds : 0
+                };
+            }
+        });
+        var endDate = laydate.render({
+            elem: '#endTime',
+            type: 'date',
+            format: 'yyyy-MM-dd',
+            done: function(value,date){
+                startDate.config.max={
+                    year:date.year,
+                    month:date.month-1,//注意是month-1，写在date上的话你后边的日期选择不了
+                    date: date.date,
+                    hours: 0,
+                    minutes: 0,
+                    seconds : 0
+                }
+            }
+        });
+    })
+    $(function () {
+        var options = {
+            url: prefix + "/withdrawAccountListView",
+            createUrl: prefix + "/taxAccountInit",
+            updateUrl: prefix + "/taxAccountEdit",
+            removeUrl: prefix + "/withdrawAccountDelete",
+            exportUrl: prefix + "/exportWithdrawAccountList",
+            modalName: "税源地账户信息",
+            showExport: true,
+            columns: [{
+                checkbox: true
+            }, {
+                field: 'id',
+                title: 'id'
+            },{
+                field: 'taxSourceCompanyId',
+                title: '税源地id',
+                visible: false
+            },{
+                field: 'allowWithdraw',
+                title: '是否提现',
+                visible: false
+            },{
+                field: 'taxSourceName',
+                title: '税源地名称',
+            }, {
+                field: 'companyName',
+                title: '公司简称',
+            }, {
+                field: 'bankAccountPublic',
+                title: '对公户名',
+            }, {
+                field: 'bankCardPublic',
+                title: '对公银行卡号',
+            }, {
+                field: 'bankPublic',
+                title: '对公银行名称',
+            }, {
+                field: 'bankNamePublic',
+                title: '对公支行名称'
+            }, {
+                field: 'reservedFieldOne',
+                title: '对公银行分支行号'
+            }, {
+                field: 'createTime',
+                title: '创建时间',
+            }, {
+                title: '操作',
+                align: 'center',
+                formatter: function (value, row, index) {
+                    var actions = [];
+                    actions.push('<a class="btn btn-success btn-xs" href="javascript:void(0)" onclick="$.operate.taxAccountDetail(\'' + row.taxSourceCompanyId + '\')"><i class="fa fa-edit"></i>查看</a> ');
+                    if(row.allowWithdraw == 1){
+                        actions.push('<a class="btn btn-danger btn-xs" href="javascript:void(0)" onclick="$.operate.withdraw(\'' + row.taxSourceCompanyId + '\')">提现</a> ');
+                    }
+                    return actions.join('');
+                }
+            }]
+        };
+        $.table.init(options);
+    });
+</script>
+</body>
+</html>

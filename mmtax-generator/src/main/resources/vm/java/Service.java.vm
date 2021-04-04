@@ -1,0 +1,15 @@
+package ${package}.service;
+
+import ${package}.domain.${className};
+import java.util.List;
+
+/**
+ * ${tableComment} 服务层
+ * 
+ * @author ${author}
+ * @date ${datetime}
+ */
+public interface I${className}Service
+{
+
+}

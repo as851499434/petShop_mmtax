@@ -1,0 +1,493 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mmtax.business.mapper.InvoiceApplyMapper">
+
+    <resultMap type="InvoiceApply" id="InvoiceApplyResult">
+        <result property="id" column="id"/>
+        <result property="invoiceAmount" column="invoice_amount"/>
+        <result property="invoiceInfoId" column="invoice_info_id"/>
+        <result property="invoiceStatus" column="invoice_status"/>
+        <result property="merchantId" column="merchant_id"/>
+        <result property="invoiceType" column="invoice_type"/>
+        <result property="operator" column="operator"/>
+        <result property="toVoid" column="to_void"/>
+        <result property="bankName" column="bank_name"/>
+        <result property="invoiceSerialNum" column="invoice_serial_num"/>
+        <result property="instruction" column="instruction"/>
+        <result property="remarks" column="remarks"/>
+        <result property="generateId" column="generate_id"/>
+        <result property="addressId" column="address_id"/>
+        <result property="delStatus" column="del_status"/>
+        <result property="providerId" column="provider_id"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <resultMap type="com.mmtax.business.dto.MerchantInvoicedDetail" id="InvoiceSuccessResult">
+        <result property="id" column="id"/>
+        <result property="invoiceAmount" column="invoice_amount"/>
+        <result property="invoiceInfoId" column="invoice_info_id"/>
+        <result property="invoiceStatus" column="invoice_status"/>
+        <result property="merchantId" column="merchant_id"/>
+        <result property="invoiceType" column="invoice_type"/>
+        <result property="invoiceCode" column="invoice_code"/>
+        <result property="invoiceNum" column="invoice_num"/>
+        <result property="invoiceTime" column="invoice_time"/>
+        <result property="invoiceMonth" column="invoice_month"/>
+        <result property="invoiceImg" column="invoice_img"/>
+        <result property="invoiceServiceName" column="invoice_service_name"/>
+        <result property="taxRate" column="tax_rate"/>
+        <result property="taxAmount" column="tax_amount"/>
+        <result property="unitPrice" column="unit_price"/>
+        <result property="bankName" column="bank_name"/>
+        <result property="instruction" column="instruction"/>
+        <result property="remarks" column="remarks"/>
+        <result property="toVoid" column="to_void"/>
+        <result property="operator" column="operator"/>
+        <result property="invoiceSerialNum" column="invoice_serial_num"/>
+    </resultMap>
+
+
+    <resultMap type="com.mmtax.business.dto.InvoiceDetailDTO" id="InvoiceDetailResult">
+        <result property="id" column="id"/>
+        <result property="merchantId" column="merchant_id"/>
+        <result property="invoiceSerialNum" column="invoice_serial_num"/>
+        <result property="invoiceAmount" column="invoice_amount"/>
+        <result property="companyName" column="company_name"/>
+        <result property="taxpayerType" column="taxpayer_type"/>
+        <result property="addresseeName" column="addressee_name"/>
+        <result property="invoiceType" column="invoice_type"/>
+        <result property="address" column="address"/>
+        <result property="mobile" column="mobile"/>
+        <result property="invoiceStatus" column="invoice_status"/>
+        <result property="instruction" column="instruction"/>
+    </resultMap>
+    <update id="updateInvoiceRestartStatus">
+        UPDATE
+            tbl_invoice_apply
+        SET to_void = #{status}
+        WHERE id = #{invoiceId}
+    </update>
+
+    <select id="listInvoiceApplications" resultType="com.mmtax.business.dto.InvoiceQueryDTO">
+        SELECT
+        t1.id AS id,
+        t1.invoice_serial_num AS invoiceSerialNum,
+        t1.invoice_type AS invoiceType,
+        t1.invoice_amount AS invoiceAmount,
+        t1.create_time AS createTime,
+        t1.invoice_status AS invoiceStatus,
+        t2.merchant_name AS merchantName,
+        t1.to_void AS toVoid,
+        t3.invoice_serial_name as invoiceSerialName,
+        t3.tax_amount as taxAmount,
+        t3.tax_rate as taxRate,
+        t3.unit_price as unitPrice
+        FROM
+        tbl_invoice_apply t1
+        LEFT JOIN
+        tbl_invoice_info t2
+        ON
+        t1.invoice_info_id = t2.id
+        left join
+        tbl_invoice_apply_amount t3
+        on
+        t1.id = t3.invoice_id
+        WHERE
+        t1.to_void NOT IN (2,3)
+        AND
+        t1.merchant_id = #{merchantId}
+        and
+        t1.del_status=0
+        and
+        t3.status=0
+        <if test="invoiceSerialNum != null and invoiceSerialNum != ''">
+            AND t1.invoice_serial_num LIKE concat('%',#{invoiceSerialNum},'%')
+        </if>
+        <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+            AND t1.create_time BETWEEN concat(#{startDate},' 00:00:00') AND concat(#{endDate},' 23:59:59')
+        </if>
+        ORDER BY
+        t1.create_time DESC
+        limit #{startIndex},#{pageSize}
+    </select>
+    <select id="countInvoiceApplications" resultType="java.lang.Integer">
+        select
+        count(*)
+        from
+        tbl_invoice_apply
+        where
+        to_void NOT IN (2,3)
+        AND
+        merchant_id = #{merchantId}
+        and
+        del_status=0
+        <if test="invoiceSerialNum != null and invoiceSerialNum != ''">
+            and invoice_serial_num like concat('%',#{invoiceSerialNum},'%')
+        </if>
+        <if test="invoiceCode != null and invoiceCode != ''">
+            and invoice_code like concat('%',#{invoiceCode},'%')
+        </if>
+        <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+            and create_time between concat(#{startDate},' 00:00:00') and concat(#{endDate},' 23:59:59')
+        </if>
+        order by
+        create_time desc
+    </select>
+    <select id="listSysInvoiceApplications" parameterType="com.mmtax.business.dto.ManagerInvoiceApplyDTO"
+            resultType="com.mmtax.business.dto.InvoiceQueryDTO">
+        select
+        t1.id as id,
+        t1.invoice_serial_num AS invoiceSerialNum,
+        t1.invoice_type AS invoiceType,
+        t1.invoice_amount AS invoiceAmount,
+        t1.create_time AS createTime,
+        t1.invoice_status AS invoiceStatus,
+        t2.merchant_name AS merchantName
+        FROM tbl_invoice_record t1
+        LEFT JOIN tbl_merchant_info t2
+        on t1.merchant_id = t2.id
+        WHERE
+        t1.del_status=0
+        <if test="invoiceSerialNum != null and invoiceSerialNum != ''">
+            AND t1.invoice_serial_num LIKE concat('%',#{invoiceSerialNum},'%')
+        </if>
+        <if test="merchantName != null and merchantName != ''">
+            AND t2.merchant_name LIKE concat('%',#{merchantName},'%')
+        </if>
+        <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+            AND t1.create_time BETWEEN concat(#{startDate},' 00:00:00') AND concat(#{endDate},' 23:59:59')
+        </if>
+        <if test="startAmount != null and startAmount != '' and endAmount != null and endAmount != ''">
+            AND t1.invoice_amount BETWEEN #{startAmount} AND #{endAmount}
+        </if>
+
+          ORDER BY
+        t1.create_time DESC
+    </select>
+    <select id="countSysInvoiceApplications" resultType="java.lang.Integer">
+        select
+        count(*)
+        from
+        tbl_invoice_apply
+        where
+        1=1
+        and
+        del_status=0
+        <if test="invoiceSerialNum != null and invoiceSerialNum != ''">
+            and invoice_serial_num like concat('%',#{invoiceSerialNum},'%')
+        </if>
+        <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+            and create_time between concat(#{startDate},' 00:00:00') and concat(#{endDate},' 23:59:59')
+        </if>
+        order by
+        create_time desc
+    </select>
+    <select id="getInvoiceDetailById" resultMap="InvoiceDetailResult">
+        SELECT t1.id,
+               t1.invoice_serial_num,
+               t1.invoice_amount,
+               t1.merchant_id,
+               t1.instruction,
+               t1.invoice_status,
+               t1.invoice_type,
+               t2.company_name,
+               t2.taxpayer_type,
+               t3.addressee_name,
+               t3.address,
+               t3.mobile
+        FROM tbl_invoice_apply t1
+                 LEFT JOIN
+             tbl_invoice_info t2
+             ON
+                 t1.merchant_id = t2.merchant_id
+                 LEFT JOIN
+             tbl_address t3
+             ON
+                 t1.address_id = t3.id
+        WHERE t1.id = #{id}
+          and t1.del_status = 0
+    </select>
+    <select id="listSuccessInvoiceApplications" resultType="com.mmtax.business.dto.MerchantInvoicedDetail">
+        select
+        t1.id,
+        t1.invoice_amount as invoiceAmount,
+        t1.invoice_status as invoiceStatus,
+        t1.invoice_type as InvoiceType,
+        t2.invoice_code as invoiceCode,
+        t2.invoice_no as invoiceNum,
+        t2.invoice_time as invoiceTime,
+        t2.invoice_month as invoiceMonth,
+        t1.to_void as toVoid,
+        t2.invoice_img as invoiceImg,
+        t1.invoice_serial_num as invoiceSerialNum,
+        t1.address_id as addressId,
+        t1.bank_name as bankName,
+        t1.remarks,
+        t1.instruction,
+        t1.operator
+        from
+        tbl_invoice_apply t1,
+        tbl_invoice_apply_detail t2
+        where
+        1=1
+        and
+        t1.id = t2.invoice_apply_id
+        and
+        t1.merchant_id = #{merchantId}
+        and
+        t1.del_status=0
+        <if test="invoiceSerialNum != null and invoiceSerialNum != ''">
+            and t1.invoice_serial_num like concat('%',#{invoiceSerialNum},'%')
+        </if>
+        <if test="invoiceCode != null and invoiceCode != ''">
+            and t1.invoice_code like concat('%',#{invoiceCode},'%')
+        </if>
+        <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+            and t1.create_time between concat(#{startDate},' 00:00:00') and concat(#{endDate},' 23:59:59')
+        </if>
+        and
+        t1.invoice_status = 'POSTED'
+        order by
+        t1.create_time desc
+        limit #{startIndex},#{pageSize}
+    </select>
+    <select id="countSuccessInvoiceApplications" resultType="java.lang.Integer">
+        select
+        COUNT(*)
+        from
+        tbl_invoice_apply
+        where
+        merchant_id = #{merchantId}
+        and
+        del_status=0
+        <if test="invoiceSerialNum != null and invoiceSerialNum != ''">
+            and invoice_serial_num like concat('%',#{invoiceSerialNum},'%')
+        </if>
+        <if test="invoiceCode != null and invoiceCode != ''">
+            and invoice_code like concat('%',#{invoiceCode},'%')
+        </if>
+        <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+            and create_time between concat(#{startDate},' 00:00:00') and concat(#{endDate},' 23:59:59')
+        </if>
+        and
+        invoice_status = 'POSTED'
+        order by
+        create_time desc
+    </select>
+    <select id="getCheckDetailById" resultType="com.mmtax.business.dto.InvoiceCheckDetailDTO">
+        select id,
+               invoice_type      as invoiceType,
+               bank_name         as bankName,
+               remarks           as remarks,
+               instruction       as instruction,
+               invoice_amount    as invoiceAmount,
+               invoice_serial_num as invoiceSerialNum
+        FROM `tbl_invoice_apply`
+        where id = #{invoiceApplyId}
+          and del_status = 0
+    </select>
+    <select id="listSysInvoicedApplications" resultType="com.mmtax.business.dto.QueryInvoiceDetailsDTO">
+        select
+        t1.invoice_serial_num as invoiceSerialNum,
+        t1.invoice_no as invoiceNo,
+        t1.invoice_type as invoiceType,
+        t1.invoice_amount as invoiceAmount,
+        t2.merchant_name as merchantName,
+        t1.invoice_content as invoiceContent,
+        t1.invoice_status as invoiceStatus,
+        t1.create_time as createTime
+        from tbl_invoice_record t1
+        left join tbl_merchant_info t2
+        on t1.merchant_id = t2.id
+        where
+        1=1
+        and
+        t1.del_status=0
+        and (t1.invoice_status = 2  or t1.invoice_status = 5 or t1.invoice_status = 6)
+        <if test="invoiceSerialNum != null and invoiceSerialNum != ''">
+            and t1.invoice_serial_num like concat('%',#{invoiceSerialNum},'%')
+        </if>
+        <if test="invoiceNo != null and invoiceNo != ''">
+            and t1.invoice_no like concat('%',#{invoiceNo},'%')
+        </if>
+        <if test="invoiceContent != null and invoiceContent != ''">
+            and t1.invoice_content like concat('%',#{invoiceContent},'%')
+        </if>
+        <if test="merchantName != null and merchantName != ''">
+            and t2.merchant_name like concat('%',#{merchantName},'%')
+        </if>
+        <if test="startAmount != null and startAmount != '' and endAmount != null and endAmount != ''">
+            AND t1.invoice_amount BETWEEN #{startAmount} AND #{endAmount}
+        </if>
+        order by
+        t1.create_time desc
+
+    </select>
+    <select id="countInvoicedApplications" resultType="java.lang.Integer">
+        select
+        count(*)
+        from
+        tbl_invoice_apply
+        where
+        to_void =#{type}
+        and
+        del_status=0
+        <if test="invoiceSerialNum != null and invoiceSerialNum != ''">
+            and invoice_serial_num like concat('%',#{invoiceSerialNum},'%')
+        </if>
+        <if test="invoiceCode != null and invoiceCode != ''">
+            and invoice_code like concat('%',#{invoiceCode},'%')
+        </if>
+        <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+            and create_time between concat(#{startDate},' 00:00:00') and concat(#{endDate},' 23:59:59')
+        </if>
+        and
+        invoice_status = 'POSTED'
+    </select>
+    <select id="listRestartInvoice" parameterType="com.mmtax.business.dto.ManagerInvoiceApplyDTO"
+            resultType="com.mmtax.business.dto.ManagerInvoiceDetailDTO">
+        select
+        t1.id,
+        t1.invoice_amount as invoiceAmount,
+        t1.invoice_status as invoiceStatus,
+        t1.invoice_type as InvoiceType,
+        t1.to_void as toVoid,
+        t1.invoice_serial_num as invoiceSerialNum,
+        t1.bank_name as bankName,
+        t1.remarks,
+        t1.instruction
+        from
+        tbl_invoice_apply t1
+        where
+        t1.to_void = #{status}
+        and
+        t1.del_status=0
+        <if test="invoiceSerialNum != null and invoiceSerialNum != ''">
+            and t1.invoice_serial_num like concat('%',#{invoiceSerialNum},'%')
+        </if>
+        <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+            and t1.create_time between concat(#{startDate},' 00:00:00') and concat(#{endDate},' 23:59:59')
+        </if>
+        order by
+        t1.create_time desc
+    </select>
+    <select id="getRestartInvoiceList" resultType="com.mmtax.business.dto.InvoiceCheckDetailDTO">
+        SELECT
+            t1.id as id,
+            t1.invoice_type   as invoiceType,
+            t1.bank_name      as bankName,
+            t1.remarks        as remarks,
+            t1.instruction    as instruction,
+            t1.invoice_amount as invoiceAmount,
+            t2.id             as invoiceDetailId
+        FROM   `tbl_invoice_apply` t1
+        left join
+            tbl_invoice_apply_detail t2
+        on
+            t1.id = t2.invoice_apply_id
+        WHERE t1.generate_id = #{invoiceId}
+          and t1.del_status = 0
+    </select>
+    <select id="getRestartInvoiceIds" resultType="java.lang.Integer">
+        SELECT id
+        FROM tbl_invoice_apply
+        WHERE generate_id = #{invoiceId}
+          and del_status = 0
+    </select>
+    <select id="getTotalAmount" resultType="com.mmtax.business.dto.MerchantInvoiceTotalAmountDTO">
+        select
+        count(*) as totalCount,
+        sum(invoice_amount) as totalAmount
+        from
+        tbl_invoice_apply
+        where
+        merchant_id = #{merchantId}
+        and
+        del_status=0
+        <if test="invoiceSerialNum != null and invoiceSerialNum != ''">
+            and invoice_serial_num like concat('%',#{invoiceSerialNum},'%')
+        </if>
+        <if test="invoiceCode != null and invoiceCode != ''">
+            and invoice_code like concat('%',#{invoiceCode},'%')
+        </if>
+        <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+            and create_time between concat(#{startDate},' 00:00:00') and concat(#{endDate},' 23:59:59')
+        </if>
+        and
+        invoice_status
+        in('AGREE','POSTED')
+    </select>
+    <select id="getMerchantIdByInvoiceId" resultType="java.lang.Integer">
+        SELECT merchant_id
+        FROM tbl_invoice_apply
+        WHERE id = #{invoiceId}
+          and del_status = 0
+    </select>
+
+    <update id="updateDelStatus">
+        update
+            tbl_invoice_apply
+        set del_status=1
+        where id = #{id}
+    </update>
+
+    <select id="getInvoiceCheckByInvoiceId" resultType="com.mmtax.business.dto.InvoiceCheckDTO">
+        SELECT
+            t1.id as id,
+			t1.invoice_serial_num as invoiceSerialNum,
+			t2.merchant_name as merchantName,
+			t1.behalf_main_body as behalfMainBody,
+			t1.invoice_amount as invoiceAmount,
+			t1.invoice_title as invoiceTitle,
+			t1.invoice_type as invoiceType,
+			t1.taxpayer_identification_number as taxpayerIdentificationNumber,
+			t1.bank_name as bankName,
+			t1.bank_account_no as bankAccountNo,
+			t1.company_address as companyAddress,
+			t1.invoice_mobile as invoiceMobile,
+			t1.invoice_content as invoiceContent,
+			t1. return_reason as returnReason,
+			t1.remark as remark,
+			t1.return_remark as returnRemark,
+			t1.addressee_name as addresseeName,
+			t1.address_mobile as addressMobile,
+			t1.address as address,
+			t1.express_company_name as expressCompanyName,
+			t1.express_no as expressNo,
+			t1.express_company_name_return as expressCompanyNameReturn,
+			t1.express_no_return as expressNoReturn
+        FROM tbl_invoice_record t1
+        LEFT JOIN tbl_merchant_info t2
+        on t1.merchant_id = t2.id
+        where
+        t1.id = #{id}
+          and t1.del_status = 0
+    </select>
+
+    <update id="toInvoiceChangeState" >
+         UPDATE tbl_invoice_record  a
+				set a.express_company_name = #{expressCompanyName},
+				    a.express_no = #{expressNo},
+					a.invoice_no = #{invoiceNo},
+					a.invoice_status = 2
+					where a.id=#{id}
+    </update>
+
+    <select id="invoiceAmountDetailsCheck" resultType="com.mmtax.business.dto.InvoiceAmountDetailsDTO">
+        select
+            t3.invoice_amount as invoiceAmount,
+            t1.order_serial_num as orderSerialNum,
+            t1.amount as amount,
+            t1.create_time as createTime
+        from tbl_recharge_record t1
+        left join tbl_invoice_recharge_correlation t2
+        on t1.id = t2.recharge_record_id
+        left join tbl_invoice_record t3
+        on t3.id = t2.invoice_record_id
+        where t3.id = #{id}
+        and t3.del_status = 0
+    </select>
+</mapper>

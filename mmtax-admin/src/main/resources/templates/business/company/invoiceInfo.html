@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('企业信息列表')" />
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="formId" autocomplete="off">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            发票申请编号：<input type="text" name="invoiceSerialNum"/>
+                        </li>
+                        <li>
+                            发票编号：<input type="text" name="invoiceNo"/>
+                        </li>
+                        <li class="select-time">
+                            <label>发票金额范围： </label>
+                            <input type="text" placeholder="起始金额"
+                                   name="startMoney"/>
+                            <span>-</span>
+                            <input type="text" placeholder="结束金额" name="endMoney"/>
+                        </li>
+                        <li>
+                            发票抬头：<input type="text" name="invoiceTitle"/>
+                        </li>
+                        <li>
+                            应税劳务服务名：<input type="text" name="content"/>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.limitSearch()"><i
+                                    class="fa fa-search"></i>&nbsp;搜索</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i
+                                    class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+
+        <div class="btn-group-sm" id="toolbar" role="group">
+            <a class="btn btn-warning" onclick="$.table.exportExcel()"
+            shiro:hasPermission="manager:customerInfo:invoiceExport">
+            <i class="fa fa-download"></i> 导出
+            </a>
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table" data-mobile-responsive="true"></table>
+        </div>
+    </div>
+</div>
+<div th:include="include :: footer"></div>
+<script th:inline="javascript">
+    var prefix = ctx + "manager/companyInfo";
+    var rsigns = [[${@dict.getType('invoice_type')}]];
+    var signs = [[${@dict.getType('billing_status')}]];
+    layui.use('laydate',function () {
+        var laydate = layui.laydate;
+        var startDate = laydate.render({
+            elem: '#startTime',
+            type: 'date',
+            format: 'yyyy-MM-dd',
+            done: function(value, date){
+                endDate.config.min ={
+                    year:date.year,
+                    month:date.month-1,
+                    date: date.date,
+                    hours: 0,
+                    minutes: 0,
+                    seconds : 0
+                };
+            }
+        });
+        var endDate = laydate.render({
+            elem: '#endTime',
+            type: 'date',
+            format: 'yyyy-MM-dd',
+            done: function(value,date){
+                startDate.config.max={
+                    year:date.year,
+                    month:date.month-1,//注意是month-1，写在date上的话你后边的日期选择不了
+                    date: date.date,
+                    hours: 0,
+                    minutes: 0,
+                    seconds : 0
+                }
+            }
+        });
+    })
+    $(function() {
+        var options = {
+            url: prefix + "/invoiceInfoDetail",
+            // createUrl: prefix + "/add",
+            // updateUrl: prefix + "/edit/{id}",
+            // removeUrl: prefix + "/remove",
+            exportUrl: prefix + "/invoiceExport",
+            modalName: "发票信息",
+            showExport: true,
+            columns: [{
+                checkbox: true
+            },
+                {
+                    field : 'invoiceSerialNum',
+                    title : '发票申请编号',
+                },
+                {
+                    field : 'invoiceNo',
+                    title : '发票编号',
+                },
+                {
+                    field : 'invoiceTitle',
+                    title : '发票抬头',
+                },
+                {
+                    field : 'expressNo',
+                    title : '快递单号',
+                },
+                {
+                    field : 'expressCompanyName',
+                    title : '快递公司',
+                },
+                {
+                    field : 'addressInfo',
+                    title : '收件信息',
+                },
+                {
+                    field : 'invoiceType',
+                    title : '开票类型',
+                    formatter: function (value, row, index) {
+                        return $.table.selectDictLabel(rsigns, row.invoiceType);
+                    }
+                },
+                {
+                    field : 'invoiceAmount',
+                    title : '开票金额（元）',
+                },
+                {
+                    field : 'content',
+                    title : '应税劳务服务名称',
+                },
+                {
+                    field : 'invoiceStatus',
+                    title : '发票状态',
+                    formatter: function (value, row, index) {
+                        return $.table.selectDictLabel(signs, row.invoiceStatus);
+                    }
+                },
+                {
+                    field : 'createTimeStr',
+                    title : '开票日期',
+                }
+            ]
+        };
+        $.table.init(options);
+    });
+</script>
+</body>
+</html>

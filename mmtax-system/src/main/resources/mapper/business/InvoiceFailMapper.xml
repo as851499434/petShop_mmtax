@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mmtax.business.mapper.InvoiceFailMapper">
+
+    <resultMap type="InvoiceFail" id="InvoiceFailResult">
+        <result property="id" column="id"/>
+        <result property="invoiceId" column="invoice_id"/>
+        <result property="status" column="status"/>
+        <result property="redInvoice" column="red_invoice"/>
+        <result property="sealExplain" column="seal_explain"/>
+        <result property="delStatus" column="del_status"/>
+        <result property="providerId" column="provider_id"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="check" column="is_check"/>
+        <result property="redInvoiceInfo" column="red_invoice_info"/>
+
+    </resultMap>
+    <update id="updateRestartInfoByInvoiceId">
+        UPDATE
+        tbl_invoice_fail
+        SET
+        is_check = #{status}
+        WHERE
+        invoice_id = #{invoiceId}
+    </update>
+    <update id="removeInvoiceFailInfoByInvoiceId">
+        UPDATE
+        tbl_invoice_fail
+        SET
+        del_status = 1
+        WHERE
+        invoice_id = #{invoiceId}
+    </update>
+
+    <select id="getRestartInfoByInvoiceId" resultMap="InvoiceFailResult">
+        SELECT
+        *
+        FROM
+        tbl_invoice_fail
+        WHERE
+        invoice_id = #{invoiceId}
+        AND
+        del_status = 0
+    </select>
+
+</mapper>

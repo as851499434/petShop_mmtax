@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+	<th:block th:include="include :: header('修改常见问题')" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-commonProblem-edit" th:object="${commonProblem}">
+			<input id="id" name="id" th:field="*{id}"  type="hidden">
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">问题：</label>
+				<div class="col-sm-8" >
+					<input id="problem" name="problem" th:field="*{problem}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">解答：</label>
+				<div class="col-sm-8">
+<!--					<input id="answer" name="answer" th:field="*{answer}" class="form-control" type="text" style="height: 300px">-->
+					<textarea type="text" name="answer" th:field="*{answer}" class="form-control" style="height: 400px"></textarea>
+				</div>
+			</div>
+		</form>
+    </div>
+    <div th:include="include::footer"></div>
+    <script type="text/javascript">
+		var prefix = ctx + "business/commonProblem";
+		$("#form-commonProblem-edit").validate({
+			rules:{
+				xxxx:{
+					required:true,
+				},
+			},
+			focusCleanup: true
+		});
+		
+		function submitHandler() {
+	        if ($.validate.form()) {
+	            $.operate.save(prefix + "/edit", $('#form-commonProblem-edit').serialize());
+	        }
+	    }
+	</script>
+</body>
+</html>

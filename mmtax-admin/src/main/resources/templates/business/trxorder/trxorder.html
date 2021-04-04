@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="include :: header('交易订单')"/>
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="formId" autocomplete="off">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            订单流水号：<input type="text" name="orderSerialNum"/>
+                        </li>
+                        <li>
+                            商户名称：<input type="text" name="merchantName"/>
+                        </li>
+                        <li>
+                            收款户名：<input type="text" name="payeeName"/>
+                        </li>
+                        <li>
+                            所属销售：<input type="text" name="saleName"/>
+                        </li>
+                        <li>
+                            <label>打款状态：</label>
+                            <select name="orderStatus" th:with="type=${@dict.getType('trxorder_status')}">
+                                <option value="">所有</option>
+                                <option th:each="dict : ${type}" th:text="${dict.dictLabel}"
+                                        th:value="${dict.dictValue}">
+                                </option>
+                            </select>
+                        </li>
+                        <li>
+                            <label>打款渠道：</label>
+                            <select name="paymentChannel" th:with="type=${@dict.getType('pay_channel')}">
+                                <option value="">所有</option>
+                                <option th:each="dict : ${type}" th:text="${dict.dictLabel}"
+                                        th:value="${dict.dictValue}">
+                                </option>
+                            </select>
+                        </li>
+                        <li class="select-time">
+                            <label>创建时间： </label>
+                            <input type="text" class="time-input" id="startTime" placeholder="开始时间"
+                                   name="startDate"/>
+                            <span>-</span>
+                            <input type="text" class="time-input" id="endTime" placeholder="结束时间" name="endDate"/>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.limitSearch()"><i
+                                    class="fa fa-search"></i>&nbsp;搜索</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i
+                                    class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+
+        <!--<div class="btn-group-sm" id="toolbar" role="group">-->
+        <!--<a class="btn btn-primary btn-edit disabled" onclick="$.operate.infoTab()"-->
+        <!--shiro:hasPermission="manager:trxOrder:detail">-->
+        <!--<i class="fa fa-edit"></i> 详情-->
+        <!--</a>-->
+        <!--</div>-->
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table" data-mobile-responsive="true"></table>
+        </div>
+    </div>
+</div>
+<th:block th:include="include :: footer"/>
+<script th:inline="javascript">
+    var statusData = [[${@dict.getType('trxorder_status')}]];
+    var payChannelData = [[${@dict.getType('pay_channel')}]];
+    var Itssales = [[${@dict.getType('Its_sales')}]];
+    layui.use('laydate',function () {
+        var laydate = layui.laydate;
+        var startDate = laydate.render({
+            elem: '#startTime',
+            type: 'date',
+            format: 'yyyy-MM-dd',
+            done: function(value, date){
+                endDate.config.min ={
+                    year:date.year,
+                    month:date.month-1,
+                    date: date.date,
+                    hours: 0,
+                    minutes: 0,
+                    seconds : 0
+                };
+            }
+        });
+        var endDate = laydate.render({
+            elem: '#endTime',
+            type: 'date',
+            format: 'yyyy-MM-dd',
+            done: function(value,date){
+                startDate.config.max={
+                    year:date.year,
+                    month:date.month-1,//注意是month-1，写在date上的话你后边的日期选择不了
+                    date: date.date,
+                    hours: 0,
+                    minutes: 0,
+                    seconds : 0
+                }
+            }
+        });
+    })
+    var prefix = ctx + "manager/trxOrder";
+    $(function () {
+        var options = {
+            url: prefix + "/getListTrxOrder",
+            createUrl: prefix + "/add",
+            updateUrl: prefix + "/detail",
+            removeUrl: prefix + "/remove",
+            exportUrl: prefix + "/export",
+
+            modalName: "交易订单",
+            showExport: true,
+            columns: [{
+                checkbox: false
+            },
+                {
+                    field: 'id',
+                    title: 'id',
+                    visible: false
+                }, {
+                    field: 'merchantName',
+                    title: '商户名称',
+                }, {
+                    field: 'saleName',
+                    title: '所属销售'
+                },{
+                    field: 'payeeName',
+                    title: '收款户名',
+                },
+                {
+                    field: 'amount',
+                    title: '商户打款请求金额（元）',
+                },
+                {
+                    field: 'orderSerialNum',
+                    title: '订单流水号',
+                }, {
+                    field: 'merchantSerialNum',
+                    title: '商户订单流水号',
+                },
+                {
+                    field: 'createTime',
+                    title: '创建时间',
+                }, {
+                    field: 'orderStatus',
+                    title: '打款状态',
+                    align: "left",
+                    formatter: function (value, row, index) {
+                        return $.table.selectDictLabel(statusData, row.orderStatus);
+                    }
+                },
+                 {
+                    field: 'updateTime',
+                    title: '更新时间',
+                    visible: false
+                }, {
+                    field: 'merchantId',
+                    title: '商户id',
+                    visible: false
+                }, {
+                    field: 'paymentChannel',
+                    title: '打款渠道',
+                    visible: false,
+                    formatter: function (value, row, index) {
+                        return $.table.selectDictLabel(payChannelData, row.paymentChannel);
+                    }
+                }, {
+                    field: 'batchNo',
+                    title: '批次号',
+                    visible: false
+                }, {
+                    field: 'payeeBankNo',
+                    title: '收款人银行卡号',
+                    visible: false
+                }, {
+                    field: 'bankName',
+                    title: '收款人银行卡所属银行名称',
+                    visible: false
+                }, {
+                    field: 'payeeIdCardNo',
+                    title: '收款人身份证号',
+                    visible: false
+                }, {
+                    field: 'payeeMobile',
+                    title: '收款人手机号',
+                    visible: false
+                }, {
+                    field: 'charge',
+                    title: '手续费',
+                    visible: false
+                }, {
+                    field: 'actualAmount',
+                    title: '实发金额',
+                    visible: false
+                }, {
+                    field: 'comment',
+                    title: '失败原因',
+                    width: '10%',
+                },
+                {
+                    title: '操作',
+                    align: 'center',
+                    width: '20%',
+                    formatter: function (value, row, index) {
+                        var actions = [];
+                        if (row.orderStatus == '1') {
+                            actions.push('<button class="btn btn-primary btn-xs"  name="downloadBtn" id="\'' + row.orderSerialNum + '\'"  onclick="downloadCredential(\'' + row.orderSerialNum + '\')">银行回单</button> ');
+                            // actions.push('<button class="btn btn-info btn-xs"  name="downloaRechargedBtn" id="\'' + row.orderSerialNum + '\'" onclick="downloadRecharge(\'' + row.subject + '\')" >结算凭证</button> ');
+                        } else if (row.orderStatus == '2') {
+                            actions.push('<button class="btn btn-success btn-xs"  name="returnBtn" id="\'' + row.orderSerialNum + '\'" href="javascript:void(0)" onclick="refund(\'' + row.orderSerialNum + '\')">退 款</button> ');
+                        } else {
+                            actions.push('<a>--</a> ');
+                        }
+                        return actions.join('');
+                    }
+                }
+                ]
+        };
+        $.table.init(options);
+    });
+    function downloadRecharge(subject) {
+        window.location.href="http://47.98.44.0/meimiao/template/结算凭证（周测试）.pdf";
+        // if(subject == "江西启博"){
+        //     console.log("江西启博");
+        //     window.location.href="http://47.98.44.0/meimiao/template/江西启博.pdf";
+        // }else if(subject == "泰宁博瑞"){
+        //     console.log("泰宁博瑞");
+        //     window.location.href="http://47.98.44.0/meimiao/template/泰宁博瑞.pdf";
+        // }else if(subject == "海南浚聚"){
+        //     console.log("海南浚聚");
+        //     window.location.href="http://47.98.44.0/meimiao/template/海南浚聚.pdf";
+        // }else{
+        //     console.log("null");
+        //     window.location.href="http://47.98.44.0/meimiao/template/template.pdf";
+        // }
+
+    }
+    function downloadCredential(orderSerialNum) {
+        var len = $("button[name='downloadBtn']").length
+        for (var i = 0;i<len;i++) {
+            if ($("button[name='downloadBtn']")[i].id.replace("'","").replace("'","") == orderSerialNum) {
+            }
+        }
+        window.location.assign("https://admin.wukongxinxiang.com/common/downloadCredential?orderSerialNum="+orderSerialNum);
+        // window.location.href="http://47.98.44.0/meimiao/template/电子回单（周测试）.pdf";
+    }
+    function refund(orderSerialNum) {
+        var len = $("button[name='returnBtn']").length
+        for (var i = 0;i<len;i++) {
+            if ($("button[name='returnBtn']")[i].id.replace("'","").replace("'","") == orderSerialNum) {
+                $("button[name='returnBtn']")[i].disabled = true
+            }
+        }
+        $.ajax({
+            url: "/merchant/replenish/refundTranferOrder?orderSerialNum="+orderSerialNum,
+            // data: data,
+            type: "get",
+            // datatype:"json",
+            contentType: 'application/json',
+            success: function(result) {
+                if(result.code === 0){
+                    $.modal.msgSuccess(result.msg)
+                }else {
+                    $.modal.msgError(result.msg)
+                }
+            }
+        })
+    }
+</script>
+</body>
+</html>

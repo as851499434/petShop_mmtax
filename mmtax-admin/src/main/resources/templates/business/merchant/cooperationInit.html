@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="include :: header('商户信息')"/>
+    <style>
+        .bg{
+            width:100%;
+            height: 100%;
+            background:rgba(0,0,0,.5);
+            position: absolute;
+            top: 0px;
+            right: 0px;
+            left: 0px;
+            display: none;
+            z-index: 99;
+        }
+        .license{
+            background: #fff;
+            position: absolute;
+            z-index: 1000;
+            top:100px;
+            left:50%;
+            margin-left: -250px;
+            display: none;
+        }
+        #img-change{
+            border: 1px solid #eee;
+            position: relative;
+            left: 50%;
+            margin-left: -150px;
+            z-index: 100;
+        }
+        .container {
+            margin: 30px auto 0 auto;
+            position: relative;
+            font-family: 微软雅黑;
+            font-size: 12px;
+            /*width: 750px;*/
+            width: 500px;
+        }
+    </style>
+</head>
+<body class="white-bg">
+<div class="form-content">
+    <div class="row">
+        <h4 class="form-header h4">基本信息：</h4>
+        <form class="form-horizontal m" id="form-user-add">
+            <div class="col-md-12">
+                <!--<div class="form-group">-->
+                    <!--<label class="col-sm-3 control-label"><span style="color: red; ">*</span>商户编码：</label>-->
+                    <!--<div class="col-sm-9">-->
+                        <!--<input name="merchantCode" autocomplete="off" placeholder="请输入商户编码" class="form-control" type="text" maxlength="11" required>-->
+                    <!--</div>-->
+                <!--</div>-->
+                <div class="form-group">
+                    <label class="col-sm-3 control-label"><span style="color: red; ">*</span>企业名称：</label>
+                    <div class="col-sm-9">
+                        <input name="companyName" autocomplete="off" placeholder="请输入企业名称" class="form-control" type="text" required>
+                    </div>
+                </div>
+                <!--<div class="form-group">-->
+                    <!--<label class="col-sm-3 control-label"><span style="color: red; ">*</span>商户别名：</label>-->
+                    <!--<div class="col-sm-9">-->
+                        <!--<input name="merchantName" autocomplete="off" placeholder="请输入商户别名" class="form-control" type="text" required>-->
+                    <!--</div>-->
+                <!--</div>-->
+                <div class="form-group">
+                    <label class="col-sm-3 control-label"><span style="color: red; ">*</span>法人名字：</label>
+                    <div class="col-sm-9">
+                        <input name="legalPersonName" autocomplete="off" placeholder="请输入法人名字" class="form-control" type="text" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label"><span style="color: red; ">*</span>营业执照注册号：</label>
+                    <div class="col-sm-9">
+                        <input name="businessLicenseCode" autocomplete="off" placeholder="请输入营业执照注册号" class="form-control" type="text" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label"><span style="color: red; ">*</span>营业执照影印件：</label>
+                    <div class="col-sm-8">
+                        <div class="text-center">
+                            <a href="javascript:onBanner()" style="display: block;width: 120px;height: 120px;border: 1px solid #eee;">
+                                <i class="fa fa fa-plus license_i" style="font-size: 32px; color: #e5e6e7;line-height: 120px;"></i>
+                                <img class="img-lg" id="license_img" style="display: none"/>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <label class="col-sm-3 control-label"><span style="color: red; ">*</span>纳税人类型：</label>
+                <div class="col-sm-9">
+                    <label class="radio-box"> <input type="radio" name="taxpayerType" value="0" /> 一般纳税人 </label>
+                    <label class="radio-box"> <input type="radio" name="taxpayerType" value="1" /> 小规模纳税人 </label>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="license">
+        <div class="container">
+            <input type="file" id="file" style="display: none" onchange="filechange(event)" accept="image/*"/>
+            <img width="300px" height="300px" id="img-change">
+            <i class="fa fa fa-plus banner" style="font-size: 112px; color: #e5e6e7;position: relative;left: 42px;bottom: -24px;"></i>
+        </div>
+        <div class="row" style="margin: 40px auto;">
+            <div class="col-sm-offset-4 col-sm-10">
+                <button type="button" class="btn btn-sm btn-primary" onclick="submitImg()"><i class="fa fa-check"></i>保 存</button>&nbsp;
+                <button type="button" class="btn btn-sm btn-danger" onclick="closeImgItem()"><i class="fa fa-reply-all"></i>关 闭 </button>
+            </div>
+        </div>
+    </div>
+    <div class="bg"></div>
+
+    <div class="row" style="margin: 20px auto; height: 90px;line-height: 90px;">
+        <div class="col-sm-offset-5 col-sm-3">
+            <button type="button" class="btn btn-sm btn-danger" onclick="closeItem()"><i class="fa fa-reply-all"></i>上一步</button>
+            <button type="button" class="btn btn-sm btn-success" onclick="submitItem()"><i class="fa fa-check"></i>下一步</button>
+        </div>
+    </div>
+</div>
+<div th:include="include::footer"></div>
+<script type="text/javascript">
+    function onBanner() {
+        $(".bg").css("display","block")
+        $(".license").css("display","block")
+    }
+
+    $("#img-change").click(function () {
+        $("#file").click();
+    })
+    var imgURL;
+    var files;
+    var options = {
+        imgSrc:""
+    }
+    var filechange=function(event){
+        files = event.target.files, file;
+        if (files && files.length > 0) {
+            file = files[0];
+            if(file.size > 1024 * 1024 * 2) {
+                alert('图片大小不能超过 2MB!');
+                return false;
+            }
+            var URL = window.URL || window.webkitURL;
+            imgURL = URL.createObjectURL(file);
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                imgURL = e.target.result;
+                if((imgURL).indexOf("image/")==-1){
+                    $.modal.alertWarning("文件格式错误，请上传图片类型,如：JPG，PNG后缀的文件。");
+                } else {
+                    options.imgSrc = e.target.result
+                    if(options.imgSrc.indexOf("data:image/x-icon")!=-1) {
+                        options.imgSrc = options.imgSrc.replace("image/x-icon", "image/png")
+                    }
+                }
+            }
+            $("#img-change").attr("src",imgURL);
+            reader.readAsDataURL(file);
+        }
+    };
+    function getBlob() {
+        var imageData = options.imgSrc;
+        if(imageData!="") {
+            if(imageData.indexOf("data:image/png;base64,")==0) {
+                var b64 = imageData.replace('data:image/png;base64,', '');
+            }else if(imageData.indexOf("data:image/jpeg;base64,")==0){
+                var b64 = imageData.replace('data:image/jpeg;base64,', '');
+            }else {
+                var b64 = imageData.replace('data:image/jpg;base64,', '');
+            }
+            var binary = atob(b64);
+            var array = [];
+            for (var i = 0; i < binary.length; i++) {
+                array.push(binary.charCodeAt(i));
+            }
+            return new Blob([new Uint8Array(array)], {type: 'image/png'});
+        }
+    }
+    function submitImg() {
+        var img = getBlob()
+        if(img == undefined){
+            $.modal.msgWarning("请选择图片")
+            return
+        }
+        var formdata = new FormData();
+        formdata.append("file", img);
+        $.ajax({
+            url: ctx + "common/upload",
+            data: formdata,
+            type: "post",
+            processData: false,
+            contentType: false,
+            success: function(result) {
+                $(".license").css("display","none")
+                $(".bg").css("display","none")
+                $(".license_i").css("display","none")
+                $('#license_img').css("display","block")
+                $('#license_img').attr('src',result.url);
+                $('#license_img').attr('alt',result.fileName);
+            }
+        })
+    }
+    function closeImgItem() {
+        $(".bg").css("display","none")
+        $(".license").css("display","none")
+    }
+    $("#form-user-add").validate({
+        onkeyup: false,
+        rules:{
+            merchantCode:{
+                minlength: 1,
+                maxlength: 20,
+            },
+            companyName:{
+                minlength: 1,
+                maxlength: 20
+            },
+            companyName:{
+                minlength: 1,
+                maxlength: 20
+            },
+            businessLicenseCode:{
+                minlength: 5,
+                maxlength: 20
+            },
+        },
+        focusCleanup: true
+    });
+    function submitItem() {
+        var cooperation = $("#form-user-add").serializeArray();
+        if ($.validate.form()) {
+            var license_img = $("#license_img").attr("src")
+            var taxpayerType = $("input[type='radio']:checked").val();
+            if(license_img == undefined||license_img == ""){
+                $.modal.msgWarning("请上传营业执照影印件");
+                return
+            }
+            if(taxpayerType == undefined||taxpayerType == ""){
+                $.modal.msgWarning("请选择纳税人类型");
+                return
+            }
+            cooperation.push({"name": "businessLicenseImg", "value": license_img});
+            cooperation.push({"name": "taxpayerType", "value": taxpayerType});
+            cooperation = JSON.stringify(cooperation)
+            sessionStorage.setItem("cooperation", cooperation)
+            $.modal.openTab("添加商户信息", "/manager/merchant/invoiceInfoInit");
+        }
+    }
+</script>
+</body>
+</html>

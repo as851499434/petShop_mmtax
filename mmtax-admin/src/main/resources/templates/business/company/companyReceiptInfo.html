@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('企业资金流水列表')" />
+    <style>
+        .content{
+            width: 100%;
+            background: #fff;
+            color: #333333;
+            border-radius: 6px;
+            margin-top: -8px;
+            padding-top: 5px;
+            padding-bottom: 13px;
+            box-shadow: 1px 3px 3px rgba(0,0,0,.2);
+        }
+    </style>
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="formId">
+                <div class="select-list">
+                    <ul>
+                        <li style="display: none">
+                            id：<input type="text" name="id"/>
+                        </li>
+                        <li>
+                            账户名称：<input type="text" name="merchantName"/>
+                        </li>
+                        <li>
+                            <label>交易类型：</label>
+                            <select name="paymentType" th:with="type=${@dict.getType('account_detail_type')}">
+                                <option value="">所有</option>
+                                <option th:each="dict : ${type}" th:text="${dict.dictLabel}"
+                                        th:value="${dict.dictValue}">
+                                </option>
+                            </select>
+                        </li>
+                        <li class="select-time">
+                            <label>交易时间： </label>
+                            <input type="text" class="time-input" id="startTime" placeholder="开始时间"
+                                   name="startDate" autocomplete="off"/>
+                            <span>-</span>
+                            <input type="text" class="time-input" id="endTime" placeholder="结束时间" name="endDate" autocomplete="off"/>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.limitSearch()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+        <div class="btn-group-sm" id="toolbar" role="group">
+            <a class="btn btn-warning" onclick="$.table.exportExcel()"
+               shiro:hasPermission="manager:customerInfo:companyReceiptInfoExport">
+                <i class="fa fa-download"></i> 导出
+            </a>
+            <!--<a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="business:customerAccount:add">-->
+            <!--<i class="fa fa-plus"></i> 添加-->
+            <!--</a>-->
+            <!--<a class="btn btn-primary btn-edit disabled" onclick="$.operate.edit()" shiro:hasPermission="business:customerAccount:edit">-->
+            <!--<i class="fa fa-edit"></i> 修改-->
+            <!--</a>-->
+            <!--<a class="btn btn-danger btn-del btn-del disabled" onclick="$.operate.removeAll()" shiro:hasPermission="business:customerAccount:remove">-->
+            <!--<i class="fa fa-remove"></i> 删除-->
+            <!--</a>-->
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table" data-mobile-responsive="true"></table>
+        </div>
+    </div>
+</div>
+<div th:include="include :: footer"></div>
+<script th:inline="javascript">
+    var prefix = ctx + "manager/companyInfo";
+    var signs = [[${@dict.getType('account_detail_type')}]];
+    layui.use('laydate',function () {
+        var laydate = layui.laydate;
+        var startDate = laydate.render({
+            elem: '#startTime',
+            type: 'date',
+            format: 'yyyy-MM-dd',
+            done: function(value, date){
+                endDate.config.min ={
+                    year:date.year,
+                    month:date.month-1,
+                    date: date.date,
+                    hours: 0,
+                    minutes: 0,
+                    seconds : 0
+                };
+            }
+        });
+        var endDate = laydate.render({
+            elem: '#endTime',
+            type: 'date',
+            format: 'yyyy-MM-dd',
+            done: function(value,date){
+                startDate.config.max={
+                    year:date.year,
+                    month:date.month-1,//注意是month-1，写在date上的话你后边的日期选择不了
+                    date: date.date,
+                    hours: 0,
+                    minutes: 0,
+                    seconds : 0
+                }
+            }
+        });
+    })
+    $(function() {
+        var options = {
+            url: prefix + "/selectCompanyReceiptInfo",
+            // createUrl: prefix + "/add",
+            // updateUrl: prefix + "/edit/{id}",
+            // removeUrl: prefix + "/remove",
+            exportUrl: prefix + "/companyReceiptInfoExport",
+            modalName: "合同数据",
+            showExport: true,
+            columns: [{
+                checkbox: true
+            },
+                {
+                    field : 'orderSerialNum',
+                    title : '流水号',
+                },
+                {
+                    field : 'merchantName',
+                    title : '账户名称',
+                },
+                {
+                    field : 'paymentType',
+                    title : '交易类型',
+                    formatter: function (value, row, index) {
+                        return $.table.selectDictLabel(signs, row.paymentType);
+                    }
+                },
+                {
+                    title : '增加(元)',
+                    formatter: function (value, row, index) {
+                        return ("+" + row.increaseAmount )
+                    }
+                },
+                {
+                    title : '减少(元)',
+                    formatter: function (value, row, index) {
+                        return ("-" + row.decreaseAmount )
+                    }
+                },
+                {
+                    field : 'paymentUsableAmountAfter',
+                    title : '账户余额(元)',
+                },
+                {
+                    field : 'createTime',
+                    title : '交易时间',
+                }]
+        };
+        $.table.init(options);
+    });
+</script>
+</body>
+</html>

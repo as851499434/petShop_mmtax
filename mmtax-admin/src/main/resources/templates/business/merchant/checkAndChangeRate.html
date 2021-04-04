@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+	<th:block th:include="include :: header('费率变更列表')" />
+	<style>
+		.bg{
+			width:100%;
+			height: 100%;
+			background:rgba(0,0,0,.5);
+			position: absolute;
+			top: 0px;
+			right: 0px;
+			left: 0px;
+			display: none;
+			z-index: 99;
+		}
+		.dialog {
+			width: 640px;
+			background: #fff;
+			position: fixed;
+			z-index: 1000;
+			top:100px;
+			left:50%;
+			margin-left: -250px;
+			display: none;
+		}
+		.dialog .dialog_header {
+			padding: 20px 20px 10px;
+			font-size: 16px;
+			display: flex;
+			justify-content: space-between;
+		}
+		.dialog .dialog_body{
+			padding: 30px 20px;
+			color: #606266;
+			font-size: 14px;
+		}
+		.dialog_body .checkTable {
+			position: relative;
+			overflow: hidden;
+			-webkit-box-sizing: border-box;
+			box-sizing: border-box;
+			border-top: 1px solid #ebeef5;
+			border-left: 1px solid #ebeef5;
+			/*border-right: 1px solid #ebeef5;*/
+		}
+		.dialog_body table {
+			table-layout: fixed;
+			border-collapse: collapse;
+			-webkit-box-flex: 1;
+			flex: 1;
+			color: #606266;
+			width: 100%;
+			max-width: 100%;
+			font-size: 14px;
+			white-space: pre-wrap
+		}
+		.dialog_body table tr{
+			background-color: #fff;
+			border-bottom: 1px solid #ebeef5;
+		}
+		.dialog_body table td{
+			text-align: center;
+			padding: 10px;
+			border-right: 1px solid #ebeef5;
+			text-overflow: ellipsis;
+			white-space: normal;
+			word-break: break-all;
+		}
+		.dialog .dialog_footer {
+			padding: 10px 20px 20px;
+			text-align: right;
+			-webkit-box-sizing: border-box;
+			box-sizing: border-box;
+		}
+		.dialog_footer button {
+			display: inline-block;
+			line-height: 1;
+			white-space: nowrap;
+			cursor: pointer;
+			background: #fff;
+			border: 1px solid #dcdfe6;
+			color: #606266;
+			-webkit-appearance: none;
+			text-align: center;
+			-webkit-box-sizing: border-box;
+			box-sizing: border-box;
+			outline: 0;
+			margin: 0 5px;
+			padding: 7px 15px;
+			font-size: 12px;
+			border-radius: 3px;
+		}
+	</style>
+</head>
+<body class="gray-bg">
+     <div class="container-div">
+		<div class="row">
+			<div class="col-sm-12 search-collapse">
+				<form id="formId">
+					<div class="select-list">
+						<ul>
+							<li>
+								商户名称：<input type="text" name="merchantName"/>
+							</li>
+
+							<li>
+								商户编号：<input type="text" name="merchantCode"/>
+							</li>
+
+							<li>
+								直属代理商：<input type="text" name="agentName"/>
+							</li>
+
+							<li>
+								<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.limitSearch()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+								<a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+							</li>
+						</ul>
+					</div>
+				</form>
+			</div>
+			
+	        <div class="btn-group-sm" id="toolbar" role="group">
+				<!--<a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="business:checkAndChangeRate:add">-->
+					<!--<i class="fa fa-plus"></i> 添加-->
+				<!--</a>-->
+				<!--<a class="btn btn-primary btn-edit disabled" onclick="$.operate.edit()" shiro:hasPermission="business:checkAndChangeRate:edit">-->
+					<!--<i class="fa fa-edit"></i> 修改-->
+				<!--</a>-->
+				<!--<a class="btn btn-danger btn-del btn-del disabled" onclick="$.operate.removeAll()" shiro:hasPermission="business:checkAndChangeRate:remove">-->
+					<!--<i class="fa fa-remove"></i> 删除-->
+				<!--</a>-->
+				<!--<a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="business:checkAndChangeRate:export">-->
+						<!--<i class="fa fa-download"></i> 导出-->
+				 <!--</a>-->
+			</div>
+			<div class="col-sm-12 select-table table-striped">
+				<table id="bootstrap-table" data-mobile-responsive="true"></table>
+			</div>
+		</div>
+		 <div class="dialog">
+			 <input type="hidden" id="merchantCode" name="merchantCode">
+			 <div class="dialog_header">
+				 <span>详情</span>
+				 <span style="cursor: default" onclick="disappearTable()">X</span>
+			 </div>
+			 <div class="dialog_body">
+				 <div class="checkTable">
+					 <table>
+						 <tr>
+							 <td></td>
+							 <td>原服务费</td>
+							 <td>变更申请服务费</td>
+						 </tr>
+						 <tr>
+							 <td>普通服务费(%)</td>
+							 <td id="oldOrdinaryServiceRate"></td>
+							 <td id="newOrdinaryServiceRate"></td>
+						 </tr>
+						 <tr>
+							 <td>大额服务费(%)</td>
+							 <td id="oldServiceBigRate"></td>
+							 <td id="newServiceBigRate"></td>
+						 </tr>
+					 </table>
+				 </div>
+			 </div>
+			 <div class="dialog_footer">
+				 <span>
+					 <button type="button" onclick="disappearTable()">关闭</button>
+					 <button type="button" id="not_btn" style="background-color: #f56c6c;border-color: #f56c6c;color: #fff" onclick="notAgree()">驳回</button>
+					 <button type="button" id="agree_btn" style="background-color: #304156;border-color: #304156;color: #fff" onclick="agreeChange()">同意</button>
+				 </span>
+			 </div>
+		 </div>
+		 <div class="bg"></div>
+	 </div>
+    <div th:include="include :: footer"></div>
+    <script th:inline="javascript">
+        var editFlag = [[${@permission.hasPermi('business:checkAndChangeRate:edit')}]];
+        var removeFlag = [[${@permission.hasPermi('business:checkAndChangeRate:remove')}]];
+        var prefix = ctx + "manager/merchant";
+
+        $(function() {
+            var options = {
+                url: prefix + "/chackAndChangeRate",
+                createUrl: prefix + "/add",
+                updateUrl: prefix + "/edit/{id}",
+                removeUrl: prefix + "/remove",
+				exportUrl: prefix + "/export",
+                modalName: "费率变更",
+		        showExport: true,
+                columns: [{
+		            checkbox: false
+		        },
+				// {
+				// 	field : 'id',
+				// 	title : '',
+				// 	visible: false
+				// },
+				// {
+				// 	field : 'merchantId',
+				// 	title : '商户id',
+				// },
+				{
+					field : 'merchantName', 
+					title : '商户名称',
+				},
+				{
+					field : 'merchantCode', 
+					title : '商户编号',
+				},
+				{
+					field : 'agentName', 
+					title : '直属代理商',
+				},
+				// {
+				// 	field : 'agentNumber',
+				// 	title : '直属代理商编号',
+				// },
+				{
+					field : 'checkState', 
+					title : '审核状态',
+					formatter: function(value, row, index) {
+						if (row.checkState == 0) {
+							return '待审核'
+						} else if (row.checkState == 1) {
+							return '审核通过'
+						} else {
+							return '审核驳回'
+						}
+					}
+				},
+				// {
+				// 	field : 'oldOrdinaryServiceRate',
+				// 	title : '原单笔普通服务费费率',
+				// },
+				// {
+				// 	field : 'newOrdinaryServiceRate',
+				// 	title : '新单笔普通服务费费率',
+				// },
+				// {
+				// 	field : 'oldServiceBigRate',
+				// 	title : '原单笔大额服务费费率',
+				// },
+				// {
+				// 	field : 'newServiceBigRate',
+				// 	title : '新单笔大额服务费费率',
+				// },
+				// {
+				// 	field : 'providerId',
+				// 	title : '',
+				// },
+				// {
+				// 	field : 'createTime',
+				// 	title : '创建时间',
+				// },
+				{
+					field : 'createTime',
+					title : '提交时间',
+				},
+		        {
+		            title: '操作',
+		            align: 'center',
+		            formatter: function(value, row, index) {
+		            	var paramRow = row
+		            	var actions = [];
+		            	if (row.checkState == 0) {
+							actions.push('<a class="btn btn-success btn-xs" href="javascript:void(0)" onclick="openModal(\'' + row.checkState + '\',\'' + row.oldOrdinaryServiceRate + '\',\'' + row.newOrdinaryServiceRate + '\',\'' + row.oldServiceBigRate + '\',\'' + row.newServiceBigRate + '\',\'' + row.merchantId + '\',\'' + row.merchantCode + '\')">审核</a> ');
+						} else {
+							actions.push('<a class="btn btn-success btn-xs" href="javascript:void(0)" onclick="openModal(\'' + row.checkState + '\',\'' + row.oldOrdinaryServiceRate + '\',\'' + row.newOrdinaryServiceRate + '\',\'' + row.oldServiceBigRate + '\',\'' + row.newServiceBigRate + '\',\'' + row.merchantId + '\',\'' + row.merchantCode + '\')">查看</a> ');
+						}
+						return actions.join('');
+		            }
+		        }]
+            };
+            $.table.init(options);
+        });
+
+        function disappearTable() {
+			$(".dialog").hide()
+			$(".bg").hide()
+		}
+		function openModal(checkState,oldOrdinaryServiceRate,newOrdinaryServiceRate,oldServiceBigRate,newServiceBigRate,merchantId,merchantCode) {
+			$("#merchantCode").val(merchantCode)
+			$(".dialog").show()
+			$(".bg").show()
+			if (checkState != '0' ) {
+				$("#not_btn").hide()
+				$("#agree_btn").hide()
+			} else {
+				$("#not_btn").attr('value',merchantId)
+				$("#agree_btn").attr('value',merchantId)
+			}
+        	$("#oldOrdinaryServiceRate").text(oldOrdinaryServiceRate)
+			$("#newOrdinaryServiceRate").text(newOrdinaryServiceRate)
+			$("#oldServiceBigRate").text(oldServiceBigRate)
+			$("#newServiceBigRate").text(newServiceBigRate)
+			$(".dialog")
+		}
+		function notAgree() {
+			$.ajax({
+				url: "/manager/merchant/changeRateFail?merchantId=" + $("#not_btn").val(),
+				// data: data,
+				type: "post",
+				// datatype: "json",
+				contentType: 'application/json',
+				success: function (result) {
+					if(result.code == 0){
+						disappearTable()
+						$.modal.msgSuccess(result.msg)
+						$.table.search()
+					}else {
+						$.modal.msgError(result.msg)
+					}
+				}
+			})
+		}
+		function agreeChange() {
+        	var param = {
+        		merchantId: $("#not_btn").val(),
+				merchantCode: $("#merchantCode").val(),
+				newBigServiceRate: $("#newServiceBigRate").text(),
+				newOrdinaryServiceRate: $("#newOrdinaryServiceRate").text(),
+				oldBigServiceRate: $("#oldServiceBigRate").text(),
+				oldOrdinaryServiceRate: $("#oldOrdinaryServiceRate").text()
+			}
+			param = JSON.stringify(param)
+			$.ajax({
+				url: "/manager/merchant/changeRateSuccess",
+				data: param,
+				type: "post",
+				datatype: "json",
+				contentType: 'application/json',
+				success: function (result) {
+					if(result.code == 0){
+						disappearTable()
+						$.modal.msgSuccess(result.msg)
+						setTimeout(function () {
+							$.table.search()
+						}, 2000)
+					}else {
+						$.modal.msgError(result.msg)
+					}
+				}
+			})
+		}
+	</script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mmtax.business.mapper.CustomerAlipayInfoMapper">
+    
+    <resultMap type="com.mmtax.business.domain.CustomerAlipayInfo" id="CustomerAlipayInfoResult">
+        <result property="id"    column="id"    />
+        <result property="customerId"    column="customer_id"    />
+        <result property="customerNo"    column="customer_no"    />
+        <result property="accountNo"    column="account_no"    />
+        <result property="accountName"    column="account_name"    />
+        <result property="certificateNo"    column="certificate_no"    />
+        <result property="mobileNo"    column="mobile_no"    />
+        <result property="verifyStatus"    column="verify_status"    />
+        <result property="bindStatus"    column="bind_status"    />
+        <result property="bankId"    column="bank_id"    />
+        <result property="providerId"    column="provider_id"    />
+        <result property="reservedFieldOne"    column="reserved_field_one"    />
+        <result property="reservedFieldTwo"    column="reserved_field_two"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+    <select id="selectByCustomerIdAndAccountNo" resultMap="CustomerAlipayInfoResult">
+        select * from tbl_customer_alipay_info
+        where customer_id = #{customerId}
+        and account_no = #{accountNo}
+    </select>
+    <select id="listCustomerIdForBind" resultType="java.lang.Integer">
+        SELECT
+        t.customer_id
+        FROM
+        tbl_customer_alipay_info t
+        WHERE
+        t.bind_status = 1
+        AND t.customer_id IN
+        <foreach collection="customerIdList" item="customerId"
+                 index="index" open="(" close=")" separator=",">
+            #{customerId}
+        </foreach>
+    </select>
+    <select id="listManagerCustomerAlipayDTO"
+            parameterType="com.mmtax.business.dto.ManagerCustomerAlipayQueryDTO"
+            resultType="com.mmtax.business.dto.ManagerCustomerAlipayDTO">
+        SELECT
+        t.id,
+        t.account_no AS accountNo,
+        t.mobile_no AS mobileNo,
+        t.customer_id AS customerId,
+        t1.real_name AS realName,
+        t1.customer_no AS customerNo,
+        t1.merchant_id AS merchantId,
+        t2.merchant_name AS merchantName,
+        t.create_time AS createTime
+        FROM
+        tbl_customer_alipay_info t
+        LEFT JOIN tbl_customer_info t1 ON t.customer_id = t1.id
+        LEFT JOIN tbl_merchant_info t2 ON t1.merchant_id = t2.id
+        WHERE
+        1 = 1
+        <if test="realName != null and realName != ''">
+            AND t1.real_name LIKE concat('%', #{realName}, '%')
+        </if>
+        <if test="merchantName != null and merchantName != ''">
+            AND t2.merchant_name LIKE concat('%', #{merchantName}, '%')
+        </if>
+        <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+            and t.create_time BETWEEN #{startDate} AND #{endDate}
+        </if>
+        ORDER BY
+        t.create_time DESC
+    </select>
+    <select id="listAlipay" resultType="com.mmtax.business.dto.BankcardAlipayInfoDTO">
+        select
+        account_no as accountNo
+        from tbl_customer_alipay_info
+        where customer_id = #{customerId}
+        and verify_status = 1 and bind_status = 1
+    </select>
+</mapper>

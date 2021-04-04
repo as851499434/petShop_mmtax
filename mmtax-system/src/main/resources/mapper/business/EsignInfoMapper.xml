@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mmtax.business.mapper.EsignInfoMapper">
+    
+    <resultMap type="com.mmtax.business.domain.EsignInfo" id="EsignInfoResult">
+        <result property="id"    column="id"    />
+        <result property="taxSourceId"    column="tax_source_id"    />
+        <result property="appId"    column="app_id"    />
+        <result property="appSecret"    column="app_secret"    />
+        <result property="providerId"    column="provider_id"    />
+        <result property="reservedFieldOne"    column="reserved_field_one"    />
+        <result property="reservedFieldTwo"    column="reserved_field_two"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+    <select id="selectByAppId" resultMap="EsignInfoResult">
+        select * from tbl_esign_info
+        where app_id = #{appId}
+    </select>
+</mapper>

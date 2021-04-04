@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="include :: header('新增税源地账户')"/>
+    <link th:href="@{/css/jquery.tagsinput-revisited.css}" rel="stylesheet"/>
+    <link th:href="@{/css/default.css}" rel="stylesheet"/>
+    <style>
+        .bg{
+            width:100%;
+            height: 100%;
+            background:rgba(0,0,0,.5);
+            position: absolute;
+            top: 0px;
+            right: 0px;
+            left: 0px;
+            display: none;
+            z-index: 99;
+        }
+        .license,.contract,.positive,.reverse{
+            background: #fff;
+            position: fixed;
+            z-index: 1000;
+            top:100px;
+            left:50%;
+            margin-left: -250px;
+            display: none;
+        }
+        #img-change,#positive-change,#reverse-change{
+            border: 1px solid #eee;
+            position: relative;
+            left: 50%;
+            margin-left: -150px;
+            z-index: 100;
+        }
+        /*.contract .container{*/
+        /*margin: 30px auto 0 auto;*/
+        /*position: relative;*/
+        /*font-family: 微软雅黑;*/
+        /*font-size: 12px;*/
+        /*width: 750px;*/
+        /*}*/
+        .container {
+            margin: 30px auto 0 auto;
+            position: relative;
+            font-family: 微软雅黑;
+            font-size: 12px;
+            /*width: 750px;*/
+            width: 500px;
+        }
+        form{
+            margin-top: 30px;
+        }
+        div.form-group span:not(.tag){
+            font-size: 12px;
+            color: red;
+            display: inline-block;
+            height: 17px;
+        }
+        span.tag >span.tag-text{
+            color:#fff;
+        }
+        .form-group{
+            margin-bottom: 6px;
+        }
+        .select-time .time-input {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: transparent;
+            outline: none;
+            height: 30px;
+            width: 36%;
+            padding-left: 10px;
+            font-size: 14px;
+        }
+        .select-time label{
+            margin: 0px 10px;
+        }
+
+        #legalPersonIdCardExp +label ,#businessLicenseExp +label{
+            display: block;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 1);
+            border:1px solid #aaa;
+        }
+
+        #legalPersonIdCardExp:checked +label::before,#businessLicenseExp:checked +label::before {
+            display: block;
+            content: "\2714";
+            text-align: center;
+            font-size: 16px;
+            color: #666;
+        }
+    </style>
+</head>
+<body class="white-bg">
+<div class="form-content">
+    <div class="tab-content">
+        <div role="tabpanel" class="tab-pane active" id="params">
+            <div class="">
+                <form id="form" class="form-horizontal" data-toggle="validator" role="form">
+                    <div class="row">
+                        <h4 class="form-header h4" style="margin-left: 40px">税源地账户信息：</h4>
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label"><span style="color: red; ">*</span>税源地名称：</label>
+                                <div class="col-xs-4">
+                                    <select class="form-control select2-multiple" name="taxSourceCompanyId" th:with="type=${@dict.getType('source_id')}">
+                                        <option>请选择</option>
+                                        <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                                    </select>
+                                    <span></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label"><span style="color: red; ">*</span>公司简称：</label>
+                                <div class="col-sm-4">
+                                    <input name="companyName" autocomplete="off" placeholder="请输入公司简称" class="form-control" type="text" required>
+                                    <span class="companyName"> </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label"><span style="color: red; ">*</span>对公户名：</label>
+                                <div class="col-sm-4">
+                                    <input name="bankAccountPublic" id="bankAccountPublic" autocomplete="off" class="form-control" type="text" placeholder="请输入对公户名" required>
+                                    <span class="bankAccountPublic"> </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label"><span style="color: red; ">*</span>对公银行卡号：</label>
+                                <div class="col-sm-4">
+                                    <input name="bankCardPublic" placeholder="请输入对公银行卡号" autocomplete="off" class="form-control" type="text" required>
+                                    <span class="bankCardPublic"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label"><span style="color: red; ">*</span>对公银行名称：</label>
+                                <div class="col-sm-4">
+                                    <input name="bankPublic" autocomplete="off" placeholder="请输入对公银行名称" class="form-control" type="text" required>
+                                    <span class="bankPublic"> </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label"><span style="color: red; ">*</span>对公支行名称：</label>
+                                <div class="col-sm-4">
+                                    <input name="bankNamePublic" autocomplete="off" placeholder="请输入对公支行名称" class="form-control" type="text" required>
+                                    <span class="bankNamePublic"> </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label"><span style="color: red; ">*</span>对公银行分支行号：</label>
+                                <div class="col-sm-4">
+                                    <input name="reservedFieldOne" placeholder="请输入对公银行支行号" autocomplete="off" class="form-control" type="text" required>
+                                    <span class="reservedFieldOne"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label"><span style="color: red; ">*</span>是否提现：</label>
+                                <div class="col-xs-4">
+                                    <select class="form-control select2-multiple" name="allowWithdraw" th:with="type=${@dict.getType('yes_or_no')}">
+                                        <option>请选择</option>
+                                        <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" style="margin: 40px auto;">
+                        <div class="col-sm-offset-5 col-sm-10">
+                            <button type="button" class="btn btn-sm btn-danger" onclick="closeItem()"><i class="fa fa-reply-all"></i>关 闭 </button>&nbsp;
+                            <button type="button" class="btn btn-sm btn-success" onclick="submitAll()"><i class="fa fa-check"></i>保 存</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:include="include::footer"></div>
+<script th:src="@{/js/jquery.tagsinput-revisited.js}"></script>
+<script th:src="@{/js/validator.js}"></script>
+<script type="text/javascript">
+    $(function(){
+        // //校验电话号码
+        // $("input[name='companyTel']").blur(function () {
+        //     if($(this).val() == ""){$(".companyTel").text("请输入1-11位的手机号")}
+        //     else if(!(/^1[3456789]\d{9}$/.test($(this).val()))){
+        //         $(".companyTel").text("请输入正确手机号")
+        //     } else {
+        //         $(".companyTel").text("")
+        //     }
+        // })
+        // //校验税号
+        // $("input[name='taxIdNumber']").blur(function () {
+        //     if($(this).val() == ""){$(".taxIdNumber").text("请输入税号")}
+        //     else if(!(/^[0-9A-HJ-NPQRTUWXY]{2}\d{6}[0-9A-HJ-NPQRTUWXY]{10}$/.test($(this).val()))){
+        //         $(".taxIdNumber").text("请输入正确的税号")
+        //     } else {
+        //         $(".taxIdNumber").text("")
+        //     }
+        // })
+        $("input[type='text']").attr("onkeyup",'this.value=this.value.replace(/\\s+/g,\'\')');
+        //校验对公支行名称
+        $("input[name='bankNamePublic']").blur(function () {
+            if($(this).val() == ""){$(".bankNamePublic").text("对公支行名称不能为空")}
+            else {
+                $(".bankNamePublic").text("")
+            }
+        })
+        //校验对公银行卡号
+        $("input[name='bankCardPublic']").blur(function () {
+            if($(this).val() == ""){$(".bankCardPublic").text("对公银行卡号不能为空")}
+            else if ($(this).val().length > 19) {
+                $(".bankCardPublic").text("对公银行卡号长度不应超过19位")
+                $(this)[0].value = ''
+            }
+            else if(!( /^[0-9]*$/.test($(this).val()))){
+                $(".bankCardPublic").text("对公银行卡号格式为纯数字")
+                $(this)[0].value = ''
+            }else {
+                $(".bankCardPublic").text("")
+            }
+        })
+        //校验公司简称
+        $("input[name='companyName']").blur(function () {
+            if($(this).val() == ""){$(".companyName").text("公司简称不能为空")}
+            else {
+                $(".companyName").text("")
+            }
+        })
+        //校验对公银行名称
+        $("input[name='bankPublic']").blur(function () {
+            if($(this).val() == ""){$(".bankPublic").text("对公银行名称不能为空")}
+            else {
+                $(".bankPublic").text("")
+            }
+        })
+        //校验对公户名
+        $("input[name='bankAccountPublic']").blur(function () {
+            if($(this).val() == ""){$(".bankAccountPublic").text("对公户名不能为空")}
+            else {
+                $(".bankAccountPublic").text("")
+            }
+        })
+        //校验对公银行分支行号
+        $("input[name='reservedFieldOne']").blur(function () {
+            if($(this).val() == ""){$(".reservedFieldOne").text("对公银行分支行号不能为空")}
+            else if ($(this).val().length > 20) {
+                $(".reservedFieldOne").text("对公银行分支行号长度不应超过20位")
+                $(this)[0].value = ''
+            }
+            else if(!( /^[0-9]*$/.test($(this).val()))){
+                $(".reservedFieldOne").text("对公银行支行号格式为纯数字")
+                $(this)[0].value = ''
+            } else {
+                $(".reservedFieldOne").text("")
+            }
+        })
+    })
+    // 保存
+    function submitAll() {
+        var data = $("#form").serializeArray();
+        var params = {}
+        data.forEach(function (item) {
+            params[item.name] = item.value
+        })
+        if (params.taxSourceCompanyId == '请选择') {
+            $.modal.msgWarning("请选择税源地")
+            return
+        }
+        if (params.companyName == '') {
+            $.modal.msgWarning("公司简称不能为空")
+            return
+        }
+        if (params.bankAccountPublic == '') {
+            $.modal.msgWarning("对公户名不能为空")
+            return
+        }
+        if (params.bankNamePublic == '') {
+            $.modal.msgWarning("对公支行名称不能为空")
+            return
+        }
+        if (params.bankPublic == '') {
+            $.modal.msgWarning("对公银行名称不能为空")
+            return
+        }
+        if (params.bankCardPublic == '') {
+            $.modal.msgWarning("对公银行卡号不能为空")
+            return
+        }
+        if (params.reservedFieldOne == '') {
+            $.modal.msgWarning("对公银行分支行号不能为空")
+            return
+        }
+        if (params.allowWithdraw == '请选择') {
+            $.modal.msgWarning("请选择是否提现")
+            return
+        }
+        params = JSON.stringify(params)
+        $.ajax({
+            url: "/tax/taxWithdrawAccount/withdrawAccountAdd",
+            data: params,
+            type: "post",
+            datatype:"json",
+            contentType: 'application/json',
+            beforeSend: function () {
+                $.modal.loading("正在处理中，请稍后...");
+            },
+            success: function(result) {
+                if (typeof callback == "function") {
+                    callback(result);
+                    $.modal.msgSuccess("添加成功");
+                }
+                $.operate.successTabCallback(result);
+            }
+        })
+    }
+</script>
+</body>
+</html>

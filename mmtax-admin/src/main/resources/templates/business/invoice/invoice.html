@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="include :: header('发票申请列表')"/>
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12" style="padding: 0px">
+            <div class="panel-group" id="accordion">
+                <div class="panel panel-default" style="background: #FFFBE6;border:1px solid #FFF0A0;">
+                    <div class="panel-heading" style="background: #FFFBE6;">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordion"
+                               href="#collapseOne" style="display: block">
+                                发票申请说明 有多个可申请开票的账单/流水时，请您合并申请开票！
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="collapseOne" class="panel-collapse collapse in">
+                        <div class="panel-body" style="border-top: 1px solid #FFF0A0">
+                            <h4>专用发票申请说明</h4>
+                            1、每个商户每月小于20万元的发票申请只能申请一次，请尽量合并申请开票；
+                            2、大于等于20万元发票申请无限制，但不允许拆分成多张小于20万元的专用发票后申请开票。
+                            <h4>普通发票申请说明</h4>
+                            1、为了给您带来更好的普通发票开具体验，建议您尽量申请增值税电子普通发票；
+                            2、电子普通发票开具成功后可到申请记录页面、发票管理页面打开已开具的电子普通发票进行下载PDF。
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12 search-collapse">
+            <form id="formId" autocomplete="off">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            商户名称：<input type="text" name="merchantName"/>
+                        </li>
+                        <li class="select-time">
+                            <label>申请时间： </label>
+                            <input type="text" class="time-input" id="startTime" placeholder="开始时间"
+                                   name="startDate"/>
+                            <span>-</span>
+                            <input type="text" class="time-input" id="endTime" placeholder="结束时间" name="endDate"/>
+                        </li>
+                        <li>
+                            选择金额范围：<input type="text" name="startAmount" placeholder="起始金额"/>
+                            <span>-</span>
+                            <input type="text" name="endAmount" placeholder="结束金额"/>
+                        </li>
+                        <li>
+                            发票申请编号：<input type="text" name="invoiceSerialNum"/>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.limitSearch()"><i
+                                    class="fa fa-search"></i>&nbsp;搜索</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i
+                                    class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+
+        <!--<div class="btn-group-sm" id="toolbar" role="group">-->
+        <!--<a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="business:batchPaymentRecord:add">-->
+        <!--<i class="fa fa-plus"></i> 添加-->
+        <!--</a>-->
+        <!--<a class="btn btn-primary btn-edit disabled" onclick="$.operate.edit()"-->
+        <!--shiro:hasPermission="business:batchPaymentRecord:edit">-->
+        <!--<i class="fa fa-edit"></i> 修改-->
+        <!--</a>-->
+        <!--<a class="btn btn-danger btn-del btn-del disabled" onclick="$.operate.removeAll()"-->
+        <!--shiro:hasPermission="business:batchPaymentRecord:remove">-->
+        <!--<i class="fa fa-remove"></i> 删除-->
+        <!--</a>-->
+        <!--<a class="btn btn-warning" onclick="$.table.exportExcel()"-->
+        <!--shiro:hasPermission="business:batchPaymentRecord:export">-->
+        <!--<i class="fa fa-download"></i> 导出-->
+        <!--</a>-->
+        <!--</div>-->
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table" data-mobile-responsive="true"></table>
+        </div>
+    </div>
+</div>
+<div th:include="include :: footer"></div>
+<script th:inline="javascript">
+    var checkFlag = [[${@permission.hasPermi('manager:invoice:checkInvoice')}]]; // editFlag
+    var typeData = [[${@dict.getType('invoice_type')}]];
+    var statusData = [[${@dict.getType('billing_status')}]];
+
+    var prefix = ctx + "manager/invoice";
+    layui.use('laydate',function () {
+        var laydate = layui.laydate;
+        var startDate = laydate.render({
+            elem: '#startTime',
+            type: 'date',
+            format: 'yyyy-MM-dd',
+            done: function(value, date){
+                endDate.config.min ={
+                    year:date.year,
+                    month:date.month-1,
+                    date: date.date,
+                    hours: 0,
+                    minutes: 0,
+                    seconds : 0
+                };
+            }
+        });
+        var endDate = laydate.render({
+            elem: '#endTime',
+            type: 'date',
+            format: 'yyyy-MM-dd',
+            done: function(value,date){
+                startDate.config.max={
+                    year:date.year,
+                    month:date.month-1,//注意是month-1，写在date上的话你后边的日期选择不了
+                    date: date.date,
+                    hours: 0,
+                    minutes: 0,
+                    seconds : 0
+                }
+            }
+        });
+    })
+    $(function () {
+        var options = {
+            url: prefix + "/queryInvoice",
+            createUrl: prefix + "/add",
+            updateUrl: prefix + "/edit/{id}",
+            removeUrl: prefix + "/remove",
+            exportUrl: prefix + "/export",
+            modalName: "发票申请",
+            showExport: true,
+            columns: [{
+                checkbox: true
+            },
+                {
+                    field: 'id',
+                    title: '发票ID',
+                    visible:false
+                }, {
+                    field: 'merchantName',
+                    title: '商户名称',
+                },  {
+                    field: 'invoiceSerialNum',
+                    title: '发票申请编号',
+                },  {
+                    field: 'invoiceAmount',
+                    title: '开票金额',
+                }, {
+                    field: 'invoiceType',
+                    title: '发票类型',
+                    align: "left",
+                    formatter: function (value, row, index) {
+                        return $.table.selectDictLabel(typeData, row.invoiceType);
+                    }
+                },{
+                    field: 'invoiceStatus',
+                    title: '开票状态',
+                    align: "left",
+                    formatter: function (value, row, index) {
+                        return $.table.selectDictLabel(statusData, row.invoiceStatus);
+                    }
+                },{
+                    field: 'createTime',
+                    title: '申请时间',
+                }, {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        var actions = [];
+                        if (row.invoiceStatus == '1') {
+                            actions.push('<a class="btn btn-success btn-xs" href="javascript:void(0)" onclick="$.operate.invoiceCheckTab(\'' + row.id + '\')">审 核</a>');
+                        } else if (row.invoiceStatus == '4') {
+                            actions.push('<a class="btn btn-success btn-xs" href="javascript:void(0)" onclick="$.operate.invoiceCheckTab(\'' + row.id + '\')">审 核</a>');
+                        } else if (row.invoiceStatus == '7') {
+                            actions.push('<a class="btn btn-success btn-xs" href="javascript:void(0)" onclick="$.operate.invoiceCheckTab(\'' + row.id + '\')">开 票</a>');
+                        }
+                        return actions.join('');
+                    }
+                }]
+        };
+        $.table.init(options);
+    });
+
+</script>
+</body>
+</html>

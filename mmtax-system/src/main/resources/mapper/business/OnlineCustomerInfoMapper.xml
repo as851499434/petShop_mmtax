@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mmtax.business.mapper.OnlineCustomerInfoMapper">
+    
+    <resultMap type="com.mmtax.business.domain.OnlineCustomerInfo" id="OnlineCustomerInfoResult">
+        <result property="id"    column="id"    />
+        <result property="customerId"    column="customer_id"    />
+        <result property="customerNo"    column="customer_no"    />
+        <result property="subAccountNo"    column="sub_account_no"    />
+        <result property="taxSourceId"    column="tax_source_id"    />
+        <result property="providerId"    column="provider_id"    />
+        <result property="reservedFieldOne"    column="reserved_field_one"    />
+        <result property="reservedFieldTwo"    column="reserved_field_two"    />
+        <result property="reservedFieldThree"    column="reserved_field_three"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+    <select id="selectByCustomerIdCustomerNo" resultMap="OnlineCustomerInfoResult">
+        select * from tbl_online_customer_info
+        where 1 = 1
+        <if test="customerId != null">
+            and customer_id = #{customerId}
+        </if>
+        <if test="customerNo != null and customerNo != ''">
+            and customer_no = #{customerNo}
+        </if>
+    </select>
+    <select id="selectByIdCardNoTaxSourceId" resultMap="OnlineCustomerInfoResult">
+        select * from tbl_online_customer_info t1
+        left join tbl_customer_info t2 on t1.customer_id = t2.id
+        where t2.certificate_no = #{idCardNo} and t2.tax_source_id = #{taxSourceId}
+    </select>
+</mapper>

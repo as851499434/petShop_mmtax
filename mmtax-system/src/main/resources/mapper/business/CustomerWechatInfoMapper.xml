@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mmtax.business.mapper.CustomerWechatInfoMapper">
+    
+    <resultMap type="com.mmtax.business.domain.CustomerWechatInfo" id="CustomerWechatInfoResult">
+        <result property="id"    column="id"    />
+        <result property="customerId"    column="customer_id"    />
+        <result property="wechatNumber"    column="wechat_number"    />
+        <result property="wechatName"    column="wechat_name"    />
+        <result property="loginMobile"    column="login_mobile"    />
+        <result property="openId"    column="open_id"    />
+        <result property="hasQuit"    column="has_quit"    />
+        <result property="providerId"    column="provider_id"    />
+        <result property="reservedFieldOne"    column="reserved_field_one"    />
+        <result property="reservedFieldTwo"    column="reserved_field_two"    />
+        <result property="reservedFieldThree"    column="reserved_field_three"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+    <select id="selectByCustomerIdHasQuit" resultMap="CustomerWechatInfoResult">
+        select * from tbl_customer_wechat_info
+        where 1 = 1
+        and customer_id = #{customerId}
+        <if test="hasQuit != null">
+            and has_quit = #{hasQuit}
+        </if>
+    </select>
+    <select id="selectByOpenId" resultMap="CustomerWechatInfoResult">
+        select * from tbl_customer_wechat_info
+        where open_id = #{openId}
+        and has_quit = 0
+        order by create_time
+    </select>
+
+</mapper>

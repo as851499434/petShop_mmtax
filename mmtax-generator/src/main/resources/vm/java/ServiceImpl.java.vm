@@ -1,0 +1,16 @@
+package ${package}.service.impl;
+
+import org.springframework.stereotype.Service;
+import ${package}.service.I${className}Service;
+
+/**
+ * ${tableComment} 服务层实现
+ * 
+ * @author ${author}
+ * @date ${datetime}
+ */
+@Service
+public class ${className}ServiceImpl implements I${className}Service
+{
+
+}

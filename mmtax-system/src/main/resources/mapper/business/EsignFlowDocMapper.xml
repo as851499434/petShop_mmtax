@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mmtax.business.mapper.EsignFlowDocMapper">
+    
+    <resultMap type="com.mmtax.business.domain.EsignFlowDoc" id="EsignFlowDocResult">
+        <result property="id"    column="id"    />
+        <result property="esignFlowId"    column="esign_flow_id"    />
+        <result property="flowId"    column="flow_id"    />
+        <result property="contractInfoId"    column="contract_info_id"    />
+        <result property="fileId"    column="file_id"    />
+        <result property="encryption"    column="encryption"    />
+        <result property="fileName"    column="file_name"    />
+        <result property="filePassword"    column="file_password"    />
+        <result property="providerId"    column="provider_id"    />
+        <result property="reservedFieldOne"    column="reserved_field_one"    />
+        <result property="reservedFieldTwo"    column="reserved_field_two"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+    <select id="selectByFileIdAndFlowId" resultMap="EsignFlowDocResult">
+        select * from tbl_esign_flow_doc
+        where flow_id = #{flowId}
+        <if test="fileId != null and fileId != ''">
+            and file_id = #{fileId}
+        </if>
+    </select>
+
+</mapper>

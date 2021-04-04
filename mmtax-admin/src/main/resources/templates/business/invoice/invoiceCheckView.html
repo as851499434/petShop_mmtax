@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="include :: header('发票详情信息')"/>
+    <link th:href="@{/css/bootstrap-switch.min.css}" rel="stylesheet"/>
+    <style>
+        div.form-group span:not(.tag){
+            font-size: 12px;
+            color: red;
+            display: inline-block;
+            height: 20px;
+        }
+        span.tag >span.tag-text{
+            color:#fff;
+        }
+        .form-group{
+            margin-bottom: 6px;
+        }
+    </style>
+</head>
+<body class="white-bg">
+<div class="form-content">
+    <h2 class="form-header h2" style="font-weight: bold">开票信息：</h2>
+    <form class="form-horizontal m" th:object="${invoiceCheckInfo}" id="form-user-add">
+        <h4 class="form-header h4">基本信息：</h4>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">商户名称：</label>
+            <div class="col-sm-5">
+                <input type="text" name="companyName" th:value="*{merchantName}" class="form-control" placeholder="" disabled>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">代征主体：</label>
+            <div class="col-sm-5">
+                <input type="text" name="behalfMainBody" th:value="*{behalfMainBody}" class="form-control" placeholder="" disabled>
+            </div>
+        </div>
+        <div id="aboutInvoice" style="display: none">
+            <h4 class="form-header h4">开票信息：</h4>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">发票金额（元）：</label>
+                <div class="col-sm-5">
+                    <input type="text" name="invoiceAmount" th:value="*{invoiceAmount}" class="form-control" placeholder="" disabled>
+                </div>
+                <a href="javascript:void(0)" style="line-height: 34px;" onclick="openCheckTabDetail()">详情</a>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">发票抬头：</label>
+                <div class="col-sm-5">
+                    <input type="text" name="invoiceTitle" th:value="*{invoiceTitle}" class="form-control" placeholder="" disabled>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">发票类型：</label>
+                <div class="col-sm-5">
+                    <input type="text" name="invoiceType" th:value="*{invoiceType}" class="form-control" placeholder="" disabled>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">纳税人识别号：</label>
+                <div class="col-sm-5">
+                    <input type="text" name="taxpayerIdentificationNumber" th:value="*{taxpayerIdentificationNumber}" class="form-control" placeholder="" disabled>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">开户银行名称：</label>
+                <div class="col-sm-5">
+                    <input type="text" name="bankName" th:value="*{bankName}" class="form-control" placeholder="" disabled>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">开户账号：</label>
+                <div class="col-sm-5">
+                    <input type="text" name="bankAccountNo" th:value="*{bankAccountNo}" class="form-control" placeholder="" disabled>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">单位注册地址：</label>
+                <div class="col-sm-5">
+                    <input type="text" name="companyAddress" th:value="*{companyAddress}" class="form-control" placeholder="" disabled>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">联系电话：</label>
+                <div class="col-sm-5">
+                    <input type="text" name="invoiceMobile" th:value="*{invoiceMobile}" class="form-control" placeholder="" disabled>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">货物或应税劳务、服务名称：</label>
+                <div class="col-sm-5">
+                    <input type="text" name="invoiceContent" th:value="*{invoiceContent}" class="form-control" placeholder="" disabled>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">发票备注：</label>
+                <div class="col-sm-5">
+                    <input type="text" name="remark" th:value="*{remark}" class="form-control" placeholder="" disabled>
+                </div>
+            </div>
+            <h4 class="form-header h4">收件信息：</h4>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">收件人：</label>
+                <div class="col-sm-5">
+                    <input type="text" name="addresseeName" th:value="*{addresseeName}" class="form-control" placeholder="" disabled>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">联系电话：</label>
+                <div class="col-sm-5">
+                    <input type="text" name="addressMobile" th:value="*{addressMobile}" class="form-control" placeholder="" disabled>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">收件地址：</label>
+                <div class="col-sm-5">
+                    <input type="text" name="address" th:value="*{address}" class="form-control" placeholder="" disabled>
+                </div>
+            </div>
+        </div>
+        <div id="aboutReturn" style="display: none">
+            <h4 class="form-header h4">退票理由：</h4>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">退票原因：</label>
+                <div class="col-sm-5">
+                    <input type="text" name="returnReason" th:value="*{returnReason}" class="form-control" placeholder="" disabled>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">备注：</label>
+                <div class="col-sm-5">
+                    <input type="text" name="returnRemark" th:value="*{returnRemark}" class="form-control" placeholder="" disabled>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">发票邮寄物流：</label>
+                <div class="col-sm-5">
+                    <input type="text" name="expressCompanyNameReturn" th:value="*{expressCompanyNameReturn}" class="form-control" placeholder="" disabled>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">运单号：</label>
+                <div class="col-sm-5">
+                    <input type="text" name="expressNoReturn" th:value="*{expressNoReturn}" class="form-control" placeholder="" disabled>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div id="checkTicket" class="form-horizontal" style="display:none;">
+        <h2 class="form-header h2" style="font-weight: bold">审核：</h2>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">审核结果：</label>
+            <div class="col-sm-9" style="padding-top: 5px">
+                <input type="radio" name="invoiceIds" value="0" checked style="margin:0 8px 0 0;width: 18px;height: 18px;vertical-align: middle"/>
+                <label>驳回申请</label>
+                <input type="radio" name="invoiceIds" value="1" style="margin:0 8px 0 20px;width: 18px;height: 18px;vertical-align: middle" />
+                <label>审核通过</label>
+            </div>
+        </div>
+        <div class="form-group" id="reason" style="display: none">
+            <label class="col-sm-3 control-label"><span style="color: red; ">*</span>驳回理由：</label>
+            <div class="col-sm-5">
+                <input type="text" name="pre_rejectedReason" checked autocomplete="off" class="form-control" placeholder="请输入驳回理由">
+                <span class="pre_rejectedReason"></span>
+            </div>
+        </div>
+        <div class="row" style="margin: 20px auto; height: 90px;">
+            <div class="col-sm-offset-5 col-sm-3">
+                <button type="button" class="btn btn-sm btn-danger" onclick="closeItem()"><i class="fa fa-reply-all"></i>关 闭</button>
+                <button type="button" class="btn btn-sm btn-success" onclick="submitApply1()"><i class="fa fa-check "></i>保 存</button>
+            </div>
+        </div>
+    </div>
+    <div id="Tickets" class="form-horizontal" style="display:none;">
+        <h2 class="form-header h2" style="font-weight: bold">开票：</h2>
+        <div class="form-group">
+            <label class="col-sm-3 control-label"><span style="color: red; ">*</span>发票号：</label>
+            <div class="col-sm-5">
+                <input type="text" name="invoiceNo" autocomplete="off" class="form-control" placeholder="请输入发票号">
+                <span class="invoiceNo"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label"><span style="color: red; ">*</span>快递公司：</label>
+            <div class="col-sm-5">
+                <input type="text" name="expressCompanyName" autocomplete="off" class="form-control" placeholder="请输入快递公司">
+                <span class="expressCompanyName"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label"><span style="color: red; ">*</span>单号：</label>
+            <div class="col-sm-5">
+                <input type="text" name="expressNo" autocomplete="off" class="form-control" placeholder="请输入快递单号">
+                <span class="expressNo"></span>
+            </div>
+        </div>
+        <div class="row" style="margin: 20px auto; height: 90px;">
+            <div class="col-sm-offset-5 col-sm-3">
+                <button type="button" class="btn btn-sm btn-danger" onclick="closeItem()"><i class="fa fa-reply-all"></i>关 闭</button>
+                <button type="button" class="btn btn-sm btn-success" onclick="submitTicket()"><i class="fa fa-check "></i>开 票</button>
+            </div>
+        </div>
+    </div>
+    <div id="returnTicket" class="form-horizontal" style="display:none;">
+        <h2 class="form-header h2" style="font-weight: bold">审核：</h2>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">审核结果：</label>
+            <div class="col-sm-9" style="padding-top: 5px">
+                <input type="radio" name="invoiceId" value="0" checked style="margin:0 8px 0 0;width: 18px;height: 18px;vertical-align: middle"/>
+                <label>驳回退票</label>
+                <input type="radio" name="invoiceId" value="1" style="margin:0 8px 0 20px;width: 18px;height: 18px;vertical-align: middle" />
+                <label>同意退票</label>
+            </div>
+        </div>
+        <div class="form-group" id="backReason" style="display: none">
+            <label class="col-sm-3 control-label"><span style="color: red; ">*</span>驳回理由：</label>
+            <div class="col-sm-5">
+                <input type="text" name="rejectedReason" autocomplete="off" class="form-control" placeholder="请输入退票驳回理由">
+                <span class="rejectedReason"></span>
+            </div>
+        </div>
+        <div class="row" style="margin: 20px auto; height: 90px;">
+            <div class="col-sm-offset-5 col-sm-3">
+                <button type="button" class="btn btn-sm btn-danger" onclick="closeItem()"><i class="fa fa-reply-all"></i>关 闭</button>
+                <button type="button" class="btn btn-sm btn-success" onclick="submitApply2()"><i class="fa fa-check "></i>保 存</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:include="include::footer"></div>
+<script th:src="@{/js/bootstrap-switch.min.js}"></script>
+<script type="text/javascript">
+    var info = sessionStorage.getItem("info");
+    info = JSON.parse(info)
+    var invoiceStatus = info.invoiceStatus
+    var invoiceSerialNum = info.invoiceSerialNum
+    var id = info.id
+    // 不同状态显示不同的审核内容
+    if (invoiceStatus == '1') {
+        $("#checkTicket").css('display','block')
+        $("#aboutInvoice").css('display','block')
+    } else if (invoiceStatus == '4') {
+        $("#returnTicket").css('display','block')
+        $("#aboutReturn").css('display','block')
+    } else if (invoiceStatus == '7') {
+        $("#Tickets").css('display','block')
+        $("#aboutInvoice").css('display','block')
+    }
+    // 默认选中时理由显示
+    $(function () {
+        var invoiceId = $("input[name='invoiceId']:checked").val();
+        var invoiceIds = $("input[name='invoiceIds']:checked").val();
+        if (invoiceId == 0){
+            $("#backReason").css('display','block')
+        } else {
+            $("#backReason").css('display','none')
+            $("input[name='pre_rejectedReason']")[0].value = ''
+        }
+        if (invoiceIds == 0){
+            $("#reason").css('display','block')
+        } else {
+            $("#backReason").css('display','none')
+            $("input[name='rejectedReason']")[0].value = ''
+        }
+    })
+    // 单选框的点击显示
+    $("input[name='invoiceId']").click(function () {
+        var invoiceId = $("input[name='invoiceId']:checked").val();
+        if (invoiceId == 0){
+            $("#backReason").css('display','block')
+        } else {
+            $("#backReason").css('display','none')
+            $("input[name='pre_rejectedReason']")[0].value = ''
+        }
+    })
+    $("input[name='invoiceIds']").click(function () {
+        var invoiceIds = $("input[name='invoiceIds']:checked").val();
+        if (invoiceIds == 0){
+            $("#reason").css('display','block')
+        } else {
+            $("#reason").css('display','none')
+            $("input[name='rejectedReason']")[0].value = ''
+        }
+    })
+    // 校验
+    $("input[name='pre_rejectedReason']").blur(function () {
+        if($(this).val() == ""){$(".pre_rejectedReason").text("驳回申请原因不能为空")}
+        else if($(this).val().length > 40){
+            $(".pre_rejectedReason").text("驳回申请原因不得超过40个字")
+            $("input[name='pre_rejectedReason']")[0].value = ''
+        }else {$(".pre_rejectedReason").text("")}
+    })
+    $("input[name='rejectedReason']").blur(function () {
+        if($(this).val() == ""){$(".rejectedReason").text("驳回退票原因不能为空")}
+        else if($(this).val().length > 40){
+            $(".rejectedReason").text("驳回申请原因不得超过40个字")
+            $("input[name='rejectedReason']")[0].value = ''
+        }else {$(".rejectedReason").text("")}
+    })
+    $("input[name='invoiceNo']").blur(function () {
+        if($(this).val() == ""){$(".invoiceNo").text("发票号不能为空")}
+        else if($(this).val().length > 40){
+            $(".invoiceNo").text("发票号不得超过40个字")
+            $("input[name='invoiceNo']")[0].value = ''
+        }else {$(".invoiceNo").text("")}
+    })
+    $("input[name='expressCompanyName']").blur(function () {
+        if($(this).val() == ""){$(".expressCompanyName").text("快递公司不能为空")}
+        else if($(this).val().length > 40){
+            $(".expressCompanyName").text("快递公司名称不得超过40个字")
+            $("input[name='expressCompanyName']")[0].value = ''
+        }else {$(".expressCompanyName").text("")}
+    })
+    $("input[name='expressNo']").blur(function () {
+        if($(this).val() == ""){$(".expressNo").text("快递单号不能为空")}
+        else if($(this).val().length > 40){
+            $(".expressNo").text("快递单号不得超过40个字")
+            $("input[name='expressNo']")[0].value = ''
+        }else {$(".expressNo").text("")}
+    })
+
+    //申请时驳回、同意
+    function submitApply1() {
+        var invoiceIds = $("input[name='invoiceIds']:checked").val()
+        var rejectedReason = $("input[name='pre_rejectedReason']").val()
+        var datas = {
+            invoiceStatus:invoiceStatus,
+            id:id,
+            invoiceSerialNum:invoiceSerialNum,
+            invoiceId:invoiceIds,
+            rejectedReason:rejectedReason
+        }
+        if (invoiceIds == undefined) {
+            $.modal.msgWarning("请选择审核结果")
+            return
+        }
+        if (invoiceIds == 0 && rejectedReason == '') {
+            $.modal.msgWarning("请填写驳回申请的原因")
+            return
+        }
+        $.post("/manager/invoice/agreeAndRefuseInvoiceChangeState",datas,function (data) {
+            if (data.code === 0) {
+                $.modal.msgSuccess(data.msg);
+                $.operate.successTabCallback(data);
+            }
+        })
+    }
+    //退票时驳回、同意
+    function submitApply2() {
+        var invoiceId = $("input[name='invoiceId']:checked").val()
+        var rejectedReason = $("input[name='rejectedReason']").val()
+        var datas = {
+            invoiceStatus:invoiceStatus,
+            id:id,
+            invoiceSerialNum:invoiceSerialNum,
+            invoiceId:invoiceId,
+            rejectedReason:rejectedReason
+        }
+        if (invoiceId == undefined) {
+            $.modal.msgWarning("请选择审核结果")
+            return
+        }
+        if (invoiceId == 0 && rejectedReason == '') {
+            $.modal.msgWarning("请填写驳回退票的原因")
+            return
+        }
+        $.post("/manager/invoice/agreeAndRefuseInvoiceChangeState",datas,function (data) {
+            if (data.code === 0) {
+                $.modal.msgSuccess(data.msg);
+                $.operate.successTabCallback(data);
+            }
+        })
+    }
+    //开票
+    function submitTicket() {
+        var expressCompanyName = $("input[name='expressCompanyName']").val()
+        var invoiceNo = $("input[name='invoiceNo']").val()
+        var expressNo = $("input[name='expressNo']").val()
+        var datas = {
+            id:id,
+            expressCompanyName:expressCompanyName,
+            invoiceNo:invoiceNo,
+            expressNo:expressNo
+        }
+        if (expressCompanyName == '') {
+            $.modal.msgWarning("请填写快递公司")
+            return
+        }
+        if (invoiceNo == '') {
+            $.modal.msgWarning("请填写发票号")
+            return
+        }if (expressNo == '') {
+            $.modal.msgWarning("请填写快递单号")
+            return
+        }
+        $.post("/manager/invoice/toInvoiceChangeState",datas,function (data) {
+            if (data.code === 0) {
+                $.modal.msgSuccess(data.msg);
+                $.operate.successTabCallback(data);
+            }
+        })
+    }
+    //    跳转金额明细
+    function openCheckTabDetail() {
+        info = JSON.stringify(info)
+        sessionStorage.setItem("info", info);
+        $.modal.openTab("查看金额明细", "/manager/invoice/invoiceAmountDetailsCheckView?id="+id);
+    }
+</script>
+</body>
+</html>

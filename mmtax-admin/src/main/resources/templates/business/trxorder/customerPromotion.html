@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="include :: header('推广列表')"/>
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="formId" autocomplete="off">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            批次号：<input type="text" name="batchNo"/>
+                        </li>
+                        <li>
+                            姓名：<input type="text" name="payeeName"/>
+                        </li>
+                        <li>
+                            身份证号：<input type="text" name="payeeIdCardNo"/>
+                        </li>
+                        <li>
+                            手机号：<input type="text" name="payeeMobile"/>
+                        </li>
+                        <li>
+                            所属商户：<input type="text" name="merchantName"/>
+                        </li>
+                        <li class="select-time">
+                            <label>推广开始时间： </label>
+                            <input type="text" class="time-input" id="startDate" placeholder="起始时间"
+                                   name="promotionStartTime"/>
+                            <span>-</span>
+                            <input type="text" class="time-input" id="endDate" placeholder="结束时间" name="promotionEndTime"/>
+                        </li>
+                        <li class="select-time">
+                            <label>信息创建时间： </label>
+                            <input type="text" class="time-input" id="startTime" placeholder="开始时间"
+                                   name="startTime"/>
+                            <span>-</span>
+                            <input type="text" class="time-input" id="endTime" placeholder="结束时间" name="endTime"/>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.limitSearch()"><i
+                                    class="fa fa-search"></i>&nbsp;搜索</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i
+                                    class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+
+        <!--<div class="btn-group-sm" id="toolbar" role="group">-->
+        <!--<a class="btn btn-primary btn-edit disabled" onclick="$.operate.infoTab()"-->
+        <!--shiro:hasPermission="manager:trxOrder:detail">-->
+        <!--<i class="fa fa-edit"></i> 详情-->
+        <!--</a>-->
+        <!--</div>-->
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table" data-mobile-responsive="true"></table>
+        </div>
+    </div>
+</div>
+<th:block th:include="include :: footer"/>
+<script th:inline="javascript">
+    layui.use('laydate',function () {
+        var laydate = layui.laydate;
+        var startDate = laydate.render({
+            elem: '#startTime',
+            type: 'date',
+            format: 'yyyy-MM-dd',
+            done: function(value, date){
+                endDate.config.min ={
+                    year:date.year,
+                    month:date.month-1,
+                    date: date.date,
+                    hours: 0,
+                    minutes: 0,
+                    seconds : 0
+                };
+            }
+        });
+        var endDate = laydate.render({
+            elem: '#endTime',
+            type: 'date',
+            format: 'yyyy-MM-dd',
+            done: function(value,date){
+                startDate.config.max={
+                    year:date.year,
+                    month:date.month-1,//注意是month-1，写在date上的话你后边的日期选择不了
+                    date: date.date,
+                    hours: 0,
+                    minutes: 0,
+                    seconds : 0
+                }
+            }
+        });
+    })
+    layui.use('laydate',function () {
+        var laydate = layui.laydate;
+        var startDate = laydate.render({
+            elem: '#startDate',
+            type: 'date',
+            format: 'yyyy-MM-dd',
+            done: function(value, date){
+                endDate.config.min ={
+                    year:date.year,
+                    month:date.month-1,
+                    date: date.date,
+                    hours: 0,
+                    minutes: 0,
+                    seconds : 0
+                };
+            }
+        });
+        var endDate = laydate.render({
+            elem: '#endDate',
+            type: 'date',
+            format: 'yyyy-MM-dd',
+            done: function(value,date){
+                startDate.config.max={
+                    year:date.year,
+                    month:date.month-1,//注意是month-1，写在date上的话你后边的日期选择不了
+                    date: date.date,
+                    hours: 0,
+                    minutes: 0,
+                    seconds : 0
+                }
+            }
+        });
+    })
+    var prefix = ctx + "manager/trxOrder";
+    $(function () {
+        var options = {
+            url: prefix + "/getPromotionList",
+            createUrl: prefix + "/add",
+            updateUrl: prefix + "/detail",
+            removeUrl: prefix + "/remove",
+            exportUrl: prefix + "/export",
+
+            modalName: "推广列表",
+            showExport: true,
+            columns: [{
+                checkbox: false
+            },
+                {
+                    field: 'id',
+                    title: 'id',
+                    visible: false
+                }, {
+                    field: 'batchNo',
+                    title: '批次号',
+                }, {
+                    field: 'customerNo',
+                    title: '灵工号',
+                },  {
+                    field: 'payeeName',
+                    title: '姓名',
+                },  {
+                    field: 'merchantName',
+                    title: '所属商户',
+                }, {
+                    field: 'payeeIdCardNo',
+                    title: '身份证号',
+                }, {
+                    field: 'payeeBankCard',
+                    title: '银行卡号',
+                }, {
+                    field: 'payeeMobile',
+                    title: '手机号',
+                },{
+                    field: 'amount',
+                    title: '金额（元）',
+                }, {
+                    field: 'quantity',
+                    title: '数量',
+                }, {
+                    field: 'unitPrice',
+                    title: '单价（元）',
+                }, {
+                    field: 'province',
+                    title: '省',
+                }, {
+                    field: 'city',
+                    title: '市',
+                }, {
+                    field: 'area',
+                    title: '区',
+                }, {
+                    field: 'street',
+                    title: '街道',
+                }, {
+                    field: 'community',
+                    title: '社区',
+                }, {
+                    field: 'promotionStartTime',
+                    title: '推广开始时间',
+                }, {
+                    field: 'promotionEndTime',
+                    title: '推广结束时间',
+                },{
+                    field: 'createTime',
+                    title: '信息创建时间',
+                }
+            ]
+        };
+        $.table.init(options);
+    });
+</script>
+</body>
+</html>

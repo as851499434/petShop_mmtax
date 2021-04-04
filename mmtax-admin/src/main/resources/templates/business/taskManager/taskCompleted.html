@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+	<th:block th:include="include :: header('任务完成记录')" />
+</head>
+<body class="gray-bg">
+<div class="container-div">
+	<div class="row">
+		<div class="col-sm-12 search-collapse">
+			<form id="formId" autocomplete="off">
+				<div class="select-list">
+					<ul>
+						<li>
+							派单方：<input type="text" name="merchantName"/>
+						</li>
+						<li>
+							承接方：<input type="text" name="taxSourceName"/>
+						</li>
+						<li>
+							任务名称：<input type="text" name="taskName"/>
+						</li>
+						<li>
+							完成人：<input type="text" name="name"/>
+						</li>
+						<li class="select-time">
+							<label>派单时间： </label>
+							<input type="text" class="time-input" id="startTime" placeholder="开始时间"
+								   name="startDate" autocomplete="off"/>
+							<span>-</span>
+							<input type="text" class="time-input" id="endTime" placeholder="结束时间" name="endDate" autocomplete="off"/>
+						</li>
+						<li>
+							<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.limitSearch()"><i
+									class="fa fa-search"></i>&nbsp;搜索</a>
+							<a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i
+									class="fa fa-refresh"></i>&nbsp;重置</a>
+						</li>
+					</ul>
+				</div>
+			</form>
+		</div>
+
+		<div class="btn-group-sm" id="toolbar" role="group">
+			<!--<a class="btn btn-warning" onclick="$.table.exportExcel()"-->
+			<!--shiro:hasPermission="manager:customerInfo:export">-->
+			<!--<i class="fa fa-download"></i> 导出-->
+			<!--</a>-->
+		</div>
+		<div class="col-sm-12 select-table table-striped">
+			<table id="bootstrap-table" data-mobile-responsive="true"></table>
+		</div>
+	</div>
+</div>
+<div th:include="include :: footer"></div>
+<script th:inline="javascript">
+	var prefix = ctx + "manager/merchantTaskInfo";
+
+	layui.use('laydate',function () {
+		var laydate = layui.laydate;
+		var startDate = laydate.render({
+			elem: '#startTime',
+			type: 'date',
+			format: 'yyyy-MM-dd',
+			done: function(value, date){
+				endDate.config.min ={
+					year:date.year,
+					month:date.month-1,
+					date: date.date,
+					hours: 0,
+					minutes: 0,
+					seconds : 0
+				};
+			}
+		});
+		var endDate = laydate.render({
+			elem: '#endTime',
+			type: 'date',
+			format: 'yyyy-MM-dd',
+			done: function(value,date){
+				startDate.config.max={
+					year:date.year,
+					month:date.month-1,//注意是month-1，写在date上的话你后边的日期选择不了
+					date: date.date,
+					hours: 0,
+					minutes: 0,
+					seconds : 0
+				}
+			}
+		});
+	})
+	$(function() {
+		var options = {
+			url: prefix + "/selectMerchantTaskCompleted",
+			// createUrl: prefix + "/add",
+			// updateUrl: prefix + "/edit/{id}",
+			// removeUrl: prefix + "/remove",
+			exportUrl: prefix + "/exportMerchantTaskCompleted",
+			modalName: "任务完成记录",
+			showExport: true,
+			columns: [{
+				checkbox: true
+			},
+				{
+					field : 'id',
+					title : '',
+					visible: false
+				},
+				{
+					field : 'taskSerialNum',
+					title : '任务编号',
+				},
+				{
+					field : 'taskName',
+					title : '任务名称',
+				},
+				{
+					field : 'taskNum',
+					title : '任务数量',
+				},
+				{
+					field : 'name',
+					title : '完成人',
+				},
+				{
+					field : 'mobileNo',
+					title : '联系电话',
+				},
+				{
+					field : 'taxSourceName',
+					title : '承接方',
+				},
+				{
+					field : 'merchantName',
+					title : '派单方',
+				},
+				{
+					field : 'createTime',
+					title : '派单时间',
+				},
+				{
+					field : 'taskCompleteTime',
+					title : '任务完成时间',
+				}
+			]
+		};
+		$.table.init(options);
+	});
+</script>
+</body>
+</html>

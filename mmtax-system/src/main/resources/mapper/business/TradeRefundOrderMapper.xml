@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mmtax.business.mapper.TradeRefundOrderMapper">
+    
+    <resultMap type="com.mmtax.business.domain.TradeRefundOrder" id="TradeRefundOrderResult">
+        <result property="id"    column="id"    />
+        <result property="linkRecordType"    column="link_record_type"    />
+        <result property="linkSerialNum"    column="link_serial_num"    />
+        <result property="amount"    column="amount"    />
+        <result property="charge"    column="charge"    />
+        <result property="actualAmount"    column="actual_amount"    />
+        <result property="refundSerialNum"    column="refund_serial_num"    />
+        <result property="status"    column="status"    />
+        <result property="comment"    column="comment"    />
+        <result property="asyncStatus"    column="async_status"    />
+        <result property="taxSourceId"    column="tax_source_id"    />
+        <result property="providerId"    column="provider_id"    />
+        <result property="reservedFieldOne"    column="reserved_field_one"    />
+        <result property="reservedFieldTwo"    column="reserved_field_two"    />
+        <result property="reservedFieldThree"    column="reserved_field_three"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+    <select id="selectByRefundSerialNum" resultMap="TradeRefundOrderResult">
+        select * from tbl_trade_refund_order
+        where refund_serial_num = #{refundSerialNum}
+    </select>
+    <select id="selectByAysncStatus" resultMap="TradeRefundOrderResult">
+        select * from tbl_trade_refund_order
+        where async_status = #{asyncStatus}
+    </select>
+</mapper>

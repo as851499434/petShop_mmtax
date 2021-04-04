@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mmtax.business.mapper.TaxTypeMapper">
+    
+    <resultMap type="com.mmtax.business.domain.TaxType" id="TaxTypeResult">
+        <result property="id"    column="id"    />
+        <result property="taxTypeNumber" column="tax_type_number"/>
+        <result property="taxSounrceCompanyId"    column="tax_sounrce_company_id"    />
+        <result property="taxSounrceCompanyName"    column="tax_sounrce_company_name"    />
+        <result property="businessType"    column="business_type"    />
+        <result property="taxType"    column="tax_type"    />
+        <result property="invoiceContent"    column="invoice_content"    />
+        <result property="businessScope"    column="business_scope"    />
+        <result property="taxPerson"    column="tax_person"    />
+        <result property="delStatus"    column="del_status"    />
+        <result property="providerId"    column="provider_id"    />
+        <result property="reservedFieldOne"    column="reserved_field_one"    />
+        <result property="reservedFieldTwo"    column="reserved_field_two"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+</mapper>

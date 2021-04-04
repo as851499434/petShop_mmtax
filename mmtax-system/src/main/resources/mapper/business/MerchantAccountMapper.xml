@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mmtax.business.mapper.MerchantAccountMapper">
+
+    <resultMap type="com.mmtax.business.domain.MerchantAccount" id="MerchantAccountResult">
+        <result property="id"    column="id"    />
+        <result property="merchantId"    column="merchant_id"    />
+        <result property="amount"    column="amount"    />
+        <result property="frozenAmount"    column="frozen_amount"    />
+        <result property="usableAmount"    column="usable_amount"    />
+        <result property="accumulatedReturnAmount"    column="accumulated_return_amount"    />
+        <result property="usableAccumulatedReturnAmount"    column="usable_accumulated_return_amount"    />
+        <result property="status"    column="status"    />
+        <result property="version"    column="version"    />
+        <result property="providerId"    column="provider_id"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <select id="getMerchantAccountByMerchantId" resultMap="MerchantAccountResult">
+        select *
+        from tbl_merchant_account
+        where merchant_id = #{merchantId}
+          and status = 'ACTIVE'
+    </select>
+
+    <select id="getMerchantAccountByMerchantIdUpCache" flushCache="true" useCache="false" resultMap="MerchantAccountResult">
+        select *
+        from tbl_merchant_account
+        where merchant_id = #{merchantId}
+        and status = 'ACTIVE'
+    </select>
+    <select id="getListManagerAccount" parameterType="com.mmtax.business.dto.ManagerAccountDTO"
+            resultType="com.mmtax.business.dto.ManagerAccountDTO">
+        select
+        t2.id as id,
+        t1.usable_amount as merchantAmount,
+        t2.merchant_name as merchantName,
+        t2.merchant_code as merchantNo,
+        t2.contacts_mobile as merchantMobile,
+        t3.user_name as saleName
+        from
+        tbl_merchant_account t1
+        left join
+        tbl_merchant_info t2
+        on
+        t1.merchant_id = t2.id
+        left join
+        sys_user t3
+        on
+        t2.belong_saler=t3.user_id
+        where
+        1=1
+        <if test="merchantMobile != null and merchantMobile != ''">
+            and t2.contacts_mobile like concat('%',#{merchantMobile},'%')
+        </if>
+        <if test="merchantName != null and merchantName != ''">
+            and t2.merchant_name like concat('%',#{merchantName},'%')
+        </if>
+        <if test="saleName != null and saleName != ''">
+            and t3.user_name like concat('%',#{saleName},'%')
+        </if>
+        <if test="saleId != null and saleId != ''">
+            and t2.belong_saler = #{saleId}
+        </if>
+        <!-- 数据范围过滤 -->
+        ${params.dataScope}
+        order by
+        t1.create_time
+        desc
+    </select>
+    <select id="getCooperationList" resultType="com.mmtax.business.dto.CooperationInfoDTO">
+        SELECT
+        t1.amount as balance,
+        t2.merchant_name AS merchantName
+        FROM
+        tbl_merchant_account t1
+        LEFT JOIN
+        tbl_merchant_info t2
+        ON
+        t1.merchant_id = t2.id
+        <if test="contactsMobile != null and contactsMobile != ''">
+            AND contacts_mobile LIKE concat('%',#{contactsMobile},'%')
+        </if>
+        <if test="merchantName != null and merchantName != ''">
+            AND merchant_name LIKE concat('%',#{merchantName},'%')
+        </if>
+        <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+            AND t1.create_time BETWEEN concat(#{startDate},' 00:00:00') AND concat(#{endDate},' 23:59:59')
+        </if>
+        ORDER BY
+        t1.create_time DESC
+        limit #{startIndex},#{pageSize}
+    </select>
+    <select id="countCooperation" resultType="java.lang.Integer">
+        SELECT
+        COUNT (*)
+        FROM
+        tbl_merchant_account t1
+        LEFT JOIN
+        tbl_merchant_info t2
+        ON
+        t1.merchant_id = t2.id
+        <if test="contactsMobile != null and contactsMobile != ''">
+            AND contacts_mobile LIKE concat('%',#{contactsMobile},'%')
+        </if>
+        <if test="merchantName != null and merchantName != ''">
+            AND merchant_name LIKE concat('%',#{merchantName},'%')
+        </if>
+        <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+            AND t1.create_time BETWEEN concat(#{startDate},' 00:00:00') AND concat(#{endDate},' 23:59:59')
+        </if>
+
+
+    </select>
+    <select id="getSysCooperationList" resultType="com.mmtax.business.dto.CooperationInfoDTO">
+
+        SELECT
+        t2.id AS id,
+        t1.usable_amount AS balance,
+        t2.merchant_name AS merchantName,
+        t4.bank_channel as bankChannel,
+        t4.alipay_channel as alipayChannel,
+        t4.wechat_channel as wechatChannel,
+        t4.sign_switch as signSwitch,
+        t2.create_time AS createTime,
+        t3.user_name as saleName
+        FROM
+        tbl_merchant_info t2
+        left JOIN
+        tbl_merchant_account t1
+        ON
+        t1.merchant_id = t2.id
+        left join
+        sys_user t3
+        on t2.belong_saler = t3.user_id
+        left join tbl_cooperation t4 on t4.merchant_id = t2.id
+        where 1=1
+        <if test="contactsMobile != null and contactsMobile != ''">
+            AND t2.contacts_mobile LIKE concat('%',#{contactsMobile},'%')
+        </if>
+        <if test="merchantName != null and merchantName != ''">
+            AND t2.merchant_name LIKE concat('%',#{merchantName},'%')
+        </if>
+        <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+            AND t1.create_time BETWEEN concat(#{startDate},' 00:00:00') AND concat(#{endDate},' 23:59:59')
+        </if>
+        <if test="saleId != null and saleId != ''">
+            and t2.belong_saler = #{saleId}
+        </if>
+        <if test="saleName != null and saleName != ''">
+            and t3.user_name LIKE concat('%',#{saleName},'%')
+        </if>
+        <!-- 数据范围过滤 -->
+        ${params.dataScope}
+        ORDER BY
+        t2.create_time DESC
+    </select>
+    <update id="updateMerchantAccount">
+        update tbl_merchant_account
+        set amount        = amount + #{amount},
+            usable_amount = usable_amount + #{amount},
+            update_time   = now()
+        where merchant_id = #{merchantId}
+    </update>
+
+    <update id="updateMerchantAccountByVersion">
+        update tbl_merchant_account
+        set amount        = amount + #{amount},
+        usable_amount = usable_amount + #{amount},
+        version = version + 1,
+        update_time   = now()
+        where id = #{id} and version = #{version}
+    </update>
+
+</mapper>

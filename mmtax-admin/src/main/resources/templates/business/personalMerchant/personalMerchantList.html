@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('入网申请')" />
+    <style>
+        .content{
+            width: 100%;
+            background: #fff;
+            color: #333333;
+            border-radius: 6px;
+            margin-top: -8px;
+            padding-top: 5px;
+            padding-bottom: 13px;
+            box-shadow: 1px 3px 3px rgba(0,0,0,.2);
+        }
+    </style>
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="formId">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            姓名：<input type="text" name="applyName"/>
+                        </li>
+                        <li>
+                            手机号：<input type="text" name="mobileNumber"/>
+                        </li>
+                        <li>
+                            <label>状态：</label>
+                            <select name="orderStatus" th:with="type=${@dict.getType('check_status')}">
+                                <option value="">所有</option>
+                                <option th:each="dict : ${type}" th:text="${dict.dictLabel}"
+                                        th:value="${dict.dictValue}">
+                                </option>
+                            </select>
+                        </li>
+                        <li class="select-time">
+                            <label>日期： </label>
+                            <input type="text" class="time-input" id="startTime" placeholder="开始时间"
+                                   name="startDate" autocomplete="off"/>
+                            <span>-</span>
+                            <input type="text" class="time-input" id="endTime" placeholder="结束时间" name="endDate" autocomplete="off"/>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.limitSearch()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+        <div class="btn-group-sm" id="toolbar" role="group">
+            <!--<a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="business:customerAlipayInfo:add">-->
+            <!--<i class="fa fa-plus"></i> 添加-->
+            <!--</a>-->
+            <!--<a class="btn btn-primary btn-edit disabled" onclick="$.operate.edit()" shiro:hasPermission="business:customerAlipayInfo:edit">-->
+            <!--<i class="fa fa-edit"></i> 修改-->
+            <!--</a>-->
+            <a class="btn btn-danger btn-del btn-del disabled" onclick="$.operate.removePersonal()" shiro:hasPermission="business:personalMerchant:batchDeleteInfo">
+            <i class="fa fa-remove"></i> 删除
+            </a>
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table" data-mobile-responsive="true"></table>
+        </div>
+    </div>
+</div>
+<div th:include="include :: footer"></div>
+<script th:inline="javascript">
+    var prefix = ctx + "business/personalMerchant";
+    var signs = [[${@dict.getType('check_status')}]];
+    var editFlag = [[${@permission.hasPermi('business:personalMerchant:licenseCheckDetail')}]];
+    layui.use('laydate',function () {
+        var laydate = layui.laydate;
+        var startDate = laydate.render({
+            elem: '#startTime',
+            type: 'date',
+            format: 'yyyy-MM-dd',
+            done: function(value, date){
+                endDate.config.min ={
+                    year:date.year,
+                    month:date.month-1,
+                    date: date.date,
+                    hours: 0,
+                    minutes: 0,
+                    seconds : 0
+                };
+            }
+        });
+        var endDate = laydate.render({
+            elem: '#endTime',
+            type: 'date',
+            format: 'yyyy-MM-dd',
+            done: function(value,date){
+                startDate.config.max={
+                    year:date.year,
+                    month:date.month-1,//注意是month-1，写在date上的话你后边的日期选择不了
+                    date: date.date,
+                    hours: 0,
+                    minutes: 0,
+                    seconds : 0
+                }
+            }
+        });
+    })
+    $(function() {
+        var options = {
+            url: prefix + "/personalMerchantList",
+            // createUrl: prefix + "/add",
+            updateUrl: prefix + "/licenseApplyDetail?applyId={id}",
+            removeUrl: prefix + "/batchDeleteInfo",
+            // exportUrl: prefix + "/payExport",
+            modalName: "入网申请",
+            showExport: true,
+            columns: [{
+                checkbox: true
+            },
+                {
+                    field : 'applyId',
+                    title : 'applyId',
+                    visible: false,
+                },
+                {
+                    field : 'applyNumber',
+                    title : '申请编号',
+                },
+                {
+                    field : 'applyName',
+                    title : '姓名',
+                },
+                {
+                    field : 'idCardNumber',
+                    title : '身份证号',
+                },
+                {
+                    field : 'mobileNumber',
+                    title : '预留手机号',
+                },{
+                    field : 'taxSounrceCompanyName',
+                    title : '税源地',
+                },
+                {
+                    field : 'invoiceContent',
+                    title : '开票类目',
+                },
+                {
+                    field : 'businessScope',
+                    title : '经营范围',
+                },
+                {
+                    field : 'businessType',
+                    title : '行业类型',
+                },
+                {
+                    field : 'orderStatus',
+                    title : '状态',
+                    formatter: function (value, row, index) {
+                        return $.table.selectDictLabel(signs, row.orderStatus);
+                    }
+                },
+                {
+                    field : 'applyTime',
+                    title : '申请时间',
+                },
+                {
+                    field : 'updateTime',
+                    title : '更新时间',
+                },
+                {
+                    title: '操作',
+                    align: 'center',
+                    width: '20%',
+                    formatter: function (value, row, index) {
+                        var actions = [];
+
+                        if (row.orderStatus != 2) {
+                            actions.push('<button class="btn btn-primary btn-xs '+editFlag+'" onclick="$.operate.editTab(\'' + row.applyId + '\')">修改/查看</button> ');
+                            actions.push('<button class="btn btn-success btn-xs"  onclick="$.operate.openIndividual(\'' + row.applyId + '\')">审 核</button> ');
+                        } else {
+                            actions.push('<button class="btn btn-primary btn-xs '+editFlag+'" disabled onclick="$.operate.editTab(\'' + row.applyId + '\')">修改/查看</button> ');
+                        }
+                        return actions.join('');
+                    }
+                }
+            ]
+        };
+        $.table.init(options);
+    });
+</script>
+</body>
+</html>

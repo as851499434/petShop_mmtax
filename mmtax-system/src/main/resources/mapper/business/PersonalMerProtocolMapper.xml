@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mmtax.business.mapper.PersonalMerProtocolMapper">
+    
+    <resultMap type="com.mmtax.business.domain.PersonalMerProtocol" id="PersonalMerProtocolResult">
+        <result property="id"    column="id"    />
+        <result property="cusEsignId"    column="cus_esign_id"    />
+        <result property="name"    column="name"    />
+        <result property="conInfoId"    column="con_info_id"    />
+        <result property="fileName"    column="file_name"    />
+        <result property="signTime"    column="sign_time"    />
+        <result property="signStatus"    column="sign_status"    />
+        <result property="comment"    column="comment"    />
+        <result property="espireTime"    column="espire_time"    />
+        <result property="expireStatus"    column="expire_status"    />
+        <result property="esignFlowId"    column="esign_flow_id"    />
+        <result property="taxSourceId"    column="tax_source_id"    />
+        <result property="signSerialNum"    column="sign_serial_num"    />
+        <result property="applyNumber"    column="apply_number"    />
+        <result property="providerId"    column="provider_id"    />
+        <result property="reservedFieldOne"    column="reserved_field_one"    />
+        <result property="reservedFieldTwo"    column="reserved_field_two"    />
+        <result property="reservedFieldThree"    column="reserved_field_three"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+</mapper>

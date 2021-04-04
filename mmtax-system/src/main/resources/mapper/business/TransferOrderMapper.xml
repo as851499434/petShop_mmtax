@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mmtax.business.mapper.TransferOrderMapper">
+    
+    <resultMap type="com.mmtax.business.domain.TransferOrder" id="TransferOrderResult">
+        <result property="id"    column="id"    />
+        <result property="merchantName"    column="merchant_name"    />
+        <result property="amount"    column="amount"    />
+        <result property="taxRate"    column="tax_rate"    />
+        <result property="charge"    column="charge"    />
+        <result property="actualAmount"    column="actual_amount"    />
+        <result property="transferSerialNum"    column="transfer_serial_num"    />
+        <result property="orderSerialNum"    column="order_serial_num"    />
+        <result property="batchNo"    column="batch_no"    />
+        <result property="customerName"    column="customer_name"    />
+        <result property="status"    column="status"    />
+        <result property="batchPaymentRecordId"    column="batch_payment_record_id"    />
+        <result property="paymentChannel"    column="payment_channel"    />
+        <result property="merchantId"    column="merchant_id"    />
+        <result property="customerId"    column="customer_id"    />
+        <result property="comment"    column="comment"    />
+        <result property="asyncStatus"    column="async_status"    />
+        <result property="providerId"    column="provider_id"    />
+        <result property="reservedFieldOne"    column="reserved_field_one"    />
+        <result property="reservedFieldTwo"    column="reserved_field_two"    />
+        <result property="reservedFieldThree"    column="reserved_field_three"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+    <select id="selectByAsyncStatus" resultMap="TransferOrderResult">
+        select * from tbl_transfer_order
+        where async_status = #{asyncStatus}
+    </select>
+    <select id="selectByTransferSerialNum" resultMap="TransferOrderResult">
+        select * from tbl_transfer_order
+        where transfer_serial_num = #{transferSerialNum}
+    </select>
+    <select id="selectByOrderSerialNumAndStatus" resultMap="TransferOrderResult">
+        select * from tbl_transfer_order
+        where order_serial_num = #{orderSerialNum}
+        <if test="status != null">
+            and status = #{status}
+        </if>
+    </select>
+    <select id="listTranferOrderInfoDTO" parameterType="com.mmtax.business.dto.QuaryTransferOrderinfoDTO"
+            resultType="com.mmtax.business.dto.TransferOrderinfoDTO">
+        select
+        t1.id as id,
+        t3.merchant_name as merchantName,
+        t5.user_name as userName,
+        t1.amount as amount,
+        t1.order_serial_num as orderSerialNum,
+        t4.merchant_serial_num as merchantSerialNum,
+        t1.create_time as createTime,
+        t1.status as status,
+        t2.real_name as realName,
+        t2.customer_no as customerNo,
+        t3.merchant_code as merchantCode,
+        t1.payment_channel as paymentChannel,
+        t4.payee_id_card_no as payeeIdCardNo,
+        t4.payee_mobile as payeeMobile,
+        t4.bank_name as bankName,
+        t4.batch_no as batchNo,
+        t4.merchant_id as merchantId,
+        t4.subject_conscription as subjectConscription,
+        t4.charge as charge,
+        t4.payment_voucher as paymentVoucher,
+        t4.update_time as updateTime,
+        t4.payee_bank_card as payeeBankCard
+        from tbl_transfer_order t1
+        left join tbl_customer_info t2 on t1.customer_id = t2.id
+        left join tbl_merchant_info t3 on t1.merchant_id = t3.id
+        left join tbl_trx_order t4 on t1.order_serial_num = t4.order_serial_num
+        left join sys_user t5 on t3.belong_saler = t5.user_id
+        where 1 = 1
+        <if test="orderSerialNum != null and orderSerialNum != ''">
+            and t1.order_serial_num = #{orderSerialNum}
+        </if>
+        <if test="merchantName != null and merchantName != ''">
+            and t3.merchant_name = #{merchantName}
+        </if>
+        <if test="customerName != null and customerName != ''">
+            and t2.real_name = #{customerName}
+        </if>
+        <if test="status != null">
+            and t1.status = #{status}
+        </if>
+        <if test="paymentChannel != null and paymentChannel != ''">
+            and t1.payment_channel = #{paymentChannel}
+        </if>
+        <if test="startDate != null and startDate !='' and endDate != null and endDate != ''">
+            and t1.create_time between concat(#{startDate},' 00:00:00') and concat(#{endDate},' 23:59:59')
+        </if>
+        order by
+        t1.create_time desc
+    </select>
+    <select id="selectInitOrProcess" resultMap="TransferOrderResult">
+    select * from tbl_transfer_order where
+    (status = -1 or status = 0)
+    and create_time &lt; #{createTime}
+    </select>
+</mapper>

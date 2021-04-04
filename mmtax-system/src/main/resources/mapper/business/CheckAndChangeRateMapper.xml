@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mmtax.business.mapper.CheckAndChangeRateMapper">
+
+    <resultMap type="CheckAndChangeRate" id="CheckAndChangeRateResult">
+        <result property="id" column="id"/>
+        <result property="merchantId" column="merchant_id"/>
+        <result property="merchantName" column="merchant_name"/>
+        <result property="merchantCode" column="merchant_code"/>
+        <result property="agentName" column="agent_name"/>
+        <result property="agentNumber" column="agent_number"/>
+        <result property="checkState" column="check_state"/>
+        <result property="oldOrdinaryServiceRate" column="old_ordinary_service_rate"/>
+        <result property="newOrdinaryServiceRate" column="new_ordinary_service_rate"/>
+        <result property="oldServiceBigRate" column="old_service_big_rate"/>
+        <result property="newServiceBigRate" column="new_service_big_rate"/>
+        <result property="providerId" column="provider_id"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <select id="selectAllChangeRateInfo" resultMap="CheckAndChangeRateResult"
+            parameterType="com.mmtax.business.dto.CheckAndChangeRateDTO">
+        select * from tbl_check_and_change_rate
+        where 1=1
+        <if test="merchantName !='' and merchantName!=null">
+          and  merchant_name like concat('%',#{merchantName},'%')
+        </if>
+        <if test="merchantCode !='' and merchantCode!=null">
+            and  merchant_code like concat('%',#{merchantCode},'%')
+        </if>
+        <if test="agentName !='' and agentName!=null">
+            and  agent_name like concat('%',#{agentName},'%')
+        </if>
+        order by create_time desc
+    </select>
+
+    <update id="updateRateSuccess" parameterType="com.mmtax.business.dto.ChangeRateSuccessDTO">
+        update tbl_check_and_change_rate
+        <set>
+            <if test="`old_ordinary_service_rate` != null">
+                `old_ordinary_service_rate` = #{oldOrdinaryServiceRate},
+            </if>
+            <if test="`new_ordinary_service_rate` != null">
+                `new_ordinary_service_rate` = #{newOrdinaryServiceRate},
+            </if>
+            <if test="`old_service_big_rate` != null">
+                `old_service_big_rate` = #{oldBigServiceRate},
+            </if>
+            <if test="`new_service_big_rate` != null">
+                `new_service_big_rate` = #{newBigServiceRate},
+            </if>
+            `check_state` = 1
+        </set>
+        where `merchant_id` = #{merchantId}
+    </update>
+
+    <update id="updateRateFail" parameterType="integer">
+        update tbl_check_and_change_rate
+        set `check_state` = 2
+        where `merchant_id` = #{merchantId}
+    </update>
+</mapper>

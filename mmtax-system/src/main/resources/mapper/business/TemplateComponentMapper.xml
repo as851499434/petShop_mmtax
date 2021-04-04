@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mmtax.business.mapper.TemplateComponentMapper">
+    
+    <resultMap type="com.mmtax.business.domain.TemplateComponent" id="TemplateComponentResult">
+        <result property="id"    column="id"    />
+        <result property="componentName"    column="component_name"    />
+        <result property="componentId"    column="component_id"    />
+        <result property="esignTemplateId"    column="esign_template_id"    />
+        <result property="templateId"    column="template_id"    />
+        <result property="providerId"    column="provider_id"    />
+        <result property="reservedFieldOne"    column="reserved_field_one"    />
+        <result property="reservedFieldTwo"    column="reserved_field_two"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+    <select id="selectByEsignTemId" resultMap="TemplateComponentResult">
+        select * from tbl_template_component
+        where esign_template_id = #{esignTemId}
+    </select>
+</mapper>

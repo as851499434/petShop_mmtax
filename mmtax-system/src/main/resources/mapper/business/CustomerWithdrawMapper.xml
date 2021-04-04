@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mmtax.business.mapper.CustomerWithdrawMapper">
+    
+    <resultMap type="com.mmtax.business.domain.CustomerWithdraw" id="CustomerWithdrawResult">
+        <result property="id"    column="id"    />
+        <result property="customerId"    column="customer_id"    />
+        <result property="merchantId"    column="merchant_id"    />
+        <result property="amount"    column="amount"    />
+        <result property="withdrawAccount"    column="withdraw_account"    />
+        <result property="bankId"    column="bank_id"    />
+        <result property="withdrawChannel"    column="withdraw_channel"    />
+        <result property="customerSerialNum"    column="customer_serial_num"    />
+        <result property="withdrawSerialNum"    column="withdraw_serial_num"    />
+        <result property="comment"    column="comment"    />
+        <result property="withdrawStatus"    column="withdraw_status"    />
+        <result property="providerId"    column="provider_id"    />
+        <result property="asyncStatus"    column="async_status"    />
+        <result property="reservedFieldOne"    column="reserved_field_one"    />
+        <result property="reservedFieldTwo"    column="reserved_field_two"    />
+        <result property="reservedFieldThree"    column="reserved_field_three"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+    <select id="selectByAsyncStatusWithdrawStatusBeforeTime" resultMap="CustomerWithdrawResult">
+        select * from tbl_customer_withdraw
+        where 1 = 1
+        <if test="asyncStatus != null">
+            and async_status = #{asyncStatus}
+        </if>
+        <if test="withdrawStatus != null">
+            and withdraw_status = #{withdrawStatus}
+        </if>
+        <if test="createTime != null and createTime != ''">
+            and create_time &lt; #{createTime}
+        </if>
+    </select>
+    <select id="selectByWithdrawSerialNum" resultMap="CustomerWithdrawResult">
+        select * from tbl_customer_withdraw
+        where withdraw_serial_num = #{withdrawSerialNum}
+    </select>
+    <select id="listPageByCustomerIdCreateTimeStatus" resultType="com.mmtax.business.dto.IncomeWithdrawDTO">
+        select
+        2 as type,
+        t1.amount as withdrawAmount,
+        t1.create_time as incomeWithdrawTime,
+        t2.merchant_name as merchantname,
+        t1.withdraw_status as status
+        from tbl_customer_withdraw t1
+        left join tbl_merchant_info t2 on t1.merchant_id = t2.id
+        where t1.customer_id = #{customerId}
+        <if test="status != null">
+            and t1.withdraw_status = #{status}
+        </if>
+        <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+            and t1.create_time between concat(#{startDate},' 00:00:00') and concat(#{endDate},' 23:59:59')
+        </if>
+        order by t1.create_time desc
+        <if test="index != null">
+            limit #{index},#{pageSize}
+        </if>
+    </select>
+    <select id="countByCustomerIdCreateTimeStatus" resultType="integer">
+        select
+        count(0)
+        from tbl_customer_withdraw
+        where customer_id = #{customerId}
+        and withdraw_status = #{status}
+        <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+            and create_time between concat(#{startDate},' 00:00:00') and concat(#{endDate},' 23:59:59')
+        </if>
+    </select>
+    <select id="sumAmountByCustomerId" resultType="decimal">
+        select
+        sum(amount)
+        from tbl_customer_withdraw
+        where customer_id = #{customerId}
+        and withdraw_status = #{status}
+        <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+            and create_time between concat(#{startDate},' 00:00:00') and concat(#{endDate},' 23:59:59')
+        </if>
+        <if test="withdrawAccount != null and withdrawAccount != ''">
+            and withdraw_account = #{withdrawAccount}
+        </if>
+    </select>
+    <select id="listCustomerWithdrawInfo" resultType="com.mmtax.business.dto.CustomerWithdrawInfoDTO">
+        SELECT
+            t1.withdraw_channel as withdrawChannel,
+            t1.withdraw_status as withdrawStatus,
+            t2.member_name as memberName,
+            t2.customer_no as customerNo,
+            t2.mobile as mobile,
+            t1.amount as amount,
+            t1.withdraw_account as withdrawAccount,
+            t1.withdraw_serial_num as withdrawSerialNum,
+            t1.create_time as createTime,
+            t3.wechat_number as wechatNumber,
+            t3.wechat_name as wechatName
+        FROM
+            tbl_customer_withdraw t1
+        LEFT JOIN tbl_customer_info t2 ON t1.customer_id = t2.id
+        LEFT JOIN tbl_customer_wechat_info t3 ON t3.customer_id = t2.id
+        <where>
+            t1.withdraw_channel = #{withdrawChannel}
+            <if test="memberName != null and memberName != ''">
+                AND t2.member_name like concat('%',#{memberName},'%')
+            </if>
+            <if test="withdrawStatus != null and withdrawStatus != ''">
+                AND t1.withdraw_status = #{withdrawStatus}
+            </if>
+            <if test="customerNo != null and customerNo != ''">
+                AND t2.customer_no like concat('%',#{customerNo},'%')
+            </if>
+            <if test="mobile != null and mobile != ''">
+                AND t2.mobile like concat('%',#{mobile},'%')
+            </if>
+            <if test="withdrawSerialNum != null and withdrawSerialNum != ''">
+                AND t1.withdraw_serial_num like concat('%',#{withdrawSerialNum},'%')
+            </if>
+            <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+                and t1.create_time between concat(#{startDate},' 00:00:00') and concat(#{endDate},' 23:59:59')
+            </if>
+        </where>
+        order by t1.create_time desc
+    </select>
+</mapper>

@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<th:block th:include="include :: header('工单详情')"/>
+	<link th:href="@{/css/bootstrap-switch.min.css}" rel="stylesheet"/>
+	<style>
+		div.form-group span:not(.tag){
+			font-size: 12px;
+			color: red;
+			display: inline-block;
+			height: 20px;
+		}
+		span.tag >span.tag-text{
+			color:#fff;
+		}
+		.form-group{
+			margin-bottom: 6px;
+		}
+		.form-content {
+			background-color: #F3F3F4;
+		}
+		.form-content .steps,.form-content .contentBox,.form-content .infoBox,.form-content .operatorBox{
+			width: 100%;
+			background-color: #fff;
+		}
+		.form-content .steps{
+			height: 46px;
+			display: flex;
+			justify-content: space-between;
+			margin-bottom: 20px;
+		}
+		.form-content .steps .stepItem{
+			width: 32%;
+			line-height: 46px;
+			text-align: center;
+			font-size: 16px;
+		}
+		.form-content .steps i{
+			width: 2%;
+			text-align: center;
+			line-height: 46px;
+		}
+		.form-content .steps span{
+			margin-left: 15px;
+		}
+		.fa-angle-right{
+			font-size: 40px;
+		}
+		.form-content .steps .stepItem,.form-content .steps i{
+			height: 100%;
+		}
+		.form-content .infoBox{
+			padding: 20px;
+			margin-bottom: 20px;
+		}
+		.form-content .infoBox .infoItem, .form-content .infoBox .infoTitle,.form-content .infoBox .infoCtn{
+			width: 100%;
+		}
+		.form-content .infoBox .infoItem {
+			width: 100%;
+			display: flex;
+			justify-content: space-between;
+			font-size: 16px;
+			color: #000000;
+			margin-bottom: 16px;
+		}
+		.infoBox .infoItem div{
+			width: 100%;
+		}
+		.form-content .infoBox .infoTitle,.form-content .infoBox .infoCtn{
+			font-size: 14px;
+			color: #000000;
+		}
+		.form-content .infoBox .infoTitle{
+			margin-bottom: 16px;
+		}
+		.form-content .contentBox{
+			padding: 20px;
+			margin-bottom: 16px;
+		}
+		.contentBox #stepTwo，.contentBox #stepThree，.contentBox #closedStep{
+			width: 100%;
+		}
+		.form-content .operatorBox {
+			padding: 20px;
+		}
+		.contentBox .txtCtn{
+			width: 100%;
+			display: flex;
+			justify-content: space-between;
+		}
+		.txtCtn .txtContent{
+			width: calc(100% - 40px);
+			word-wrap: break-word;
+			word-break: break-all;
+		}
+		.contentBox .fileShow{
+			display: flex;
+			justify-content: flex-start;
+			margin-top: 15px;
+		}
+		.contentBox .fileShow .fileBox{
+			width: 233px;
+			padding: 0 10px 10px;
+			border: 1px solid #333;
+            margin: 0 10px;
+            display: none;
+		}
+		.fileBoxTitle{
+			width: 100%;
+			height: 32px;
+			line-height: 32px;
+			font-size: 20px;
+			text-align: right;
+		}
+		.fileBoxCtn{
+			width: 100%;
+			height: 180px;
+            line-height: 180px;
+            text-align: center;
+            font-size: 40px;
+            color: #000;
+		}
+		.fileBoxCtn video,.fileBoxCtn img{
+			width: 100%;
+			height: 100%;
+		}
+		.haveOn{
+			color: #0e9aef;
+		}
+	</style>
+</head>
+<body style="background-color: #F3F3F4;padding: 5px 0 15px">
+<div class="form-content">
+	<!-- class="white-bg" 背景色#fff-->
+	<div class="steps" id="notClosed" style="display: none">
+		<div class="stepItem stepOne">
+			<i class="fa fa-circle-o"></i>
+			<span>已发布，待反馈</span>
+		</div>
+		<i class="fa fa-angle-right stepOne"></i>
+		<div class="stepItem stepTwo">
+			<i class="fa fa-circle-o"></i>
+			<span>已反馈，待处理</span>
+		</div>
+		<i class="fa fa-angle-right stepTwo"></i>
+		<div class="stepItem stepThree">
+			<i class="fa fa-circle-o"></i>
+			<span>已处理</span>
+		</div>
+	</div>
+	<div class="steps" id="closedOrder" style="display: none">
+		<div class="stepItem haveOn">
+			<i class="fa fa-circle-o"></i>
+			<span>已关闭</span>
+		</div>
+	</div>
+	<div class="infoBox">
+		<div class="infoItem">
+			<div>工单编号：<span id="workOrderSerialNumber"></span></div>
+			<div>入网申请编号：<span id="applyNumber"></span></div>
+			<div>姓名：<span id="name"></span></div>
+			<div>身份证号：<span id="idNumber"></span></div>
+		</div>
+		<!--参考  <span th:text="'Welcome to home, ' + ${user.name} + '!'"> -->
+		<div class="infoTitle"></div>
+		<div class="infoCtn"></div>
+	</div>
+	<div class="contentBox">
+		<!--已发布，待反馈 无-->
+		<!--已反馈，待处理-->
+		<div id="stepTwo" style="display: none">
+			<div>
+				<h4>反馈内容</h4>
+				<div class="txtCtn">
+					<span style="width: 40px">文本：</span><span class="txtContent"></span>
+				</div>
+				<div class="fileShow">
+                    <div class="fileBox videoBox">
+                        <div class="fileBoxTitle"><i class="fa fa-download" onclick="downloadFile(this)"></i></div>
+                        <div class="fileBoxCtn">
+                            <video poster="" src="" controls>
+                            </video>
+                        </div>
+                    </div>
+                    <div class="fileBox imgBox">
+                        <div class="fileBoxTitle"><i class="fa fa-download" onclick="downloadFile(this)"></i></div>
+                        <div class="fileBoxCtn">
+                            <img src="" alt="">
+                        </div>
+                    </div>
+                    <div class="fileBox pdfBox">
+                        <div class="fileBoxTitle"><i class="fa fa-download" onclick="downloadFile(this)"></i></div>
+                        <div class="fileBoxCtn">
+                            请下载pdf
+                            <img src="" alt="" style="display: none">
+                        </div>
+                    </div>
+				</div>
+			</div>
+		</div>
+		<!--已处理-->
+		<div id="stepThree" style="display: none">
+			<div>
+				<h4>反馈内容</h4>
+				<div class="txtCtn"></div>
+				<div class="fileShow">
+                    <div class="fileBox videoBox">
+                        <div class="fileBoxTitle"><i class="fa fa-download" onclick="downloadFile(this)"></i></div>
+                        <div class="fileBoxCtn">
+                            <video poster="" src="" controls>
+                            </video>
+                        </div>
+                    </div>
+                    <div class="fileBox imgBox">
+                        <div class="fileBoxTitle"><i class="fa fa-download" onclick="downloadFile(this)"></i></div>
+                        <div class="fileBoxCtn">
+                            <img src="" alt="">
+                        </div>
+                    </div>
+                    <div class="fileBox pdfBox">
+                        <div class="fileBoxTitle"><i class="fa fa-download" onclick="downloadFile(this)"></i></div>
+                        <div class="fileBoxCtn">
+                            请下载pdf
+                            <img src="" alt="" style="display: none">
+                        </div>
+                    </div>
+				</div>
+			</div>
+		</div>
+		<!--已关闭-->
+		<div id="closedStep" style="display: none">
+			<div>
+				<h4>反馈内容</h4>
+				<div class="txtCtn"></div>
+				<div class="fileShow">
+                    <div class="fileBox videoBox">
+                        <div class="fileBoxTitle"><i class="fa fa-download" onclick="downloadFile(this)"></i></div>
+                        <div class="fileBoxCtn">
+                            <video poster="" src="" controls>
+                            </video>
+                        </div>
+                    </div>
+                    <div class="fileBox imgBox">
+                        <div class="fileBoxTitle"><i class="fa fa-download" onclick="downloadFile(this)"></i></div>
+                        <div class="fileBoxCtn">
+                            <img src="" alt="">
+                        </div>
+                    </div>
+                    <div class="fileBox pdfBox">
+                        <div class="fileBoxTitle"><i class="fa fa-download" onclick="downloadFile(this)"></i></div>
+                        <div class="fileBoxCtn">
+                            请下载pdf
+                            <img src="" alt="" style="display: none">
+                        </div>
+                    </div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="operatorBox">
+		<h4>操作</h4>
+		<div id="status_closed" style="display: none"><button type="button" class="btn btn-sm btn-danger" onclick="closeOrder()"><i class="fa fa-times"></i> 关闭工单</button></div>
+		<div id="status_deal" style="display: none">
+			<button type="button" class="btn btn-sm btn-success" onclick="dealOrder()"><i class="fa fa-check-square-o"></i> 已处理</button>
+			<button type="button" class="btn btn-sm btn-danger" onclick="closeOrder()" style="margin-left: 15px"><i class="fa fa-times"></i> 关闭工单</button>
+		</div>
+	</div>
+</div>
+<div class="row" style="margin: 20px auto; height: 90px;">
+	<div class="col-sm-offset-5 col-sm-9">
+		<button type="button" class="btn btn-sm btn-danger" onclick="closeItem()"><i class="fa fa-reply-all"></i>关 闭</button>
+	</div>
+</div>
+<div th:include="include::footer"></div>
+<script th:src="@{/js/bootstrap-switch.min.js}"></script>
+<script type="text/javascript">
+
+	var workOrderSerialNumber = window.location.search.split("?")[1].split("=")[1]
+	// 获取工单详情
+	$.get("/business/personalMerchant/queryWorkOrderDetail?workOrderSerialNumber="+workOrderSerialNumber,function (data) {
+		if(data.code === 0){
+			$("#workOrderSerialNumber").text(data.data.workOrderSerialNumber)
+			$("#applyNumber").text(data.data.applyNumber)
+			$("#name").text(data.data.name)
+			$("#idNumber").text(data.data.certificateNo)
+			$(".infoTitle").text("标题：" + data.data.title)
+			$(".infoCtn").text("内容：" + data.data.content)
+			$(".txtContent").text(data.data.txt)
+			if (data.data.status == 0) { // 待反馈
+                $("#notClosed").show()
+				$("#status_closed").show()
+                $(".stepOne").addClass("haveOn")
+			} else if (data.data.status == 1) { // 待处理
+				$("#notClosed").show()
+				$("#status_deal").show()
+				$("#stepTwo").show()
+				$(".stepOne").addClass("haveOn")
+				$(".stepTwo").addClass("haveOn")
+                if (data.data.videoAddress != "" && data.data.videoAddress != null){
+                    $("#stepTwo .videoBox").show()
+                    $("#stepTwo video").attr("src",data.data.videoAddress)
+                }
+                if (data.data.imgAddress != "" && data.data.imgAddress != null){
+                    $("#stepTwo .imgBox").show()
+                    $("#stepTwo .imgBox img").attr("src",data.data.imgAddress)
+                }
+                if (data.data.pdfAddress != "" && data.data.pdfAddress != null){
+                    $("#stepTwo .pdfBox").show()
+                    $("#stepTwo .pdfBox img").attr("src",data.data.pdfAddress)
+                }
+			} else if (data.data.status == 2) { // 已处理
+				$("#notClosed").show()
+				$(".stepOne").addClass("haveOn")
+				$(".stepTwo").addClass("haveOn")
+				$(".stepThree").addClass("haveOn")
+				$("#stepThree").show()
+                if (data.data.videoAddress != "" && data.data.videoAddress != null){
+                    $("#stepThree .videoBox").show()
+                    $("#stepThree video").attr("src",data.data.videoAddress)
+                }
+                if (data.data.imgAddress != "" && data.data.imgAddress != null){
+                    $("#stepThree .imgBox").show()
+                    $("#stepThree .imgBox img").attr("src",data.data.imgAddress)
+                }
+                if (data.data.pdfAddress != "" && data.data.pdfAddress != null){
+                    $("#stepThree .pdfBox").show()
+                    $("#stepThree .pdfBox img").attr("src",data.data.pdfAddress)
+                }
+				$(".operatorBox").hide()
+			} else if (data.data.status == 3) { // 关闭
+				$("#closedOrder").show()
+				$("#closedStep").show()
+                if (data.data.videoAddress != "" && data.data.videoAddress != null){
+                    $("#closedStep .videoBox").show()
+                    $("#closedStep video").attr("src",data.data.videoAddress)
+                }
+                if (data.data.imgAddress != "" && data.data.imgAddress != null){
+                    $("#closedStep .imgBox").show()
+                    $("#closedStep .imgBox img").attr("src",data.data.imgAddress)
+                }
+                if (data.data.pdfAddress != "" && data.data.pdfAddress != null){
+                    $("#closedStep .pdfBox").show()
+                    $("#closedStep .pdfBox img").attr("src",data.data.pdfAddress)
+                }
+                $(".operatorBox").hide()
+			}
+		}else {
+			$.modal.msgError(data.msg)
+		}
+	})
+
+	// 下载相关
+	function downloadFile(obj) {
+		// console.log(obj.parentNode.parentNode.children[1].children[0].src) // video的src
+		var url= obj.parentNode.parentNode.children[1].children[0].src
+		window.location.href = ctx + 'business/personalMerchant/downloadWorOrder?url='+url
+		// $.ajax({
+		// 	url: "/business/personalMerchant/downloadWorOrder?url="+url,
+		// 	// data: data,
+		// 	type: "get",
+		// 	// datatype:"json",
+		// 	contentType: 'application/json',
+		// 	success: function(result) {
+		// 		console.log(result)
+		// 		// if(result.code === 0){
+		// 		// 	$.modal.msgSuccess(result.msg)
+		// 		// }else {
+		// 		// 	$.modal.msgError(result.msg)
+		// 		// }
+		// 	}
+		// })
+	}
+	// 关闭工单
+	function closeOrder() {
+        $.ajax({
+            url: "/business/personalMerchant/closeWorkOrder?workOrderSerialNumber="+workOrderSerialNumber,
+            // data: data,
+            type: "get",
+            // datatype:"json",
+            contentType: 'application/json',
+            success: function(result) {
+                if(result.code === 0){
+                    $.modal.msgSuccess(result.msg)
+                }else {
+                    $.modal.msgError(result.msg)
+                }
+                $.operate.successTabCallback(result);
+            }
+        })
+	}
+	//  处理工单
+	function dealOrder() {
+        $.ajax({
+            url: "/business/personalMerchant/disPoseWorkOrder?workOrderSerialNumber="+workOrderSerialNumber,
+            // data: data,
+            type: "get",
+            // datatype:"json",
+            contentType: 'application/json',
+            success: function(result) {
+                if(result.code === 0){
+                    $.modal.msgSuccess(result.msg)
+                }else {
+                    $.modal.msgError(result.msg)
+                }
+                $.operate.successTabCallback(result);
+            }
+        })
+	}
+</script>
+</body>
+</html>

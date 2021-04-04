@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <th:block th:include="include :: header('首页')" />
+    <link th:href="@{/css/style.css}" rel="stylesheet"/>
+    <link th:href="@{/css/month.css}" rel="stylesheet"/>
+</head>
+
+<body class="gray-bg">
+
+<span id="roleId" style="display: none">[[${user.roles[0].roleId}]]</span>
+<span id="roleKey" style="display: none" >[[${user.roles[0].roleKey}]]</span>
+
+    <div class="layui-fluid dataadmin" style="display: none" >
+        <div style="height: 520px; align-content: center">
+                <H1 >
+                    <p align="center" >欢迎您来到企业数据平台</p>
+                </H1>
+        </div>
+    </div>
+    <div class="layui-fluid system">
+        <div class="layui-left-top" style="height: 220px">
+            <div class="left-top-content">
+                <h3>
+                    <p>本月累计打款：<span class="content-price amount1"></span>元</p>
+                    <p>本月完成打款：<span class="content-price orderNum1"></span>笔</p>
+                </h3>
+                <div class="content-box">
+                    <ul>
+                        <li><p><img th:src="@{/img/bank.png}" alt="">月度银行卡</p><h4><span class="monthly1"></span></h4></li>
+                        <li><p><img th:src="@{/img/applay.png}" alt="">月度支付宝</p><h4><span class="monthly2"></span></h4></li>
+                        <li><p><img th:src="@{/img/wx.png}" alt="">月度微信</p><h4><span class="monthly3"></span></h4></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="layui-left-top" style="height: 220px">
+            <div class="left-top-content">
+                <h3>
+                    <p>累计打款：<span class="content-price amount"></span>元</p>
+                    <p>累计完成打款：<span class="content-price orderNum"></span>笔</p>
+                </h3>
+                <div class="content-box">
+                    <ul>
+                        <li><p><img th:src="@{/img/bank.png}" alt="">累计银行卡</p><h4><span class="bank"></span></h4></li>
+                        <li><p><img th:src="@{/img/applay.png}" alt="">累计支付宝</p><h4><span class="applay"></span></h4></li>
+                        <li><p><img th:src="@{/img/wx.png}" alt="">累计微信</p><h4><span class="wx"></span></h4></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="layui-right-top"  style="height: 460px">
+            <h3>累计扣税</h3>
+            <div id="addUse" style="height: 380px;overflow: hidden;"></div>
+        </div>
+        <div class="layui-bottom-right" style="height: 460px">
+            <h3>年度消费走势图</h3>
+            <div id="xse" style="height: 400px; margin-top: 20px; -webkit-tap-highlight-color: transparent; user-select: none; position: relative;"></div>
+        </div>
+    </div>
+    <div class="sales layui-fluid">
+        <div class="layui-left-top" style="height: 360px">
+            <div class="left-top-content">
+                <h3>
+                    <p>累计打款：<span class="content-price amount"></span>元</p>
+                    <p>累计打款笔数：<span class="content-price orderNum"></span>笔</p>
+                    <p>累计服务费：<span class="content-price taxFeeValue"></span>元</p>
+                </h3>
+                <div class="content-box">
+                    <ul>
+                        <li><p>今日交易金额</p><h4><span class="todayAmount"></span></h4></li>
+                        <li><p>今日服务费</p><h4><span class="todayServiceAmount"></span></h4></li>
+                        <li><p>今日订单笔数</p><h4><span class="todayOrderCount"></span></h4></li>
+                        <li><p>当月交易金额</p><h4><span class="monthAmount"></span></h4></li>
+                        <li><p>当月服务费</p><h4><span class="monthServiceAmount"></span></h4></li>
+                        <li><p>当月订单笔数</p><h4><span class="monthOrderCount"></span></h4></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="layui-right-top"  style="height: 460px">
+            <h3>累计扣税</h3>
+            <div id="Pie" style="height: 380px;overflow: hidden;"></div>
+        </div>
+        <div class="layui-bottom-right" style="height: 460px">
+            <h3>
+                <select name="consumption" id="selectconsumption" style="width:160px;height: 30px;padding-left: 10px;color:#333;font-weight: 400">
+                    <option value="0">年消费走势图</option>
+                    <option value="1">月消费走势图</option>
+                </select>
+                <div style="float: right;">
+                    <div class="month">
+                        <select name="selectDate" id="year" style="width:160px;height: 30px;padding-left: 10px;color:#333;font-weight: 400">
+                        </select>
+                        <a class="btn btn-primary btn-rounded btn-sm" onclick="yearPaidStatistics()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+                    </div>
+                    <div class="day" style="display: none">
+                        <input type="text" class="input" name="selectDate" id="monthly" onfocus="focus1()" style="width:160px;height: 30px;padding-left: 10px;color:#333;font-weight: 400" placeholder="请选择时间" autocomplete="off">
+                        <a class="btn btn-primary btn-rounded btn-sm" onclick="getDay()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+                    </div>
+                </div>
+            </h3>
+            <div id="consumption" style="height: 400px; margin-top: 20px; -webkit-tap-highlight-color: transparent; user-select: none; position: relative;"></div>
+        </div>
+    </div>
+    <script th:src="@{/js/jquery.min.js}"></script>
+    <script th:src="@{/js/echarts.min.js}"></script>
+    <script th:src="@{/js/echartsTheme.js}"></script>
+    <script th:src="@{/js/month.js}"></script>
+    <th:block th:include="include :: footer" />
+    <script>
+        var roleId = $("#roleId").text()
+        var roleKey =$("#roleKey").text();
+        if(roleKey == "enterpriseDataManagement"){
+            $(".system").css("display","none")
+            $(".sales").css("display","none")
+            $(".dataadmin").css("display","block")
+        }else if(roleId != 1 ){
+            var paymentAmount = []
+            var monthNo = []
+            $(".system").css("display","none")
+            $(".sales").css("display","block")
+            $.get("/manager/index/cumulativePaymentBySale",function (data) {
+                $(".amount").text(data.data.amount)
+                $(".orderNum").text(data.data.orderNum)
+                $(".taxFeeValue").text(data.data.taxFeeValue)
+                var taxFeeValue = parseInt(data.data.taxFeeValue)
+                var amount = parseInt(data.data.amount)
+                var myCharts2 = echarts.init(document.getElementById('Pie'), myEchartsTheme);
+                var option2 = {
+                    color: ['#6C67FF', '#3075FC'],
+                    tooltip: {
+                        trigger: 'item'
+                    },
+                    legend: {
+                        orient: 'vertical',
+                        x: 'right',
+                        data: ['累计扣税', '累计打款',]
+                    },
+                    series: [
+                        {
+                            name: '',
+                            type: 'pie',
+                            radius: [30, 110],
+                            label: {
+                                emphasis: {
+                                    show: true,
+                                    textStyle: {
+                                        fontSize: '30',
+                                        fontWeight: 'bold'
+                                    }
+                                }
+                            },
+                            data: [
+                                {value: taxFeeValue, name: '累计扣税'},
+                                {value: amount, name: '累计打款'},
+                            ]
+                        }
+                    ]
+                }
+                myCharts2.setOption(option2);
+            })
+            $.get("/manager/index/getSaleStatistics",function (data) {
+                $(".monthAmount").text(data.data.monthAmount)
+                $(".monthOrderCount").text(data.data.monthOrderCount)
+                $(".monthServiceAmount").text(data.data.monthServiceAmount)
+                $(".todayAmount").text(data.data.todayAmount)
+                $(".todayOrderCount").text(data.data.todayOrderCount)
+                $(".todayServiceAmount").text(data.data.todayServiceAmount)
+            })
+            $("#selectconsumption").change(function () {
+                var selectconsumption = $("#selectconsumption").val()
+                paymentAmount = []
+                monthNo = []
+                if(selectconsumption == 1) {
+                    $(".month").css("display","none")
+                    $(".day").css("display","block")
+                }else{
+                    $(".month").css("display","block")
+                    $(".day").css("display","none")
+                    yearPaidStatistics()
+                }
+            })
+            var nowyear = new Date().getFullYear()
+            $.get("/manager/index/getMerchantYearPaidStatistics?selectDate="+nowyear,function (data) {
+                var arr = data.data
+                arr.forEach(function(item){
+                    paymentAmount.push(item.date)
+                    monthNo.push(item.amount)
+                })
+                myCharts3.setOption(option3);
+            })
+            var myCharts3 = echarts.init(document.getElementById('consumption'), myEchartsTheme);
+            var option3 = {
+                xAxis: {
+                    boundaryGap: false,
+                    data: paymentAmount
+                },
+                yAxis: {
+                    type: 'value'
+                },
+                color: ['#3075FC'],
+                series: {
+                    data: monthNo,
+                    type: 'line',
+                    smooth: true,
+                    areaStyle: {
+                        normal: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                { offset: 0, color: 'blue' },
+                                { offset: 1, color: 'white' }
+                            ])
+                        }
+                    }
+                }
+            }
+        }else {
+            $(".system").css("display","block")
+            $(".sales").css("display","none")
+            var paymentAmount = []
+            var monthNo = []
+            $.get("/manager/index/cumulativePaymentBySale",function (data) {
+
+                $(".amount").text(data.data.amount)
+                $(".orderNum").text(data.data.orderNum)
+                $(".bank").text(data.data.bankAmount)
+                $(".applay").text(data.data.aLiPayAmount)
+                $(".wx").text(data.data.weChatAmount)
+                var taxFeeValue = parseInt(data.data.taxFeeValue)
+                var amount = parseInt(data.data.amount)
+                var myCharts2 = echarts.init(document.getElementById('addUse'), myEchartsTheme);
+                var option2 = {
+                    color: ['#6C67FF', '#3075FC'],
+                    title: { text: '' },
+                    tooltip: {
+                        trigger: 'item'
+                    },
+                    legend: {
+                        orient: 'vertical',
+                        x: 'right',
+                        data: ['累计扣税', '累计打款',]
+                    },
+                    series: [
+                        {
+                            name: '',
+                            type: 'pie',
+                            radius: [30, 110],
+                            label: {
+                                emphasis: {
+                                    show: true,
+                                    textStyle: {
+                                        fontSize: '30',
+                                        fontWeight: 'bold'
+                                    }
+                                }
+                            },
+                            data: [
+                                {value: taxFeeValue, name: '累计扣税'},
+                                {value: amount, name: '累计打款'},
+                            ]
+                        }
+                    ]
+                }
+                myCharts2.setOption(option2);
+            })
+            $.get("/manager/index/monthAmount",function (data) {
+                var arr = data.data
+                arr.forEach(function(item){
+                    paymentAmount.push(item.month)
+                    monthNo.push(item.amount)
+                })
+                myCharts3.setOption(option3);
+            })
+            $.get("/manager/index/monthPayment",function (data) {
+                $(".amount1").text(data.data.amount)
+                $(".orderNum1").text(data.data.orderNum)
+                $(".monthly1").text(data.data.bankAmount)
+                $(".monthly2").text(data.data.aLiPayAmount)
+                $(".monthly3").text(data.data.weChatAmount)
+
+            })
+
+            var myCharts3 = echarts.init(document.getElementById('xse'), myEchartsTheme);
+            var option3 = {
+                title: { text: '' },
+                tooltip: {
+                    trigger: 'axis'
+                },
+                xAxis: {
+                    boundaryGap: false,
+                    data: paymentAmount
+                },
+                yAxis: {
+                    type: 'value'
+                },
+                color: ['#3075FC'],
+                series: {
+                    data: monthNo,
+                    type: 'line',
+                    smooth: true,
+                    areaStyle: {
+                        normal: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                { offset: 0, color: 'blue' },
+                                { offset: 1, color: 'white' }
+                            ])
+                        }
+                    }
+                }
+            }
+        }
+        function focus1() {
+            if ($('.monthpicker')) {
+                $(".monthpicker").remove();
+            }
+            var y ,_dates= $('#monthly').val();
+            if (_dates) {
+                var _time = _dates.split('-');
+                y = _time[0];
+            }
+            $('#monthly').monthpicker({
+                selectYears: y ? y : '',
+                onMonthSelect: function(m, y) {
+                    console.log('Month: ' + m + ', year: ' + y);
+                }
+            })
+
+        }
+        var nowy = new Date().getFullYear(),
+            whYears = [];
+        for (var i = nowy - 20; i < nowy + 30; i++) {
+            whYears.push(i);
+        }
+        var yearhtml = ''
+        whYears.forEach(function (item) {
+            if(nowy == item) {
+                yearhtml += '<option value="' + item + '" selected>' + item + '</option>'
+            }else {
+                yearhtml += '<option value="' + item + '">' + item + '</option>'
+            }
+        })
+        $("#year").append(yearhtml)
+        function yearPaidStatistics() {
+            var yeara = $("#year option:selected").val()
+            var paymentAmount = []
+            var monthNo = []
+            $.get("/manager/index/getMerchantYearPaidStatistics?selectDate="+yeara,function (data) {
+                var arr = data.data
+                arr.forEach(function(item){
+                    paymentAmount.push(item.date)
+                    monthNo.push(item.amount)
+                })
+                myCharts3.setOption(option3);
+            })
+            var myCharts3 = echarts.init(document.getElementById('consumption'), myEchartsTheme);
+            var option3 = {
+                tooltip: {
+                    trigger: 'axis'
+                },
+                xAxis: {
+                    boundaryGap: false,
+                    data: paymentAmount
+                },
+                yAxis: {
+                    type: 'value'
+                },
+                color: ['#3075FC'],
+                series: {
+                    data: monthNo,
+                    type: 'line',
+                    smooth: true,
+                    areaStyle: {
+                        normal: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                { offset: 0, color: 'blue' },
+                                { offset: 1, color: 'white' }
+                            ])
+                        }
+                    }
+                }
+            }
+        }
+        function getDay() {
+            var dayDate = $("#monthly").val()
+            var paymentAmount = []
+            var monthNo = []
+            if (dayDate == '') {
+                $.modal.msgWarning("时间选择不能为空")
+                return
+            }
+            $.get("/manager/index/getMerchantMonthPaidStatistics?selectDate="+dayDate,function (data) {
+                var arr = data.data
+                arr.forEach(function(item){
+                    paymentAmount.push(item.date)
+                    monthNo.push(item.amount)
+                })
+                myCharts3.setOption(option3);
+            })
+            var myCharts3 = echarts.init(document.getElementById('consumption'), myEchartsTheme);
+            var option3 = {
+                tooltip: {
+                    trigger: 'axis'
+                },
+                xAxis: {
+                    boundaryGap: false,
+                    data: paymentAmount
+                },
+                yAxis: {
+                    type: 'value'
+                },
+                color: ['#3075FC'],
+                series: {
+                    data: monthNo,
+                    type: 'line',
+                    smooth: true,
+                    areaStyle: {
+                        normal: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                { offset: 0, color: 'blue' },
+                                { offset: 1, color: 'white' }
+                            ])
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+<script>
+    $.fn.monthpicker = function(options) {
+        // 获取当前年份
+        var now = new Date().getFullYear(),
+            _whYears = [];
+        for (var i = now - 20; i < now + 50; i++) {
+            _whYears.push(i);
+        }
+        options.years = _whYears;
+        // 获取当前月份
+        var nowMonth = new Date().getMonth() + 1;
+        // 月份所有按钮
+        var allButtons = [];
+
+        var months = options.months || ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'],
+
+            Monthpicker = function(el) {
+                this._el = $(el);
+                this._init();
+                this._render();
+                this._renderYears();
+                this._renderMonths();
+                this._bind();
+                allButtons = $('.monthpicker table button');
+            };
+
+        Monthpicker.prototype = {
+            destroy: function() {
+                this._el.off('click');
+                this._yearsSelect.off('click');
+                this._container.off('click');
+                $(document).off('click', $.proxy(this._hide, this));
+                this._container.remove();
+            },
+
+            _init: function() {
+                this._el.html(options.years[0] + '-' + months[0]);
+                this._el.data('monthpicker', this);
+            },
+
+            _bind: function() {
+                this._el.on('click', $.proxy(this._show, this));
+                $(document).on('click', $.proxy(this._hide, this));
+                this._yearsSelect.on('click', function(e) { e.stopPropagation(); });
+                $('#whSelect').change(function() {
+                    var selectYear = $(this).children('option:selected').val();
+                    $.each(allButtons, function(i, button) {
+                        if (selectYear == now) {
+                            if (nowMonth - 1 == i) {
+                                button.setAttribute('class', 'nowMonth');
+                            } else {
+                                button.setAttribute('class', '');
+                            }
+                        } else {
+                            button.setAttribute('class', '');
+                        }
+                    });
+                })
+                this._container.on('click', 'button', $.proxy(this._selectMonth, this));
+            },
+
+            _show: function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                this._container.css('display', 'inline-block');
+                var currMonth = this._el.attr("month");
+                if (currMonth) {
+                    $.each(allButtons, function(i, button) {
+                        if (button.innerHTML == currMonth) {
+                            button.setAttribute('class', 'curr');
+                        } else {
+                            button.removeAttribute('class', 'curr');
+                        }
+                    });
+                }
+                var selectYear = $("#whSelect").children('option:selected').val();
+                $.each(allButtons, function(i, button) {
+                    if (now == selectYear) {
+                        if (nowMonth - 1 == i) {
+                            button.classList.add("nowMonth");
+                        }
+                    } else {
+                        button.classList.remove("nowMonth");
+                    }
+                });
+            },
+
+            _hide: function() {
+                this._container.css('display', 'none');
+            },
+
+            _selectMonth: function(e) {
+                var monthIndex = $(e.target).data('value'),
+                    month = months[monthIndex],
+                    year = this._yearsSelect.val();
+                if (this._el.attr('type') == "text") {
+                    this._el.attr("value", year + '-' + month);
+                } else {
+                    this._el.html(year + '-' + month);
+                }
+                if (options.onMonthSelect) {
+                    this._el.attr("month", month);
+                    options.onMonthSelect(monthIndex, year);
+                }
+            },
+
+            _render: function() {
+                var boxOffset = this._el.offset(),
+                    cssOptions = {
+                        display: 'none',
+                        position: 'absolute',
+                        top: boxOffset.top + this._el.height() + 15,
+                        left: boxOffset.left
+                    };
+                var _dowHeight = $(document).height() - (cssOptions.top);
+                if (_dowHeight < 165) { // 165为月份插件的高度
+                    cssOptions.top = boxOffset.top - 170;
+                }
+
+                this._id = (new Date).valueOf();
+                this._container = $('<div class="monthpicker" id="monthpicker-' + this._id + '">')
+                    .css(cssOptions)
+                    .appendTo($('body'));
+            },
+
+            _renderYears: function() {
+                var markup = $.map(options.years, function (year) {
+                    if (options.selectYears) {
+                        if (options.selectYears == year) {
+                            return '<option selected>' + options.selectYears + '</option>';
+                        }
+                    } else {
+                        if (now == year) {
+                            return '<option selected>' + year + '</option>';
+                        }
+                    }
+                    return '<option>' + year + '</option>';
+                });
+                var yearsWrap = $('<div class="years">').appendTo(this._container);
+                this._yearsSelect = $('<select id="whSelect">').html(markup.join('')).appendTo(yearsWrap);
+            },
+
+            _renderMonths: function() {
+                var markup = ['<table>', '<tr>'];
+                $.each(months, function(i, month) {
+                    if (i > 0 && i % 4 === 0) {
+                        markup.push('</tr>');
+                        markup.push('<tr>');
+                    }
+                    markup.push('<td><button data-value="' + i + '">' + month + '</button></td>');
+                });
+                markup.push('</tr>');
+                markup.push('</table>');
+                this._container.append(markup.join(''));
+            }
+        };
+
+        var methods = {
+            destroy: function() {
+                var monthpicker = this.data('monthpicker');
+                if (monthpicker) monthpicker.destroy();
+                return this;
+            }
+        }
+
+        if (methods[options]) {
+            return methods[options].apply(this, Array.prototype.slice.call(arguments, 1));
+        } else if (typeof options === 'object' || !options) {
+            return this.each(function() {
+                return new Monthpicker(this);
+            });
+        } else {
+            $.error('Method ' + options + ' does not exist on monthpicker');
+        }
+    }
+</script>
+</body>
+</html>
