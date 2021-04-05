@@ -1,7 +1,6 @@
 package com.mmtax.framework.filter;
 
 import com.alibaba.fastjson.JSON;
-import com.mmtax.business.domain.MerchantInfo;
 import com.mmtax.common.constant.RequestContans;
 import com.mmtax.common.context.ApiContext;
 import com.mmtax.common.core.domain.AjaxResult;

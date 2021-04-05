@@ -103,12 +103,6 @@
             <artifactId>mmtax-framework</artifactId>
         </dependency>
 
-        <!-- app模块-->
-        <dependency>
-            <groupId>com.mmtax</groupId>
-            <artifactId>mmtax-merchant</artifactId>
-            <version>${mmtax.version}</version>
-        </dependency>
         
         <!-- 定时任务-->
         <dependency>
@@ -125,6 +119,20 @@
             <groupId>javax.ws.rs</groupId>
             <artifactId>javax.ws.rs-api</artifactId>
             <version>2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-test</artifactId>
+            <version>2.1.1.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <version>5.1.3.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
         </dependency>
 
     </dependencies>

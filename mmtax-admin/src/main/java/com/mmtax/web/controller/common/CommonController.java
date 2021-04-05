@@ -1,25 +1,14 @@
 package com.mmtax.web.controller.common;
 
-import cn.hutool.core.date.DateTime;
-import cn.hutool.core.date.DateUtil;
-import com.mmtax.business.domain.PersonalMerchant;
-import com.mmtax.business.dto.DownloadCredentialDTO;
-import com.mmtax.business.mapper.PersonalMerchantMapper;
-import com.mmtax.business.mapper.TrxOrderMapper;
 import com.mmtax.common.config.Global;
 import com.mmtax.common.config.ServerConfig;
 import com.mmtax.common.core.domain.AjaxResult;
-import com.mmtax.common.exception.BusinessException;
-import com.mmtax.common.utils.DateUtils;
 import com.mmtax.common.utils.StringUtils;
-import com.mmtax.common.utils.file.DownLoadUtils;
 import com.mmtax.common.utils.file.FileUploadUtils;
 import com.mmtax.common.utils.file.FileUtils;
 import com.mmtax.common.utils.file.PictureUploadUtils;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +24,6 @@ import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
-import java.util.Date;
 
 /**
  * 通用请求处理
@@ -74,12 +62,6 @@ public class CommonController {
 
     @Autowired
     private ServerConfig serverConfig;
-
-    @Autowired
-    TrxOrderMapper trxOrderMapper;
-
-    @Resource
-    private PersonalMerchantMapper personalMerchantMapper;
 
     /**
      * 通用下载请求
@@ -206,78 +188,78 @@ public class CommonController {
         }
     }
 
-    /**
-     * 下载身份证和营业执照图片请求
-     */
-    @ApiOperation("营业执照下载")
-    @PostMapping("/common/downloadLicense")
-    @ResponseBody
-    public AjaxResult downloadLicense(HttpServletResponse response,Integer applyId) throws Exception {
-        try {
-            PersonalMerchant personalMerchant = personalMerchantMapper.selectByPrimaryKey(applyId);
-            DownLoadUtils.downloadByByte(response,personalMerchant.getBusinessLicense());
-            return AjaxResult.success();
-        } catch (Exception e) {
-            return AjaxResult.error(e.getMessage());
-        }
-    }
-
-    /**
-     * 下载交易凭证
-     * @param response
-     * @param request
-     */
-    @GetMapping("common/downloadCredential")
-    public void credentialDownload(String orderSerialNum,HttpServletResponse response, HttpServletRequest request) {
-        if(StringUtils.isEmpty(orderSerialNum)){
-            return;
-        }
-        DownloadCredentialDTO downloadCredential = trxOrderMapper.selectCreateTimeAndPidByorderSerialNum(orderSerialNum);
-        String pid = downloadCredential.getPid();
-        String createDate= DateUtil.format(DateUtil.parse(downloadCredential.getCreateTime()), DateUtils.YYYYMMDD);
-
-
-        String filePath = CREDENTIAL_DOWNLOAD_PATH + pid + File.separator + createDate + File.separator  ;
-        orderSerialNum = orderSerialNum + SUFFIX_PDF;
-        String fileName = "";
-        //测试用 上线删
-        //  String filePath = "E:\\download\\xx\\xxxx\\download\\";
-        File file = new File(filePath);
-        File files[] = file.listFiles();
-        if(null == files){
-            throw new BusinessException("系统暂未生成你想要的交易凭证，请联系管理员");
-        }
-        boolean isFind = true;
-        for (int i = 0; i < files.length; i++) {
-            File fs = files[i];
-            fileName = fs.getName();
-
-            if(!SUFFIX_ZIP.equals(fileName.substring(fileName.lastIndexOf("."))) &&
-                    fileName.substring(41).equals(orderSerialNum)){
-                filePath = filePath + File.separator + fileName;
-                isFind = false;
-                break;
-            }
-
-        }
-        if(isFind){
-            throw new BusinessException("系统暂未生成你想要的交易凭证，请联系管理员");
-        }
-
-
-        try {
-
-            response.setCharacterEncoding("utf-8");
-            response.setContentType("multipart/form-data");
-            response.setHeader("Content-Disposition",
-                    "attachment;fileName=" + FileUtils.setFileDownloadHeader(request, fileName));
-            FileUtils.writeBytes(filePath, response.getOutputStream());
-
-        } catch (Exception e) {
-            log.error("下载文件失败", e);
-        }
-
-    }
+//    /**
+//     * 下载身份证和营业执照图片请求
+//     */
+//    @ApiOperation("营业执照下载")
+//    @PostMapping("/common/downloadLicense")
+//    @ResponseBody
+//    public AjaxResult downloadLicense(HttpServletResponse response,Integer applyId) throws Exception {
+//        try {
+//            PersonalMerchant personalMerchant = personalMerchantMapper.selectByPrimaryKey(applyId);
+//            DownLoadUtils.downloadByByte(response,personalMerchant.getBusinessLicense());
+//            return AjaxResult.success();
+//        } catch (Exception e) {
+//            return AjaxResult.error(e.getMessage());
+//        }
+//    }
+//
+//    /**
+//     * 下载交易凭证
+//     * @param response
+//     * @param request
+//     */
+//    @GetMapping("common/downloadCredential")
+//    public void credentialDownload(String orderSerialNum,HttpServletResponse response, HttpServletRequest request) {
+//        if(StringUtils.isEmpty(orderSerialNum)){
+//            return;
+//        }
+//        DownloadCredentialDTO downloadCredential = trxOrderMapper.selectCreateTimeAndPidByorderSerialNum(orderSerialNum);
+//        String pid = downloadCredential.getPid();
+//        String createDate= DateUtil.format(DateUtil.parse(downloadCredential.getCreateTime()), DateUtils.YYYYMMDD);
+//
+//
+//        String filePath = CREDENTIAL_DOWNLOAD_PATH + pid + File.separator + createDate + File.separator  ;
+//        orderSerialNum = orderSerialNum + SUFFIX_PDF;
+//        String fileName = "";
+//        //测试用 上线删
+//        //  String filePath = "E:\\download\\xx\\xxxx\\download\\";
+//        File file = new File(filePath);
+//        File files[] = file.listFiles();
+//        if(null == files){
+//            throw new BusinessException("系统暂未生成你想要的交易凭证，请联系管理员");
+//        }
+//        boolean isFind = true;
+//        for (int i = 0; i < files.length; i++) {
+//            File fs = files[i];
+//            fileName = fs.getName();
+//
+//            if(!SUFFIX_ZIP.equals(fileName.substring(fileName.lastIndexOf("."))) &&
+//                    fileName.substring(41).equals(orderSerialNum)){
+//                filePath = filePath + File.separator + fileName;
+//                isFind = false;
+//                break;
+//            }
+//
+//        }
+//        if(isFind){
+//            throw new BusinessException("系统暂未生成你想要的交易凭证，请联系管理员");
+//        }
+//
+//
+//        try {
+//
+//            response.setCharacterEncoding("utf-8");
+//            response.setContentType("multipart/form-data");
+//            response.setHeader("Content-Disposition",
+//                    "attachment;fileName=" + FileUtils.setFileDownloadHeader(request, fileName));
+//            FileUtils.writeBytes(filePath, response.getOutputStream());
+//
+//        } catch (Exception e) {
+//            log.error("下载文件失败", e);
+//        }
+//
+//    }
 
 
     @ApiOperation("测试下载图片")

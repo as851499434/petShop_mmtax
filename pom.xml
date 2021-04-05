@@ -194,12 +194,6 @@
 				<version>${mmtax.version}</version>
 			</dependency>
 
-			<!-- 核心模块-->
-			<dependency>
-				<groupId>com.mmtax</groupId>
-				<artifactId>mmtax-merchant</artifactId>
-				<version>${mmtax.version}</version>
-			</dependency>
 			
 	        <!-- 系统模块-->
 			<dependency>
@@ -225,7 +219,7 @@
 		<module>mmtax-quartz</module>
 		<module>mmtax-generator</module>
         <module>mmtax-common</module>
-        <module>mmtax-merchant</module>
+<!--        <module>mmtax-merchant</module>-->
     </modules>
     <packaging>pom</packaging>
 
