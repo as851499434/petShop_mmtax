@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mmtax.business.mapper.PetInfoMapper">
+    
+    <resultMap type="PetInfo" id="PetInfoResult">
+        <result property="id"    column="id"    />
+        <result property="masterId"    column="master_id"    />
+        <result property="petName"    column="pet_name"    />
+        <result property="petType"    column="pet_type"    />
+        <result property="petSex"    column="pet_sex"    />
+        <result property="petAge"    column="pet_age"    />
+        <result property="petInfoType"    column="pet_info_type"    />
+        <result property="photo"    column="photo"    />
+        <result property="remake"    column="remake"    />
+        <result property="delStatus"    column="del_status"    />
+        <result property="providerId"    column="provider_id"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+    <select id="selectPetInfoList"
+            resultMap="PetInfoResult"
+            parameterType="com.mmtax.business.dto.PetInfoQueryDTO">
+        SELECT
+            id,
+            pet_name,
+            pet_type,
+            pet_sex,
+            pet_age,
+            pet_info_type,
+            photo,
+            remake,
+            del_status,
+            provider_id,
+            create_time,
+            update_time
+            FROM
+            tbl_pet_info
+        WHERE
+            1 = 1
+        AND del_status = 0
+        <if test="petName != null and petName != ''">
+            and pet_name like concat('%',#{petName},'%')
+        </if>
+        <if test="petType != null and petType != ''">
+            and pet_type like concat('%',#{petType},'%')
+        </if>
+        <if test="petInfoType != null and petInfoType != ''">
+            and pet_info_type like concat('%',#{petInfoType},'%')
+        </if>
+        <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+            and create_time between concat(#{startDate},' 00:00:00') and concat(#{endDate}, ' 23:59:59')
+        </if>
+        order by
+        create_time desc
+    </select>
+
+</mapper>
