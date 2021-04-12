@@ -15,35 +15,11 @@
 							</li>
 
 							<li>
-								年龄：<input type="text" name="age"/>
-							</li>
-
-							<li>
-								性别 0 男 1 女 2 未知：<input type="text" name="sex"/>
-							</li>
-
-							<li>
 								手机号：<input type="text" name="phonenumber"/>
 							</li>
 
 							<li>
 								邮箱地址：<input type="text" name="email"/>
-							</li>
-
-							<li>
-								居住地址：<input type="text" name="adress"/>
-							</li>
-
-							<li>
-								：<input type="text" name="providerId"/>
-							</li>
-
-							<li>
-								创建时间：<input type="text" name="createTime"/>
-							</li>
-
-							<li>
-								更新时间：<input type="text" name="updateTime"/>
 							</li>
 
 							<li>
@@ -65,9 +41,6 @@
 				<a class="btn btn-danger btn-del btn-del disabled" onclick="$.operate.removeAll()" shiro:hasPermission="business:petMasterInfo:remove">
 					<i class="fa fa-remove"></i> 删除
 				</a>
-				<a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="business:petMasterInfo:export">
-						<i class="fa fa-download"></i> 导出
-				 </a>
 			</div>
 			<div class="col-sm-12 select-table table-striped">
 				<table id="bootstrap-table" data-mobile-responsive="true"></table>
@@ -100,47 +73,34 @@
 				{
 					field : 'name', 
 					title : '姓名',
-					sortable: true
 				},
 				{
 					field : 'age', 
 					title : '年龄',
-					sortable: true
 				},
 				{
 					field : 'sex', 
-					title : '性别 0 男 1 女 2 未知',
-					sortable: true
+					title : '性别',
 				},
 				{
 					field : 'phonenumber', 
 					title : '手机号',
-					sortable: true
 				},
 				{
 					field : 'email', 
 					title : '邮箱地址',
-					sortable: true
 				},
 				{
 					field : 'adress', 
 					title : '居住地址',
-					sortable: true
-				},
-				{
-					field : 'providerId', 
-					title : '',
-					sortable: true
 				},
 				{
 					field : 'createTime', 
 					title : '创建时间',
-					sortable: true
 				},
 				{
 					field : 'updateTime', 
 					title : '更新时间',
-					sortable: true
 				},
 		        {
 		            title: '操作',

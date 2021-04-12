@@ -6,6 +6,7 @@ import com.mmtax.business.dto.AddPetAndMasterInfoDto;
 import com.mmtax.business.dto.PetInfoQueryDTO;
 import com.mmtax.business.mapper.PetInfoMapper;
 import com.mmtax.business.mapper.PetMasterInfoMapper;
+import com.mmtax.common.enums.DelStatusEnum;
 import com.mmtax.common.exception.BusinessException;
 import com.mmtax.common.utils.StringUtils;
 import org.springframework.stereotype.Service;
@@ -39,6 +40,14 @@ public class PetInfoServiceImpl implements IPetInfoService
         if (null == dto) {
             throw new BusinessException("传入数据为空");
         }
+        checkPetInfo(dto);
+        //检查主人信息是否重复
+        PetMasterInfo info = new PetMasterInfo();
+        info.setPhonenumber(dto.getPhonenumber());
+        List<PetMasterInfo> infos = petMasterInfoMapper.select(info);
+        if (infos.size() == 0) {
+            throw new BusinessException("主人手机号已存在");
+        }
         //添加宠物主人信息
         PetMasterInfo petMasterInfo = new PetMasterInfo();
         petMasterInfo.setName(dto.getName());
@@ -67,49 +76,60 @@ public class PetInfoServiceImpl implements IPetInfoService
 
     @Override
     public PetInfo selectPetInfoById(Integer id) {
-        return null;
+        PetInfo petInfo = new PetInfo();
+        petInfo.setId(id);
+        PetInfo rPetInfo = petInfoMapper.selectOne(petInfo);
+        return rPetInfo;
     }
 
     @Override
     public int updatePetInfo(PetInfo petInfo) {
-        return 0;
+        petInfo.setUpdateTime(new Date());
+        int i = petInfoMapper.updateByPrimaryKeySelective(petInfo);
+        return i;
     }
 
     @Override
     public int deletePetInfoByIds(String ids) {
-        return 0;
+        List<PetInfo> petInfos = petInfoMapper.selectByIds(ids);
+        for (PetInfo petInfo : petInfos) {
+            petInfo.setDelStatus(DelStatusEnum.DELETE.getCode().toString());
+            petInfo.setUpdateTime(new Date());
+            petInfoMapper.updateByPrimaryKeySelective(petInfo);
+        }
+        return 1;
     }
 
-    private void checkPetInfo(PetInfo petInfo){
-        if (StringUtils.isEmpty(petInfo.getPetName())) {
+    private void checkPetInfo(AddPetAndMasterInfoDto dto){
+        //信息校验
+        if (StringUtils.isEmpty(dto.getPetName())) {
             throw new BusinessException("请输入宠物名字");
         }
-        if (StringUtils.isEmpty(petInfo.getPetType())) {
+        if (StringUtils.isEmpty(dto.getPetType())) {
             throw new BusinessException("请输入宠物种类");
         }
-        if (StringUtils.isEmpty(petInfo.getPetSex().toString())) {
+        if (StringUtils.isEmpty(dto.getPetSex().toString())) {
             throw new BusinessException("请输入宠物性别");
         }
-        if (StringUtils.isEmpty(petInfo.getPetAge().toString())) {
+        if (StringUtils.isEmpty(dto.getPetAge().toString())) {
             throw new BusinessException("请输入年龄");
         }
-    }
 
-    private void checkMasterInfo(PetMasterInfo info){
-        if (StringUtils.isEmpty(info.getName())) {
+        if (StringUtils.isEmpty(dto.getName())) {
             throw new BusinessException("请输入姓名");
         }
-        if (StringUtils.isEmpty(info.getAge().toString())) {
+        if (StringUtils.isEmpty(dto.getAge().toString())) {
             throw new BusinessException("请输入年龄");
         }
-        if (StringUtils.isEmpty(info.getSex())) {
+        if (StringUtils.isEmpty(dto.getSex())) {
             throw new BusinessException("请输入性别");
         }
-        if (StringUtils.isEmpty(info.getPhonenumber())) {
+        if (StringUtils.isEmpty(dto.getPhonenumber())) {
             throw new BusinessException("请输入手机号");
         }
-        if (StringUtils.isEmpty(info.getEmail())) {
+        if (StringUtils.isEmpty(dto.getEmail())) {
             throw new BusinessException("请输入邮箱号码");
         }
     }
+
 }
