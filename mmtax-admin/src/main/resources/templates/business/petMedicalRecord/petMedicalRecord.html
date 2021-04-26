@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
 <head>
-	<th:block th:include="include :: header('宠物列表')" />
+	<th:block th:include="include :: header('医疗宠物病历列表')" />
 </head>
 <body class="gray-bg">
      <div class="container-div">
@@ -10,36 +10,20 @@
 				<form id="formId">
 					<div class="select-list">
 						<ul>
+
 							<li>
-								主人名字：<input type="text" name="name"/>
+								主人姓名：<input type="text" name="name"/>
 							</li>
+
 							<li>
-								主人手机号：<input type="text" name="phonenumber"/>
+								手机号：<input type="text" name="phonenumber"/>
 							</li>
+
 							<li>
 								宠物名字：<input type="text" name="petName"/>
 							</li>
-
 							<li>
-								宠物种类：<input type="text" name="petType"/>
-							</li>
-
-							<li>
-								<label>宠物信息类型：</label>
-								<select name="petInfoType" th:with="type=${@dict.getType('pet_info_type')}">
-									<option value="">所有</option>
-									<option th:each="dict : ${type}" th:text="${dict.dictLabel}"
-											th:value="${dict.dictValue}">
-									</option>
-								</select>
-							</li>
-
-							<li class="select-time">
-								<label>创建时间： </label>
-								<input type="text" class="time-input" id="startTime" placeholder="开始时间"
-									   name="startDate" autocomplete="off"/>
-								<span>-</span>
-								<input type="text" class="time-input" id="endTime" placeholder="结束时间" name="endDate" autocomplete="off"/>
+								创建时间：<input type="text" name="createTime"/>
 							</li>
 
 							<li>
@@ -52,13 +36,13 @@
 			</div>
 			
 	        <div class="btn-group-sm" id="toolbar" role="group">
-				<a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="business:petInfo:add">
+				<a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="business:petMedicalRecord:add">
 					<i class="fa fa-plus"></i> 添加
 				</a>
-				<a class="btn btn-primary btn-edit disabled" onclick="$.operate.edit()" shiro:hasPermission="business:petInfo:edit">
+				<a class="btn btn-primary btn-edit disabled" onclick="$.operate.edit()" shiro:hasPermission="business:petMedicalRecord:edit">
 					<i class="fa fa-edit"></i> 修改
 				</a>
-				<a class="btn btn-danger btn-del btn-del disabled" onclick="$.operate.removeAll()" shiro:hasPermission="business:petInfo:remove">
+				<a class="btn btn-danger btn-del btn-del disabled" onclick="$.operate.removeAll()" shiro:hasPermission="business:petMedicalRecord:remove">
 					<i class="fa fa-remove"></i> 删除
 				</a>
 			</div>
@@ -69,12 +53,11 @@
 	</div>
     <div th:include="include :: footer"></div>
     <script th:inline="javascript">
-		var sex = [[${@dict.getType('pet_sex')}]];
+        var editFlag = [[${@permission.hasPermi('business:petMedicalRecord:edit')}]];
+        var removeFlag = [[${@permission.hasPermi('business:petMedicalRecord:remove')}]];
+        var prefix = ctx + "business/petMedicalRecord";
 		var signs = [[${@dict.getType('pet_info_type')}]];
-
-        var editFlag = [[${@permission.hasPermi('business:petInfo:edit')}]];
-        var removeFlag = [[${@permission.hasPermi('business:petInfo:remove')}]];
-        var prefix = ctx + "business/petInfo";
+		var sex = [[${@dict.getType('pet_sex')}]];
 
         $(function() {
             var options = {
@@ -82,8 +65,7 @@
                 createUrl: prefix + "/add",
                 updateUrl: prefix + "/edit/{id}",
                 removeUrl: prefix + "/remove",
-				exportUrl: prefix + "/export",
-                modalName: "宠物",
+                modalName: "医疗宠物病历",
 		        showExport: true,
                 columns: [{
 		            checkbox: true
@@ -102,37 +84,39 @@
 					title : '主人手机号',
 				},
 				{
-					field : 'petName', 
+					field : 'petName',
 					title : '宠物名字',
 				},
 				{
-					field : 'petType', 
+					field : 'petType',
 					title : '宠物种类',
 				},
 				{
-					field : 'petSex', 
+					field : 'petInfoType',
+					title : '宠物信息类型',
+					formatter: function (value, row, index) {
+						return $.table.selectDictLabel(signs, row.petInfoType);
+					}
+				},
+				{
+					field : 'petSex',
 					title : '宠物性别',
 					formatter: function (value, row, index) {
 						return $.table.selectDictLabel(sex, row.petSex);
 					}
 				},
 				{
-					field : 'petAge', 
-					title : '宠物年龄',
+					field : 'disease', 
+					title : '疾病',
 				},
 				{
-					field : 'petInfoType', 
-					title : '宠物信息类型',
-					formatter: function (value, row, index) {
-						return $.table.selectDictLabel(signs, row.petInfoType);
-					}
+					field : 'method', 
+					title : '治疗方法',
 				},
-
-				{
-					field : 'remake', 
-					title : '备注',
-				},
-
+					{
+						field : 'remake',
+						title : '备注',
+					},
 				{
 					field : 'createTime', 
 					title : '创建时间',

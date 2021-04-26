@@ -23,10 +23,11 @@
 				<label class="col-sm-3 control-label">宠物性别：</label>
 				<div class="col-sm-8">
 					<select name="petSex" th:with="type=${@dict.getType('pet_sex')}">
-						<option>请选择</option>
-						<option th:each="dict : ${type}" th:text="${dict.dictLabel}"
-								th:value="${dict.dictValue}">
-						</option>
+						<option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}" th:selected="*{petSex} == ${dict.dictValue}"></option>
+<!--						<option>请选择</option>-->
+<!--						<option th:each="dict : ${type}" th:text="${dict.dictLabel}"-->
+<!--								th:value="${dict.dictValue}">-->
+<!--						</option>-->
 					</select>
 				</div>
 			</div>
@@ -40,10 +41,7 @@
 				<label class="col-sm-3 control-label">宠物信息类型：</label>
 				<div class="col-sm-8">
 					<select name="petInfoType" th:with="type=${@dict.getType('pet_info_type')}">
-						<option>请选择</option>
-						<option th:each="dict : ${type}" th:text="${dict.dictLabel}"
-								th:value="${dict.dictValue}" >
-						</option>
+						<option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}" th:selected="*{petInfoType} == ${dict.dictValue}"></option>
 					</select>
 				</div>
 			</div>

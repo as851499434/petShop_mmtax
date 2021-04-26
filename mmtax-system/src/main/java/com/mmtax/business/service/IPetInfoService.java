@@ -1,7 +1,8 @@
 package com.mmtax.business.service;
 
 import com.mmtax.business.domain.PetInfo;
-import com.mmtax.business.dto.AddPetAndMasterInfoDto;
+import com.mmtax.business.dto.AddPetAndMasterInfoDTO;
+import com.mmtax.business.dto.PetInfoDTO;
 import com.mmtax.business.dto.PetInfoQueryDTO;
 
 import java.util.List;
@@ -15,9 +16,9 @@ import java.util.List;
 public interface IPetInfoService
 {
 
-    List<PetInfo> selectPetInfoList(PetInfoQueryDTO queryDTO);
+    List<PetInfoDTO> selectPetInfoList(PetInfoQueryDTO queryDTO);
 
-    int insertPetInfo(AddPetAndMasterInfoDto dto);
+    int insertPetInfo(AddPetAndMasterInfoDTO dto);
 
     PetInfo selectPetInfoById(Integer id);
 

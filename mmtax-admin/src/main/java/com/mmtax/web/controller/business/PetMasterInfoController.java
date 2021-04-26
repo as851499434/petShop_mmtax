@@ -3,6 +3,7 @@ package com.mmtax.web.controller.business;
 import java.util.List;
 
 import com.mmtax.business.domain.PetMasterInfo;
+import com.mmtax.business.dto.PetInfoQueryDTO;
 import com.mmtax.business.service.IPetMasterInfoService;
 import com.mmtax.common.annotation.Log;
 import com.mmtax.common.core.controller.BaseController;
@@ -47,10 +48,10 @@ public class PetMasterInfoController extends BaseController
 	@RequiresPermissions("business:petMasterInfo:list")
 	@PostMapping("/list")
 	@ResponseBody
-	public TableDataInfo list(PetMasterInfo petMasterInfo)
+	public TableDataInfo list(PetInfoQueryDTO queryDTO)
 	{
 		startPage();
-        List<PetMasterInfo> list = petMasterInfoService.selectPetMasterInfoList(petMasterInfo);
+        List<PetMasterInfo> list = petMasterInfoService.selectPetMasterInfoList(queryDTO);
 		return getDataTable(list);
 	}
 

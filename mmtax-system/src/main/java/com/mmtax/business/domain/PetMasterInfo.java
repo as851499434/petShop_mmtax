@@ -35,6 +35,8 @@ public class PetMasterInfo
 	private String email;
 	/** 居住地址 */
 	private String adress;
+	/** 居住地址 */
+	private Integer delStatus;
 	/**  */
 	private Integer providerId;
 	/** 创建时间 */
@@ -42,7 +44,15 @@ public class PetMasterInfo
 	/** 更新时间 */
 	private Date updateTime;
 
-	public void setId(Integer id) 
+	public Integer getDelStatus() {
+		return delStatus;
+	}
+
+	public void setDelStatus(Integer delStatus) {
+		this.delStatus = delStatus;
+	}
+
+	public void setId(Integer id)
 	{
 		this.id = id;
 	}
@@ -152,6 +162,7 @@ public class PetMasterInfo
             .append("sex", getSex())
             .append("phonenumber", getPhonenumber())
             .append("email", getEmail())
+			.append("delStatus", getDelStatus())
             .append("adress", getAdress())
             .append("providerId", getProviderId())
             .append("createTime", getCreateTime())

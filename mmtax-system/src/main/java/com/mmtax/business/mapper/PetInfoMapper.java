@@ -1,6 +1,7 @@
 package com.mmtax.business.mapper;
 
 import com.mmtax.business.domain.PetInfo;
+import com.mmtax.business.dto.PetInfoDTO;
 import com.mmtax.business.dto.PetInfoQueryDTO;
 import com.mmtax.common.utils.MyMapper;
 
@@ -19,5 +20,6 @@ public interface PetInfoMapper extends MyMapper<PetInfo>
      * @param queryDTO
      * @return
      */
-    List<PetInfo> selectPetInfoList(PetInfoQueryDTO queryDTO);
+    List<PetInfoDTO> selectPetInfoList(PetInfoQueryDTO queryDTO);
+
 }

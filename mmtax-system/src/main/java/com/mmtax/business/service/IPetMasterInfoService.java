@@ -1,6 +1,8 @@
 package com.mmtax.business.service;
 
 import com.mmtax.business.domain.PetMasterInfo;
+import com.mmtax.business.dto.PetInfoQueryDTO;
+
 import java.util.List;
 
 /**
@@ -11,7 +13,7 @@ import java.util.List;
  */
 public interface IPetMasterInfoService
 {
-    List<PetMasterInfo> selectPetMasterInfoList(PetMasterInfo petMasterInfo);
+    List<PetMasterInfo> selectPetMasterInfoList(PetInfoQueryDTO queryDTO);
 
     int insertPetMasterInfo(PetMasterInfo petMasterInfo);
 

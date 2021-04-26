@@ -1,17 +1,9 @@
 package com.mmtax.business.dto;
 
-import com.mmtax.business.domain.PetInfo;
-import com.mmtax.business.domain.PetMasterInfo;
 import lombok.Data;
 
-import java.util.Date;
-
-/**
- * @author liangfan
- */
-
 @Data
-public class AddPetAndMasterInfoDto {
+public class AddPetMedicalDTO {
     /** 宠物名字 */
     private String petName;
     /** 宠物种类 */
@@ -24,18 +16,11 @@ public class AddPetAndMasterInfoDto {
     private Integer petInfoType;
     /** 备注 */
     private String remake;
-    /** 姓名 */
-    private String name;
-    /** 年龄 */
-    private Integer age;
-    /** 性别 0 男 1 女 2 未知 */
-    private String sex;
+    /** 疾病*/
+    private String disease;
+    /** 治疗方法 */
+    private String method;
     /** 手机号 */
     private String phonenumber;
-    /** 邮箱地址 */
-    private String email;
-    /** 居住地址 */
-    private String adress;
-
 
 }

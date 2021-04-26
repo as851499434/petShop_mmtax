@@ -3,7 +3,8 @@ package com.mmtax.web.controller.business;
 import java.util.List;
 
 import com.mmtax.business.domain.PetInfo;
-import com.mmtax.business.dto.AddPetAndMasterInfoDto;
+import com.mmtax.business.dto.AddPetAndMasterInfoDTO;
+import com.mmtax.business.dto.PetInfoDTO;
 import com.mmtax.business.dto.PetInfoQueryDTO;
 import com.mmtax.business.service.IPetInfoService;
 import com.mmtax.common.annotation.Log;
@@ -55,7 +56,7 @@ public class PetInfoController extends BaseController
 	public TableDataInfo list(PetInfoQueryDTO queryDTO)
 	{
 		startPage();
-        List<PetInfo> list = petInfoService.selectPetInfoList(queryDTO);
+        List<PetInfoDTO> list = petInfoService.selectPetInfoList(queryDTO);
 		return getDataTable(list);
 	}
 
@@ -76,7 +77,7 @@ public class PetInfoController extends BaseController
 	@Log(title = "宠物", businessType = BusinessType.INSERT)
 	@PostMapping("/add")
 	@ResponseBody
-	public AjaxResult addSave(@RequestBody AddPetAndMasterInfoDto dto)
+	public AjaxResult addSave(@RequestBody AddPetAndMasterInfoDTO dto)
 	{
 		try {
 			petInfoService.insertPetInfo(dto);

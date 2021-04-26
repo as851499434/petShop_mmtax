@@ -2,7 +2,8 @@ package com.mmtax.business.service.impl;
 
 import com.mmtax.business.domain.PetInfo;
 import com.mmtax.business.domain.PetMasterInfo;
-import com.mmtax.business.dto.AddPetAndMasterInfoDto;
+import com.mmtax.business.dto.AddPetAndMasterInfoDTO;
+import com.mmtax.business.dto.PetInfoDTO;
 import com.mmtax.business.dto.PetInfoQueryDTO;
 import com.mmtax.business.mapper.PetInfoMapper;
 import com.mmtax.business.mapper.PetMasterInfoMapper;
@@ -31,37 +32,26 @@ public class PetInfoServiceImpl implements IPetInfoService
     PetMasterInfoMapper petMasterInfoMapper;
 
     @Override
-    public List<PetInfo> selectPetInfoList(PetInfoQueryDTO queryDTO) {
+    public List<PetInfoDTO> selectPetInfoList(PetInfoQueryDTO queryDTO) {
         return petInfoMapper.selectPetInfoList(queryDTO);
     }
 
     @Override
-    public int insertPetInfo(AddPetAndMasterInfoDto dto) {
+    public int insertPetInfo(AddPetAndMasterInfoDTO dto) {
         if (null == dto) {
             throw new BusinessException("传入数据为空");
         }
         checkPetInfo(dto);
-        //检查主人信息是否重复
-        PetMasterInfo info = new PetMasterInfo();
-        info.setPhonenumber(dto.getPhonenumber());
-        List<PetMasterInfo> infos = petMasterInfoMapper.select(info);
-        if (infos.size() == 0) {
-            throw new BusinessException("主人手机号已存在");
-        }
-        //添加宠物主人信息
+        //查找宠物主人信息
         PetMasterInfo petMasterInfo = new PetMasterInfo();
-        petMasterInfo.setName(dto.getName());
-        petMasterInfo.setAge(dto.getAge());
-        petMasterInfo.setSex(dto.getSex());
         petMasterInfo.setPhonenumber(dto.getPhonenumber());
-        petMasterInfo.setEmail(dto.getEmail());
-        petMasterInfo.setAdress(dto.getAdress());
-        petMasterInfo.setCreateTime(new Date());
-        petMasterInfo.setUpdateTime(new Date());
-        petMasterInfoMapper.insertSelective(petMasterInfo);
+        PetMasterInfo masterInfo = petMasterInfoMapper.selectOne(petMasterInfo);
+        if (null == masterInfo) {
+            throw new BusinessException("未找到主人信息,请注册或检查信息是否正确");
+        }
         //添加宠物信息
         PetInfo petInfo = new PetInfo();
-        petInfo.setMasterId(petMasterInfo.getId());
+        petInfo.setMasterId(masterInfo.getId());
         petInfo.setPetName(dto.getPetName());
         petInfo.setPetSex(dto.getPetSex());
         petInfo.setPetAge(dto.getPetAge());
@@ -100,8 +90,11 @@ public class PetInfoServiceImpl implements IPetInfoService
         return 1;
     }
 
-    private void checkPetInfo(AddPetAndMasterInfoDto dto){
+    private void checkPetInfo(AddPetAndMasterInfoDTO dto){
         //信息校验
+        if (StringUtils.isEmpty(dto.getPhonenumber())) {
+            throw new BusinessException("请输入主人手机号");
+        }
         if (StringUtils.isEmpty(dto.getPetName())) {
             throw new BusinessException("请输入宠物名字");
         }
@@ -115,21 +108,6 @@ public class PetInfoServiceImpl implements IPetInfoService
             throw new BusinessException("请输入年龄");
         }
 
-        if (StringUtils.isEmpty(dto.getName())) {
-            throw new BusinessException("请输入姓名");
-        }
-        if (StringUtils.isEmpty(dto.getAge().toString())) {
-            throw new BusinessException("请输入年龄");
-        }
-        if (StringUtils.isEmpty(dto.getSex())) {
-            throw new BusinessException("请输入性别");
-        }
-        if (StringUtils.isEmpty(dto.getPhonenumber())) {
-            throw new BusinessException("请输入手机号");
-        }
-        if (StringUtils.isEmpty(dto.getEmail())) {
-            throw new BusinessException("请输入邮箱号码");
-        }
     }
 
 }
