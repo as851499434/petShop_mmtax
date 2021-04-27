@@ -32,6 +32,8 @@ public class PetSaleRecord
 	private BigDecimal cost;
 	/** 备注 */
 	private String remake;
+	/** 卖出标识 0 是 1 否 */
+	private Integer status;
 	/** 删除标识 0 未删除 1已删除 */
 	private Integer delStatus;
 	/**  */
@@ -41,7 +43,15 @@ public class PetSaleRecord
 	/** 更新时间 */
 	private Date updateTime;
 
-	public void setId(Integer id) 
+	public Integer getStatus() {
+		return status;
+	}
+
+	public void setStatus(Integer status) {
+		this.status = status;
+	}
+
+	public void setId(Integer id)
 	{
 		this.id = id;
 	}

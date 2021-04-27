@@ -59,6 +59,7 @@
         var prefix = ctx + "business/petSaleRecord";
 		var signs = [[${@dict.getType('pet_info_type')}]];
 		var sex = [[${@dict.getType('pet_sex')}]];
+		var info_status = [[${@dict.getType('info_status')}]];
 
         $(function() {
             var options = {
@@ -88,6 +89,10 @@
 				{
 					field : 'petName',
 					title : '宠物名字',
+				},
+				{
+					field : 'petAge',
+					title : '宠物年龄/月',
 				},
 				{
 					field : 'petType',
@@ -123,6 +128,13 @@
 				{
 					field : 'createTime', 
 					title : '创建时间',
+				},
+				{
+					field : 'status',
+					title : '是否卖出',
+					formatter: function (value, row, index) {
+						return $.table.selectDictLabel(info_status, row.status);
+					}
 				},
 		        {
 		            title: '操作',

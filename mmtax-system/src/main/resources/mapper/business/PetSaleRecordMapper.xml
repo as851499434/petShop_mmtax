@@ -10,6 +10,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="price"    column="price"    />
         <result property="cost"    column="cost"    />
         <result property="remake"    column="remake"    />
+        <result property="status"    column="status"    />
         <result property="delStatus"    column="del_status"    />
         <result property="providerId"    column="provider_id"    />
         <result property="createTime"    column="create_time"    />
@@ -31,6 +32,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         c.remake,
         c.price as price,
         c.cost as cost,
+        c.status as status,
         c.del_status as delStatus,
         c.create_time as createTime,
         c.update_time as updateTime

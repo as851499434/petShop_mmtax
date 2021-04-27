@@ -32,6 +32,8 @@ public class PetInfoDTO {
     private String price;
     /** 成本 */
     private String cost;
+    /** 是否标识 0 是 1 否 */
+    private String status;
     /** 删除状态 0 未删除 1 已删除 */
     private String delStatus;
     /** 创建时间 */
