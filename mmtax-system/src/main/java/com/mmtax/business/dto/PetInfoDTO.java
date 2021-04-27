@@ -28,6 +28,10 @@ public class PetInfoDTO {
     private String disease;
     /** 治疗方法 */
     private String method;
+    /** 售价 */
+    private String price;
+    /** 成本 */
+    private String cost;
     /** 删除状态 0 未删除 1 已删除 */
     private String delStatus;
     /** 创建时间 */

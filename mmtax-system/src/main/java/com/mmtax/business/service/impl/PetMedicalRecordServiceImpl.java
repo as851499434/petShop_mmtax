@@ -87,6 +87,7 @@ public class PetMedicalRecordServiceImpl implements IPetMedicalRecordService
 
     @Override
     public int updatePetMedicalRecord(PetMedicalRecord petMedicalRecord) {
+        petMedicalRecord.setUpdateTime(new Date());
         petMedicalRecordMapper.updateByPrimaryKey(petMedicalRecord);
         return 1;
     }
