@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+	<th:block th:include="include :: header('修改宠物寄养记录')" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-petFosterRecord-edit" th:object="${petFosterRecord}">
+            <input id="id" name="id" th:field="*{id}"  type="hidden">
+
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">寄养日期/天：</label>
+				<div class="col-sm-8">
+					<input id="day" name="day" th:field="*{day}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">寄养价格：</label>
+				<div class="col-sm-8">
+					<input id="price" name="price" th:field="*{price}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">备注：</label>
+				<div class="col-sm-8">
+					<input id="remake" name="remake" th:field="*{remake}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">是否已经带回家：</label>
+				<div class="col-sm-8">
+					<select name="status" th:with="type=${@dict.getType('info_status')}">
+						<option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}" th:selected="*{status} == ${dict.dictValue}"></option>
+					</select>
+				</div>
+			</div>
+		</form>
+    </div>
+    <div th:include="include::footer"></div>
+    <script type="text/javascript">
+		var prefix = ctx + "business/petFosterRecord";
+		$("#form-petFosterRecord-edit").validate({
+			rules:{
+				xxxx:{
+					required:true,
+				},
+			},
+			focusCleanup: true
+		});
+		
+		function submitHandler() {
+	        if ($.validate.form()) {
+	            $.operate.save(prefix + "/edit", $('#form-petFosterRecord-edit').serialize());
+	        }
+	    }
+	</script>
+</body>
+</html>

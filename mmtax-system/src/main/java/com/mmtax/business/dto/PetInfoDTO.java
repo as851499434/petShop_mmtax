@@ -34,6 +34,12 @@ public class PetInfoDTO {
     private String cost;
     /** 是否标识 0 是 1 否 */
     private String status;
+    /** 天数 */
+    private String day;
+    /** 结束时间时间 */
+    private Date endTime;
+    /** 剩余时间 */
+    private String remainTime;
     /** 删除状态 0 未删除 1 已删除 */
     private String delStatus;
     /** 创建时间 */

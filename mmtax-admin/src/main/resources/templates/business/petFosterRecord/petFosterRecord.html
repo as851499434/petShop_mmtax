@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
 <head>
-	<th:block th:include="include :: header('医疗宠物病历列表')" />
+	<th:block th:include="include :: header('宠物寄养记录列表')" />
 </head>
 <body class="gray-bg">
      <div class="container-div">
@@ -10,7 +10,6 @@
 				<form id="formId">
 					<div class="select-list">
 						<ul>
-
 							<li>
 								主人姓名：<input type="text" name="name"/>
 							</li>
@@ -30,6 +29,7 @@
 								<input type="text" class="time-input" id="endTime" placeholder="结束时间" name="endDate" autocomplete="off"/>
 							</li>
 
+
 							<li>
 								<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
 								<a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
@@ -40,15 +40,18 @@
 			</div>
 			
 	        <div class="btn-group-sm" id="toolbar" role="group">
-				<a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="business:petMedicalRecord:add">
+				<a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="business:petFosterRecord:add">
 					<i class="fa fa-plus"></i> 添加
 				</a>
-				<a class="btn btn-primary btn-edit disabled" onclick="$.operate.edit()" shiro:hasPermission="business:petMedicalRecord:edit">
+				<a class="btn btn-primary btn-edit disabled" onclick="$.operate.edit()" shiro:hasPermission="business:petFosterRecord:edit">
 					<i class="fa fa-edit"></i> 修改
 				</a>
-				<a class="btn btn-danger btn-del btn-del disabled" onclick="$.operate.removeAll()" shiro:hasPermission="business:petMedicalRecord:remove">
+				<a class="btn btn-danger btn-del btn-del disabled" onclick="$.operate.removeAll()" shiro:hasPermission="business:petFosterRecord:remove">
 					<i class="fa fa-remove"></i> 删除
 				</a>
+				<a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="business:petFosterRecord:export">
+						<i class="fa fa-download"></i> 导出
+				 </a>
 			</div>
 			<div class="col-sm-12 select-table table-striped">
 				<table id="bootstrap-table" data-mobile-responsive="true"></table>
@@ -57,11 +60,12 @@
 	</div>
     <div th:include="include :: footer"></div>
     <script th:inline="javascript">
-        var editFlag = [[${@permission.hasPermi('business:petMedicalRecord:edit')}]];
-        var removeFlag = [[${@permission.hasPermi('business:petMedicalRecord:remove')}]];
-        var prefix = ctx + "business/petMedicalRecord";
+        var editFlag = [[${@permission.hasPermi('business:petFosterRecord:edit')}]];
+        var removeFlag = [[${@permission.hasPermi('business:petFosterRecord:remove')}]];
+        var prefix = ctx + "business/petFosterRecord";
 		var signs = [[${@dict.getType('pet_info_type')}]];
 		var sex = [[${@dict.getType('pet_sex')}]];
+		var info_status = [[${@dict.getType('info_status')}]];
 
         $(function() {
             var options = {
@@ -69,7 +73,8 @@
                 createUrl: prefix + "/add",
                 updateUrl: prefix + "/edit/{id}",
                 removeUrl: prefix + "/remove",
-                modalName: "医疗宠物病历",
+				exportUrl: prefix + "/export",
+                modalName: "宠物寄养记录",
 		        showExport: true,
                 columns: [{
 		            checkbox: true
@@ -79,56 +84,74 @@
 					title : '',
 					visible: false
 				},
-				{
-					field : 'name',
-					title : '主人名字',
-				},
-				{
-					field : 'phonenumber',
-					title : '主人手机号',
-				},
-				{
-					field : 'petName',
-					title : '宠物名字',
-				},
-				{
-					field : 'petAge',
-					title : '宠物年龄/月',
-				},
-				{
-					field : 'petType',
-					title : '宠物种类',
-				},
-				{
-					field : 'petInfoType',
-					title : '宠物信息类型',
-					formatter: function (value, row, index) {
-						return $.table.selectDictLabel(signs, row.petInfoType);
-					}
-				},
-				{
-					field : 'petSex',
-					title : '宠物性别',
-					formatter: function (value, row, index) {
-						return $.table.selectDictLabel(sex, row.petSex);
-					}
-				},
-				{
-					field : 'disease', 
-					title : '疾病',
-				},
-				{
-					field : 'method', 
-					title : '治疗方法',
-				},
+					{
+						field : 'name',
+						title : '主人名字',
+					},
+					{
+						field : 'phonenumber',
+						title : '主人手机号',
+					},
+					{
+						field : 'petName',
+						title : '宠物名字',
+					},
+					{
+						field : 'petAge',
+						title : '宠物年龄/月',
+					},
+					{
+						field : 'petType',
+						title : '宠物种类',
+					},
+					{
+						field : 'petInfoType',
+						title : '宠物信息类型',
+						formatter: function (value, row, index) {
+							return $.table.selectDictLabel(signs, row.petInfoType);
+						}
+					},
+					{
+						field : 'petSex',
+						title : '宠物性别',
+						formatter: function (value, row, index) {
+							return $.table.selectDictLabel(sex, row.petSex);
+						}
+					},
+					{
+						field : 'price',
+						title : '寄养价格',
+					},
+
 					{
 						field : 'remake',
 						title : '备注',
 					},
-				{
-					field : 'createTime', 
-					title : '创建时间',
-				},
+
+					{
+						field : 'createTime',
+						title : '开始寄养时间',
+					},
+
+					{
+						field : 'endTime',
+						title : '结束寄养时间',
+					},
+					{
+						field : 'day',
+						title : '寄养天数',
+					},
+					{
+						field : 'remainTime',
+						title : '剩余寄养时间',
+					},
+					{
+						field : 'status',
+						title : '是否带回家',
+						formatter: function (value, row, index) {
+							return $.table.selectDictLabel(info_status, row.status);
+						}
+					},
 		        {
 		            title: '操作',
 		            align: 'center',
