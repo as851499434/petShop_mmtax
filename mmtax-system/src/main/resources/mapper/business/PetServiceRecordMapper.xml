@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mmtax.business.mapper.PetServiceRecordMapper">
+    
+    <resultMap type="PetServiceRecord" id="PetServiceRecordResult">
+        <result property="id"    column="id"    />
+        <result property="petInfoId"    column="pet_info_id"    />
+        <result property="service"    column="service"    />
+        <result property="price"    column="price"    />
+        <result property="status"    column="status"    />
+        <result property="remake"    column="remake"    />
+        <result property="delStatus"    column="del_status"    />
+        <result property="providerId"    column="provider_id"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+
+    <select id="selectPetServiceRecordList"
+            resultType="com.mmtax.business.dto.PetInfoDTO"
+            parameterType="com.mmtax.business.dto.PetInfoQueryDTO">
+        SELECT
+        b.NAME as name,
+        b.phonenumber as phonenumber,
+        c.id,
+        a.pet_name as petName,
+        a.pet_type as petType,
+        a.pet_sex as petSex,
+        a.pet_age as petAge,
+        a.pet_info_type as petInfoType,
+        c.remake,
+        c.price as price,
+        c.service as service,
+        c.status as status,
+        c.del_status as delStatus,
+        c.create_time as createTime,
+        c.update_time as updateTime
+        FROM
+        tbl_pet_service_record c
+        JOIN tbl_pet_info a ON a.id = c.pet_info_id
+        JOIN tbl_pet_master_info b ON a.master_id = b.id
+        WHERE
+        1 = 1
+        AND c.del_status = 0
+        AND a.pet_info_type = 5
+        <if test="name != null and name != ''">
+            and b.NAME like concat('%',#{name},'%')
+        </if>
+        <if test="phonenumber != null and phonenumber != ''">
+            and b.phonenumber like concat('%',#{phonenumber},'%')
+        </if>
+        <if test="petName != null and petName != ''">
+            and a.pet_name like concat('%',#{petName},'%')
+        </if>
+        <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+            and c.create_time between concat(#{startDate},' 00:00:00') and concat(#{endDate}, ' 23:59:59')
+        </if>
+        order by
+        c.create_time desc
+    </select>
+</mapper>

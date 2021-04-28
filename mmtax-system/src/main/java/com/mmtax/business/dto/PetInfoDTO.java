@@ -40,6 +40,8 @@ public class PetInfoDTO {
     private Date endTime;
     /** 剩余时间 */
     private String remainTime;
+    /** 服务 */
+    private String service;
     /** 删除状态 0 未删除 1 已删除 */
     private String delStatus;
     /** 创建时间 */
