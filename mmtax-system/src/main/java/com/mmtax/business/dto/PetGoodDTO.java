@@ -1,5 +1,6 @@
 package com.mmtax.business.dto;
 
+import io.swagger.models.auth.In;
 import lombok.Data;
 
 import java.util.Date;
@@ -19,8 +20,14 @@ public class PetGoodDTO {
     private String factory;
     /** 售价 */
     private String price;
+    /** 成本 */
+    private String cost;
     /** 生产日期 */
     private Date productionTime;
+    /** 最后日期 */
+    private Date endTime;
+    /** 保质期/天 */
+    private Integer shelfLife;
     /** 剩余时间 */
     private String remainTime;
     /** 删除状态 0 未删除 1 已删除 */

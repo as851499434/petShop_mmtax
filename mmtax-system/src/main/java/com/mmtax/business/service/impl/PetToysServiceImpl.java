@@ -50,14 +50,6 @@ public class PetToysServiceImpl implements IPetToysService
         petToys.setCost(new BigDecimal(dto.getCost()));
         petToys.setFactory(dto.getFactory());
         petToys.setRemake(dto.getRemake());
-//        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//        String productionTime = dto.getProductionTime() + " 00:00:00";
-//        Date time = null;
-//        try {
-//            time = sdf.parse(productionTime);
-//        } catch (Exception e) {
-//           throw new BusinessException("转换日期格式错误");
-//        }
         petToys.setProductionTime(dto.getProductionTime());
         petToys.setDelStatus(DelStatusEnum.NORMAL.getCode());
         petToys.setCreateTime(new Date());

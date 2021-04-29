@@ -52,7 +52,14 @@
 					<input id="remake" name="remake" th:field="*{remake}" class="form-control" type="text">
 				</div>
 			</div>
-
+			<div class="form-group">
+				<label class="col-sm-3 control-label">图片：</label>
+				<div class="col-sm-8">
+<!--					<button onclick="openInput()">上传</button>-->
+					<input  id="photo" name="photo" type="file" class="form-control" onchange="upload()">
+					<img id="img" src=""/>
+				</div>
+			</div>
 
 
 		</form>
@@ -73,7 +80,33 @@
 	        if ($.validate.form()) {
 	            $.operate.save(prefix + "/edit", $('#form-petInfo-edit').serialize());
 	        }
-	    }
+	    };
+		function openInput(){
+			$("#photo").click();
+		};
+		function upload(){
+			var file = document.getElementById("photo").files[0];
+			var formData = new FormData();
+			formData.append("file",file)
+			// 上传文件
+			$.ajax({
+				type: "POST",
+				url: "/upload/uploadImg",
+				data: formData,
+				cache: false,
+				contentType: false,
+				processData: false,
+				dataType: 'json',
+				success: function(result) {
+					console.log((result));
+					$("#img").val(result);
+				},
+				error: function(error) {
+					$.modal.alertWarning("图片上传失败。");
+				}
+			});
+		}
+
 	</script>
 </body>
 </html>

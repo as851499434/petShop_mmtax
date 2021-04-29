@@ -2,17 +2,15 @@
 <html  lang="zh" xmlns:th="http://www.thymeleaf.org">
 
 <head>
+    <meta name="referrer" content="no-referrer">
     <th:block th:include="include :: header('首页')" />
     <link th:href="@{/css/style.css}" rel="stylesheet"/>
     <link th:href="@{/css/month.css}" rel="stylesheet"/>
+    <link href="../static/css/login.min.css" th:href="@{/css/login.min.css}" rel="stylesheet"/>
 </head>
 
-<body class="gray-bg">
-
-<span id="roleId" style="display: none">[[${user.roles[0].roleId}]]</span>
-<span id="roleKey" style="display: none" >[[${user.roles[0].roleKey}]]</span>
-
-
+<body >
+宠物店管理系统欢迎您
 
 
 <script>
@@ -20,4 +18,5 @@
 </script>
 
 </body>
+
 </html>

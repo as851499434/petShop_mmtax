@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
 <head>
-	<th:block th:include="include :: header('宠物玩具列表')" />
+	<th:block th:include="include :: header('宠物食品列表')" />
 </head>
 <body class="gray-bg">
      <div class="container-div">
@@ -26,8 +26,6 @@
 								<span>-</span>
 								<input type="text" class="time-input" id="endTime" placeholder="结束时间" name="endDate" autocomplete="off"/>
 							</li>
-
-
 							<li>
 								<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
 								<a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
@@ -38,15 +36,16 @@
 			</div>
 			
 	        <div class="btn-group-sm" id="toolbar" role="group">
-				<a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="business:petToys:add">
+				<a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="business:petFoods:add">
 					<i class="fa fa-plus"></i> 添加
 				</a>
-				<a class="btn btn-primary btn-edit disabled" onclick="$.operate.edit()" shiro:hasPermission="business:petToys:edit">
+				<a class="btn btn-primary btn-edit disabled" onclick="$.operate.edit()" shiro:hasPermission="business:petFoods:edit">
 					<i class="fa fa-edit"></i> 修改
 				</a>
-				<a class="btn btn-danger btn-del btn-del disabled" onclick="$.operate.removeAll()" shiro:hasPermission="business:petToys:remove">
+				<a class="btn btn-danger btn-del btn-del disabled" onclick="$.operate.removeAll()" shiro:hasPermission="business:petFoods:remove">
 					<i class="fa fa-remove"></i> 删除
 				</a>
+
 			</div>
 			<div class="col-sm-12 select-table table-striped">
 				<table id="bootstrap-table" data-mobile-responsive="true"></table>
@@ -55,9 +54,9 @@
 	</div>
     <div th:include="include :: footer"></div>
     <script th:inline="javascript">
-        var editFlag = [[${@permission.hasPermi('business:petToys:edit')}]];
-        var removeFlag = [[${@permission.hasPermi('business:petToys:remove')}]];
-        var prefix = ctx + "business/petToys";
+        var editFlag = [[${@permission.hasPermi('business:petFoods:edit')}]];
+        var removeFlag = [[${@permission.hasPermi('business:petFoods:remove')}]];
+        var prefix = ctx + "business/petFoods";
 
         $(function() {
             var options = {
@@ -66,14 +65,14 @@
                 updateUrl: prefix + "/edit/{id}",
                 removeUrl: prefix + "/remove",
 				exportUrl: prefix + "/export",
-                modalName: "宠物玩具",
+                modalName: "宠物食品",
 		        showExport: true,
                 columns: [{
 		            checkbox: true
 		        },
 				{
 					field : 'id', 
-					title : 'id',
+					title : '',
 					visible: false
 				},
 				{
@@ -81,17 +80,18 @@
 					title : '名称',
 				},
 				{
-					field : 'number',
-					title : '数量',
-				},
-				{
-					field : 'price',
+					field : 'price', 
 					title : '售价',
 				},
 				{
-					field : 'cost',
+					field : 'cost', 
 					title : '成本',
 				},
+				{
+					field : 'number', 
+					title : '数量',
+				},
+
 				{
 					field : 'factory', 
 					title : '厂家',
@@ -101,7 +101,20 @@
 					title : '生产日期',
 				},
 				{
-					field : 'createTime',
+					field : 'shelfLife',
+					title : '保质期/天',
+				},
+				{
+					field : 'endTime',
+					title : '到期时间',
+				},
+
+				{
+					field : 'remainTime',
+					title : '剩余时间',
+				},
+				{
+					field : 'createTime', 
 					title : '创建时间',
 				},
 				{

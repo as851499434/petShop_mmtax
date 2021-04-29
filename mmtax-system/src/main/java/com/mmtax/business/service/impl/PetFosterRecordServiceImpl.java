@@ -19,6 +19,7 @@ import com.mmtax.business.service.IPetFosterRecordService;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -42,7 +43,7 @@ public class PetFosterRecordServiceImpl implements IPetFosterRecordService
     public List<PetInfoDTO> selectPetFosterRecordList(PetInfoQueryDTO dto) {
         List<PetInfoDTO> petInfoDTOS = petFosterRecordMapper.selectPetFosterRecordList(dto);
         for (PetInfoDTO petInfoDTO : petInfoDTOS) {
-            long endTime = petInfoDTO.getCreateTime().getTime() + 86400000*Integer.parseInt(petInfoDTO.getDay());
+            long endTime = petInfoDTO.getCreateTime().getTime() + 86400000L * Integer.parseInt(petInfoDTO.getDay());
             Date end = new Date(endTime);
             String datePoor = getDatePoor(end, new Date());
             petInfoDTO.setEndTime(end);
