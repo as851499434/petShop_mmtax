@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+	<th:block th:include="include :: header('修改宠物服饰')" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-petClothes-edit" th:object="${petClothes}">
+            <input id="id" name="id" th:field="*{id}"  type="hidden">
+			<div class="form-group">
+				<label class="col-sm-3 control-label">名称：</label>
+				<div class="col-sm-8">
+					<input id="name" name="name" th:field="*{name}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">数量：</label>
+				<div class="col-sm-8">
+					<input id="number" name="number" th:field="*{number}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">价格：</label>
+				<div class="col-sm-8">
+					<input id="price" name="price" th:field="*{price}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">成本：</label>
+				<div class="col-sm-8">
+					<input id="cost" name="cost" th:field="*{cost}" class="form-control" type="text">
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-sm-3 control-label">厂家：</label>
+				<div class="col-sm-8">
+					<input id="factory" name="factory" th:field="*{factory}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">生产日期：</label>
+				<div class="col-sm-8">
+					<input type="text" class="time-input" id="productionTime" placeholder="生产日期" th:field="*{productionTime}"
+						   name="startDate" autocomplete="off"/>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">可无理由退货/天：</label>
+				<div class="col-sm-8">
+					<input id="shelfLife" name="shelfLife" th:field="*{shelfLife}" class="form-control" type="text">
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-sm-3 control-label">备注：</label>
+				<div class="col-sm-8">
+					<input id="remake" name="remake" th:field="*{remake}" class="form-control" type="text">
+				</div>
+			</div>
+		</form>
+    </div>
+    <div th:include="include::footer"></div>
+    <script type="text/javascript">
+		var prefix = ctx + "business/petClothes";
+		$("#form-petClothes-edit").validate({
+			rules:{
+				xxxx:{
+					required:true,
+				},
+			},
+			focusCleanup: true
+		});
+		
+		function submitHandler() {
+	        if ($.validate.form()) {
+	            $.operate.save(prefix + "/edit", $('#form-petClothes-edit').serialize());
+	        }
+	    }
+	</script>
+</body>
+</html>
