@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mmtax.business.mapper.PetDailyNecessitiesMapper">
+    
+    <resultMap type="PetDailyNecessities" id="PetDailyNecessitiesResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="number"    column="number"    />
+        <result property="price"    column="price"    />
+        <result property="cost"    column="cost"    />
+        <result property="photo"    column="photo"    />
+        <result property="remake"    column="remake"    />
+        <result property="factory"    column="factory"    />
+        <result property="productionTime"    column="production_time"    />
+        <result property="shelfLife"    column="shelf_life"    />
+        <result property="delStatus"    column="del_status"    />
+        <result property="providerId"    column="provider_id"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+    <select id="selectPetDailyNecessitiesList"
+            resultType="com.mmtax.business.dto.PetGoodDTO"
+            parameterType="com.mmtax.business.dto.PetGoodQueryDTO">
+        SELECT
+        c.id as id,
+        c.name as name,
+        c.factory as factory,
+        c.number as number,
+        c.remake as remake,
+        c.production_time as productionTime,
+        c.price as price,
+        c.cost as cost,
+        c.shelf_life as shelfLife,
+        c.del_status as delStatus,
+        c.create_time as createTime,
+        c.update_time as updateTime
+        FROM
+        tbl_pet_daily_necessities c
+        WHERE
+        1 = 1
+        AND c.del_status = 0
+        <if test="name != null and name != ''">
+            and c.NAME like concat('%',#{name},'%')
+        </if>
+        <if test="factory != null and factory != ''">
+            and c.factory like concat('%',#{factory},'%')
+        </if>
+        <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+            and c.create_time between concat(#{startDate},' 00:00:00') and concat(#{endDate}, ' 23:59:59')
+        </if>
+        order by
+        c.create_time desc
+    </select>
+</mapper>
