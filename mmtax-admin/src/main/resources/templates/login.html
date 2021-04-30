@@ -50,8 +50,8 @@
                 <div class="col-sm-12">
                     <form id="signupForm">
                         <h4 class="no-margins" style="font-size:18px;">登录：</h4>
-                        <input type="text"     name="username" class="form-control uname"     placeholder="用户名" value="admin"    />
-                        <input type="password" name="password" class="form-control pword"    63 placeholder="密码"   value="123456" />
+                        <input type="text"     name="username" class="form-control uname"     placeholder="用户名" value=""    />
+                        <input type="password" name="password" class="form-control pword"    63 placeholder="密码"   value="" />
                         <!--th:if为真才显示元素-->
                         <div class="row m-t" th:if="${captchaEnabled==true}">
                             <div class="col-xs-6">
@@ -63,9 +63,9 @@
                                 </a>
                             </div>
                         </div>
-                        <div class="checkbox-custom" th:classappend="${captchaEnabled==false} ? 'm-t'">
-                            <input type="checkbox" id="rememberme" name="rememberme"> <label for="rememberme">记住我</label>
-                        </div>
+<!--                        <div class="checkbox-custom" th:classappend="${captchaEnabled==false} ? 'm-t'">-->
+<!--                            <input type="checkbox" id="rememberme" name="rememberme"> <label for="rememberme">记住我</label>-->
+<!--                        </div>-->
                         <button class="btn btn-success btn-block" id="btnSubmit" data-loading="正在验证登录，请稍后...">登录</button>
                     </form>
                 </div>
