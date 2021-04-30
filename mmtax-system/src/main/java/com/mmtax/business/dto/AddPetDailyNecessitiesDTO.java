@@ -20,4 +20,6 @@ public class AddPetDailyNecessitiesDTO {
     private Integer shelfLife;
     /** 生产厂家 */
     private String factory;
+    /** 图片 */
+    private String photo;
 }

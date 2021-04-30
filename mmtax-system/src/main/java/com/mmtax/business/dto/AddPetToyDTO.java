@@ -18,4 +18,6 @@ public class AddPetToyDTO {
     private String productionTime;
     /** 生产厂家 */
     private String factory;
+    /** 图片 */
+    private String photo;
 }
