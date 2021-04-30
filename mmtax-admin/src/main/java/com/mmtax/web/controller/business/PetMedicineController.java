@@ -8,6 +8,8 @@ import com.mmtax.business.dto.PetGoodQueryDTO;
 import com.mmtax.common.core.controller.BaseController;
 import com.mmtax.common.core.domain.AjaxResult;
 import com.mmtax.common.core.page.TableDataInfo;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -27,6 +29,7 @@ import com.mmtax.business.service.IPetMedicineService;
  * @author meimiao
  * @date 2021-04-29
  */
+@Api(tags = "宠物药品管理")
 @Controller
 @RequestMapping("/business/petMedicine")
 public class PetMedicineController extends BaseController
@@ -35,7 +38,8 @@ public class PetMedicineController extends BaseController
 	
 	@Autowired
 	private IPetMedicineService petMedicineService;
-	
+
+	@ApiOperation(value = "宠物药品列表页面")
 	@RequiresPermissions("business:petMedicine:view")
 	@GetMapping()
 	public String petMedicine()
@@ -46,6 +50,7 @@ public class PetMedicineController extends BaseController
 	/**
 	 * 查询宠物药品列表
 	 */
+	@ApiOperation(value = "查询宠物药品列表")
 	@RequiresPermissions("business:petMedicine:list")
 	@PostMapping("/list")
 	@ResponseBody
@@ -62,6 +67,7 @@ public class PetMedicineController extends BaseController
 	/**
 	 * 新增宠物药品
 	 */
+	@ApiOperation(value = "新增宠物药品页面")
 	@GetMapping("/add")
 	public String add()
 	{
@@ -71,6 +77,7 @@ public class PetMedicineController extends BaseController
 	/**
 	 * 新增保存宠物药品
 	 */
+	@ApiOperation(value = "新增保存宠物药品")
 	@RequiresPermissions("business:petMedicine:add")
 	@PostMapping("/add")
 	@ResponseBody
@@ -82,6 +89,7 @@ public class PetMedicineController extends BaseController
 	/**
 	 * 修改宠物药品
 	 */
+	@ApiOperation(value = "修改宠物药品页面")
 	@GetMapping("/edit/{id}")
 	public String edit(@PathVariable("id") Integer id, ModelMap mmap)
 	{
@@ -93,6 +101,7 @@ public class PetMedicineController extends BaseController
 	/**
 	 * 修改保存宠物药品
 	 */
+	@ApiOperation(value = "修改保存宠物药品")
 	@RequiresPermissions("business:petMedicine:edit")
 	@PostMapping("/edit")
 	@ResponseBody
@@ -104,6 +113,7 @@ public class PetMedicineController extends BaseController
 	/**
 	 * 删除宠物药品
 	 */
+	@ApiOperation(value = "删除宠物药品")
 	@RequiresPermissions("business:petMedicine:remove")
 	@PostMapping( "/remove")
 	@ResponseBody

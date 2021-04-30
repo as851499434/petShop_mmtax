@@ -8,6 +8,8 @@ import com.mmtax.business.dto.PetGoodQueryDTO;
 import com.mmtax.common.core.controller.BaseController;
 import com.mmtax.common.core.domain.AjaxResult;
 import com.mmtax.common.core.page.TableDataInfo;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -27,6 +29,7 @@ import com.mmtax.business.service.IPetClothesService;
  * @author meimiao
  * @date 2021-04-29
  */
+@Api(tags = "宠物服饰管理")
 @Controller
 @RequestMapping("/business/petClothes")
 public class PetClothesController extends BaseController
@@ -35,7 +38,8 @@ public class PetClothesController extends BaseController
 	
 	@Autowired
 	private IPetClothesService petClothesService;
-	
+
+	@ApiOperation(value = "跳转到宠物服饰列表页面")
 	@RequiresPermissions("business:petClothes:view")
 	@GetMapping()
 	public String petClothes()
@@ -46,6 +50,7 @@ public class PetClothesController extends BaseController
 	/**
 	 * 查询宠物服饰列表
 	 */
+	@ApiOperation(value = "查询宠物服饰列表")
 	@RequiresPermissions("business:petClothes:list")
 	@PostMapping("/list")
 	@ResponseBody
@@ -62,6 +67,7 @@ public class PetClothesController extends BaseController
 	/**
 	 * 新增宠物服饰
 	 */
+	@ApiOperation(value = "跳转到新增宠物服饰页面")
 	@GetMapping("/add")
 	public String add()
 	{
@@ -71,6 +77,7 @@ public class PetClothesController extends BaseController
 	/**
 	 * 新增保存宠物服饰
 	 */
+	@ApiOperation(value = "新增保存宠物服饰")
 	@RequiresPermissions("business:petClothes:add")
 	@PostMapping("/add")
 	@ResponseBody
@@ -82,6 +89,7 @@ public class PetClothesController extends BaseController
 	/**
 	 * 修改宠物服饰
 	 */
+	@ApiOperation(value = "跳转修改宠物服饰页面")
 	@GetMapping("/edit/{id}")
 	public String edit(@PathVariable("id") Integer id, ModelMap mmap)
 	{
@@ -93,6 +101,7 @@ public class PetClothesController extends BaseController
 	/**
 	 * 修改保存宠物服饰
 	 */
+	@ApiOperation(value = "修改保存宠物服饰接口")
 	@RequiresPermissions("business:petClothes:edit")
 	@PostMapping("/edit")
 	@ResponseBody
@@ -104,6 +113,7 @@ public class PetClothesController extends BaseController
 	/**
 	 * 删除宠物服饰
 	 */
+	@ApiOperation(value = "删除保存宠物服饰接口")
 	@RequiresPermissions("business:petClothes:remove")
 	@PostMapping( "/remove")
 	@ResponseBody

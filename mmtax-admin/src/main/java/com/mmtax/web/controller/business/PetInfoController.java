@@ -62,8 +62,9 @@ public class PetInfoController extends BaseController
 
 	
 	/**
-	 * 新增宠物
+	 * 新增保存宠物
 	 */
+	@ApiOperation(value = "新增保存宠物页面")
 	@GetMapping("/add")
 	public String add()
 	{
@@ -73,8 +74,8 @@ public class PetInfoController extends BaseController
 	/**
 	 * 新增保存宠物
 	 */
+	@ApiOperation(value = "新增保存宠物")
 	@RequiresPermissions("business:petInfo:add")
-	@Log(title = "宠物", businessType = BusinessType.INSERT)
 	@PostMapping("/add")
 	@ResponseBody
 	public AjaxResult addSave(@RequestBody AddPetAndMasterInfoDTO dto)
@@ -94,6 +95,7 @@ public class PetInfoController extends BaseController
 	/**
 	 * 修改宠物
 	 */
+	@ApiOperation(value = "跳转修改宠物页面")
 	@GetMapping("/edit/{id}")
 	public String edit(@PathVariable("id") Integer id, ModelMap mmap)
 	{
@@ -105,8 +107,8 @@ public class PetInfoController extends BaseController
 	/**
 	 * 修改保存宠物
 	 */
+	@ApiOperation(value = "修改保存宠物")
 	@RequiresPermissions("business:petInfo:edit")
-	@Log(title = "宠物", businessType = BusinessType.UPDATE)
 	@PostMapping("/edit")
 	@ResponseBody
 	public AjaxResult editSave(PetInfo petInfo)
@@ -117,8 +119,8 @@ public class PetInfoController extends BaseController
 	/**
 	 * 删除宠物
 	 */
+	@ApiOperation(value = "删除宠物")
 	@RequiresPermissions("business:petInfo:remove")
-	@Log(title = "宠物", businessType = BusinessType.DELETE)
 	@PostMapping( "/remove")
 	@ResponseBody
 	public AjaxResult remove(String ids)

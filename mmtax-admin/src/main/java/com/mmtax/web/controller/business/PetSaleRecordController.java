@@ -7,6 +7,8 @@ import com.mmtax.business.dto.PetInfoDTO;
 import com.mmtax.business.dto.PetInfoQueryDTO;
 import com.mmtax.common.core.domain.AjaxResult;
 import com.mmtax.common.core.page.TableDataInfo;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -26,6 +28,7 @@ import com.mmtax.common.core.controller.BaseController;
  * @author meimiao
  * @date 2021-04-27
  */
+@Api(tags = " 销售宠物记录管理")
 @Controller
 @RequestMapping("/business/petSaleRecord")
 public class PetSaleRecordController extends BaseController
@@ -34,7 +37,8 @@ public class PetSaleRecordController extends BaseController
 	
 	@Autowired
 	private IPetSaleRecordService petSaleRecordService;
-	
+
+	@ApiOperation(value = "销售宠物记录列表页面")
 	@RequiresPermissions("business:petSaleRecord:view")
 	@GetMapping()
 	public String petSaleRecord()
@@ -45,6 +49,7 @@ public class PetSaleRecordController extends BaseController
 	/**
 	 * 查询销售宠物记录列表
 	 */
+	@ApiOperation(value = "查询销售宠物记录列表")
 	@RequiresPermissions("business:petSaleRecord:list")
 	@PostMapping("/list")
 	@ResponseBody
@@ -60,6 +65,7 @@ public class PetSaleRecordController extends BaseController
 	/**
 	 * 新增销售宠物记录
 	 */
+	@ApiOperation(value = "新增销售宠物记录页面")
 	@GetMapping("/add")
 	public String add()
 	{
@@ -69,6 +75,7 @@ public class PetSaleRecordController extends BaseController
 	/**
 	 * 新增保存销售宠物记录
 	 */
+	@ApiOperation(value = "新增保存销售宠物记录")
 	@RequiresPermissions("business:petSaleRecord:add")
 	@PostMapping("/add")
 	@ResponseBody
@@ -80,6 +87,7 @@ public class PetSaleRecordController extends BaseController
 	/**
 	 * 修改销售宠物记录
 	 */
+	@ApiOperation(value = "修改销售宠物记录页面")
 	@GetMapping("/edit/{id}")
 	public String edit(@PathVariable("id") Integer id, ModelMap mmap)
 	{
@@ -91,6 +99,7 @@ public class PetSaleRecordController extends BaseController
 	/**
 	 * 修改保存销售宠物记录
 	 */
+	@ApiOperation(value = "修改保存销售宠物记录")
 	@RequiresPermissions("business:petSaleRecord:edit")
 	@PostMapping("/edit")
 	@ResponseBody
@@ -102,6 +111,7 @@ public class PetSaleRecordController extends BaseController
 	/**
 	 * 删除销售宠物记录
 	 */
+	@ApiOperation(value = "删除销售宠物记录")
 	@RequiresPermissions("business:petSaleRecord:remove")
 	@PostMapping( "/remove")
 	@ResponseBody

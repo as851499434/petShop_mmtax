@@ -10,6 +10,8 @@ import com.mmtax.business.service.IPetFosterRecordService;
 import com.mmtax.common.core.controller.BaseController;
 import com.mmtax.common.core.domain.AjaxResult;
 import com.mmtax.common.core.page.TableDataInfo;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -27,6 +29,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
  * @author meimiao
  * @date 2021-04-27
  */
+@Api(tags = "宠物寄养记录管理")
 @Controller
 @RequestMapping("/business/petFosterRecord")
 public class PetFosterRecordController extends BaseController
@@ -35,7 +38,8 @@ public class PetFosterRecordController extends BaseController
 	
 	@Autowired
 	private IPetFosterRecordService petFosterRecordService;
-	
+
+	@ApiOperation(value = "跳转到宠物寄样页面")
 	@RequiresPermissions("business:petFosterRecord:view")
 	@GetMapping()
 	public String petFosterRecord()
@@ -46,6 +50,7 @@ public class PetFosterRecordController extends BaseController
 	/**
 	 * 查询宠物寄养记录列表
 	 */
+	@ApiOperation(value = "查询宠物寄养记录列表")
 	@RequiresPermissions("business:petFosterRecord:list")
 	@PostMapping("/list")
 	@ResponseBody
@@ -62,6 +67,7 @@ public class PetFosterRecordController extends BaseController
 	/**
 	 * 新增宠物寄养记录
 	 */
+	@ApiOperation(value = "跳转新增宠物寄养记录页面")
 	@GetMapping("/add")
 	public String add()
 	{
@@ -71,6 +77,7 @@ public class PetFosterRecordController extends BaseController
 	/**
 	 * 新增保存宠物寄养记录
 	 */
+	@ApiOperation(value = "新增保存宠物寄养记录")
 	@RequiresPermissions("business:petFosterRecord:add")
 	@PostMapping("/add")
 	@ResponseBody
@@ -82,6 +89,7 @@ public class PetFosterRecordController extends BaseController
 	/**
 	 * 修改宠物寄养记录
 	 */
+	@ApiOperation(value = "跳转修改宠物寄养记录页面")
 	@GetMapping("/edit/{id}")
 	public String edit(@PathVariable("id") Integer id, ModelMap mmap)
 	{
@@ -93,6 +101,7 @@ public class PetFosterRecordController extends BaseController
 	/**
 	 * 修改保存宠物寄养记录
 	 */
+	@ApiOperation(value = "修改保存宠物寄养记录")
 	@RequiresPermissions("business:petFosterRecord:edit")
 	@PostMapping("/edit")
 	@ResponseBody
@@ -104,6 +113,7 @@ public class PetFosterRecordController extends BaseController
 	/**
 	 * 删除宠物寄养记录
 	 */
+	@ApiOperation(value = "删除宠物寄养记录")
 	@RequiresPermissions("business:petFosterRecord:remove")
 	@PostMapping( "/remove")
 	@ResponseBody

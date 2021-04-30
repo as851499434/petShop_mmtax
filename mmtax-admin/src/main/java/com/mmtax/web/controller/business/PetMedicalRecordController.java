@@ -10,6 +10,8 @@ import com.mmtax.common.core.controller.BaseController;
 import com.mmtax.common.core.domain.AjaxResult;
 import com.mmtax.common.core.page.TableDataInfo;
 import com.mmtax.common.enums.BusinessType;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -28,6 +30,7 @@ import com.mmtax.business.service.IPetMedicalRecordService;
  * @author meimiao
  * @date 2021-04-26
  */
+@Api(tags = "医疗宠物病历管理")
 @Controller
 @RequestMapping("/business/petMedicalRecord")
 public class PetMedicalRecordController extends BaseController
@@ -36,7 +39,8 @@ public class PetMedicalRecordController extends BaseController
 	
 	@Autowired
 	private IPetMedicalRecordService petMedicalRecordService;
-	
+
+	@ApiOperation(value = "医疗宠物病历列表页面")
 	@RequiresPermissions("business:petMedicalRecord:view")
 	@GetMapping()
 	public String petMedicalRecord()
@@ -47,6 +51,7 @@ public class PetMedicalRecordController extends BaseController
 	/**
 	 * 查询医疗宠物病历列表
 	 */
+	@ApiOperation(value = "查询医疗宠物病历列表")
 	@RequiresPermissions("business:petMedicalRecord:list")
 	@PostMapping("/list")
 	@ResponseBody
@@ -61,6 +66,7 @@ public class PetMedicalRecordController extends BaseController
 	/**
 	 * 新增医疗宠物病历
 	 */
+	@ApiOperation(value = "新增医疗宠物病历页面")
 	@GetMapping("/add")
 	public String add()
 	{
@@ -70,6 +76,7 @@ public class PetMedicalRecordController extends BaseController
 	/**
 	 * 新增保存医疗宠物病历
 	 */
+	@ApiOperation(value = "新增保存医疗宠物病历")
 	@RequiresPermissions("business:petMedicalRecord:add")
 	@PostMapping("/add")
 	@ResponseBody
@@ -81,6 +88,7 @@ public class PetMedicalRecordController extends BaseController
 	/**
 	 * 修改医疗宠物病历
 	 */
+	@ApiOperation(value = "修改医疗宠物病历页面")
 	@GetMapping("/edit/{id}")
 	public String edit(@PathVariable("id") Integer id, ModelMap mmap)
 	{
@@ -92,6 +100,7 @@ public class PetMedicalRecordController extends BaseController
 	/**
 	 * 修改保存医疗宠物病历
 	 */
+	@ApiOperation(value = "修改保存医疗宠物病历")
 	@RequiresPermissions("business:petMedicalRecord:edit")
 	@PostMapping("/edit")
 	@ResponseBody
@@ -103,8 +112,8 @@ public class PetMedicalRecordController extends BaseController
 	/**
 	 * 删除医疗宠物病历
 	 */
+	@ApiOperation(value = "删除医疗宠物病历")
 	@RequiresPermissions("business:petMedicalRecord:remove")
-	@Log(title = "医疗宠物病历", businessType = BusinessType.DELETE)
 	@PostMapping( "/remove")
 	@ResponseBody
 	public AjaxResult remove(String ids)

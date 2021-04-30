@@ -11,6 +11,8 @@ import com.mmtax.business.service.IPetFoodsService;
 import com.mmtax.common.core.controller.BaseController;
 import com.mmtax.common.core.domain.AjaxResult;
 import com.mmtax.common.core.page.TableDataInfo;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -28,6 +30,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
  * @author meimiao
  * @date 2021-04-29
  */
+@Api(tags = "宠物食品管理")
 @Controller
 @RequestMapping("/business/petFoods")
 public class PetFoodsController extends BaseController
@@ -36,7 +39,8 @@ public class PetFoodsController extends BaseController
 	
 	@Autowired
 	private IPetFoodsService petFoodsService;
-	
+
+	@ApiOperation(value = "跳转到宠物食品页面")
 	@RequiresPermissions("business:petFoods:view")
 	@GetMapping()
 	public String petFoods()
@@ -47,6 +51,7 @@ public class PetFoodsController extends BaseController
 	/**
 	 * 查询宠物食品列表
 	 */
+	@ApiOperation(value = "查询宠物食品列表")
 	@RequiresPermissions("business:petFoods:list")
 	@PostMapping("/list")
 	@ResponseBody
@@ -63,6 +68,7 @@ public class PetFoodsController extends BaseController
 	/**
 	 * 新增宠物食品
 	 */
+	@ApiOperation(value = "跳转新增宠物食品页面")
 	@GetMapping("/add")
 	public String add()
 	{
@@ -72,6 +78,7 @@ public class PetFoodsController extends BaseController
 	/**
 	 * 新增保存宠物食品
 	 */
+	@ApiOperation(value = "新增保存宠物食品接口")
 	@RequiresPermissions("business:petFoods:add")
 	@PostMapping("/add")
 	@ResponseBody
@@ -83,6 +90,7 @@ public class PetFoodsController extends BaseController
 	/**
 	 * 修改宠物食品
 	 */
+	@ApiOperation(value = "修改宠物食品页面")
 	@GetMapping("/edit/{id}")
 	public String edit(@PathVariable("id") Integer id, ModelMap mmap)
 	{
@@ -94,6 +102,7 @@ public class PetFoodsController extends BaseController
 	/**
 	 * 修改保存宠物食品
 	 */
+	@ApiOperation(value = "修改保存宠物食品")
 	@RequiresPermissions("business:petFoods:edit")
 	@PostMapping("/edit")
 	@ResponseBody
@@ -105,6 +114,7 @@ public class PetFoodsController extends BaseController
 	/**
 	 * 删除宠物食品
 	 */
+	@ApiOperation(value = "删除宠物食品")
 	@RequiresPermissions("business:petFoods:remove")
 	@PostMapping( "/remove")
 	@ResponseBody

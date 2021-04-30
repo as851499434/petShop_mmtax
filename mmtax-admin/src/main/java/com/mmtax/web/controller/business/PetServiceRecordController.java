@@ -10,6 +10,8 @@ import com.mmtax.business.service.IPetServiceRecordService;
 import com.mmtax.common.core.controller.BaseController;
 import com.mmtax.common.core.domain.AjaxResult;
 import com.mmtax.common.core.page.TableDataInfo;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -28,6 +30,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
  * @author meimiao
  * @date 2021-04-28
  */
+@Api(tags = "宠物服务记录管理")
 @Controller
 @RequestMapping("/business/petServiceRecord")
 public class PetServiceRecordController extends BaseController
@@ -36,7 +39,8 @@ public class PetServiceRecordController extends BaseController
 	
 	@Autowired
 	private IPetServiceRecordService petServiceRecordService;
-	
+
+	@ApiOperation(value = "宠物服务记录页面")
 	@RequiresPermissions("business:petServiceRecord:view")
 	@GetMapping()
 	public String petServiceRecord()
@@ -47,6 +51,7 @@ public class PetServiceRecordController extends BaseController
 	/**
 	 * 查询宠物服务记录列表
 	 */
+	@ApiOperation(value = "查询宠物服务记录列表")
 	@RequiresPermissions("business:petServiceRecord:list")
 	@PostMapping("/list")
 	@ResponseBody
@@ -62,6 +67,7 @@ public class PetServiceRecordController extends BaseController
 	/**
 	 * 新增宠物服务记录
 	 */
+	@ApiOperation(value = "新增宠物服务记录页面")
 	@GetMapping("/add")
 	public String add()
 	{
@@ -71,6 +77,7 @@ public class PetServiceRecordController extends BaseController
 	/**
 	 * 新增保存宠物服务记录
 	 */
+	@ApiOperation(value = "新增保存宠物服务记录")
 	@RequiresPermissions("business:petServiceRecord:add")
 	@PostMapping("/add")
 	@ResponseBody
@@ -82,6 +89,7 @@ public class PetServiceRecordController extends BaseController
 	/**
 	 * 修改宠物服务记录
 	 */
+	@ApiOperation(value = "修改宠物服务记录页面")
 	@GetMapping("/edit/{id}")
 	public String edit(@PathVariable("id") Integer id, ModelMap mmap)
 	{
@@ -93,6 +101,7 @@ public class PetServiceRecordController extends BaseController
 	/**
 	 * 修改保存宠物服务记录
 	 */
+	@ApiOperation(value = "修改保存宠物服务记录")
 	@RequiresPermissions("business:petServiceRecord:edit")
 	@PostMapping("/edit")
 	@ResponseBody
@@ -104,6 +113,7 @@ public class PetServiceRecordController extends BaseController
 	/**
 	 * 删除宠物服务记录
 	 */
+	@ApiOperation(value = "删除宠物服务记录")
 	@RequiresPermissions("business:petServiceRecord:remove")
 	@PostMapping( "/remove")
 	@ResponseBody

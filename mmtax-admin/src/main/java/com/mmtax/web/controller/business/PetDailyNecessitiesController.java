@@ -9,6 +9,8 @@ import com.mmtax.business.dto.PetInfoQueryDTO;
 import com.mmtax.common.core.controller.BaseController;
 import com.mmtax.common.core.domain.AjaxResult;
 import com.mmtax.common.core.page.TableDataInfo;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -29,6 +31,7 @@ import com.mmtax.business.service.IPetDailyNecessitiesService;
  * @author meimiao
  * @date 2021-04-29
  */
+@Api(tags = "宠物日用品管理")
 @Controller
 @RequestMapping("/business/petDailyNecessities")
 public class PetDailyNecessitiesController extends BaseController
@@ -37,7 +40,7 @@ public class PetDailyNecessitiesController extends BaseController
 	
 	@Autowired
 	private IPetDailyNecessitiesService petDailyNecessitiesService;
-	
+	@ApiOperation(value = "跳转到宠物日用品列表")
 	@RequiresPermissions("business:petDailyNecessities:view")
 	@GetMapping()
 	public String petDailyNecessities()
@@ -48,6 +51,7 @@ public class PetDailyNecessitiesController extends BaseController
 	/**
 	 * 查询宠物日用品列表
 	 */
+	@ApiOperation(value = "查询到宠物日用品列表")
 	@RequiresPermissions("business:petDailyNecessities:list")
 	@PostMapping("/list")
 	@ResponseBody
@@ -64,6 +68,7 @@ public class PetDailyNecessitiesController extends BaseController
 	/**
 	 * 新增宠物日用品
 	 */
+	@ApiOperation(value = "跳转新增到宠物日用品页面")
 	@GetMapping("/add")
 	public String add()
 	{
@@ -73,6 +78,7 @@ public class PetDailyNecessitiesController extends BaseController
 	/**
 	 * 新增保存宠物日用品
 	 */
+	@ApiOperation(value = "新增到宠物日用品接口")
 	@RequiresPermissions("business:petDailyNecessities:add")
 	@PostMapping("/add")
 	@ResponseBody
@@ -84,6 +90,7 @@ public class PetDailyNecessitiesController extends BaseController
 	/**
 	 * 修改宠物日用品
 	 */
+	@ApiOperation(value = "跳转修改到宠物日用品页面")
 	@GetMapping("/edit/{id}")
 	public String edit(@PathVariable("id") Integer id, ModelMap mmap)
 	{
@@ -95,6 +102,7 @@ public class PetDailyNecessitiesController extends BaseController
 	/**
 	 * 修改保存宠物日用品
 	 */
+	@ApiOperation(value = "修改宠物日用品接口")
 	@RequiresPermissions("business:petDailyNecessities:edit")
 	@PostMapping("/edit")
 	@ResponseBody
@@ -106,6 +114,7 @@ public class PetDailyNecessitiesController extends BaseController
 	/**
 	 * 删除宠物日用品
 	 */
+	@ApiOperation(value = "删除宠物日用品接口")
 	@RequiresPermissions("business:petDailyNecessities:remove")
 	@PostMapping( "/remove")
 	@ResponseBody
