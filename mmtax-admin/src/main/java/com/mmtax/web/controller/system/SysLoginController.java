@@ -40,15 +40,6 @@ public class SysLoginController extends BaseController
     {
 
         String serverName = request.getServerName();
-        String apiPermission = sysConfigService.selectConfigByKey("api_permission");
-        if (Constants.SWITCH_ON.equals(apiPermission)) {
-            if (RequestContans.PERMISSION_SERVER_NAME_ONE.equals(serverName) ||
-                    RequestContans.PERMISSION_SERVER_NAME_TWO.equals(serverName) ||
-                    RequestContans.PERMISSION_SERVER_NAME_THREE.equals(serverName) ||
-                    RequestContans.PERMISSION_SERVER_NAME_FOUR.equals(serverName)) {
-                return "error/404";
-            }
-        }
         // 如果是Ajax请求，返回Json字符串。
         if (ServletUtils.isAjaxRequest(request))
         {

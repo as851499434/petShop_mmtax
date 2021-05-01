@@ -6,7 +6,6 @@ mmtax-admin :系统管理后台端主要代码，包括系统管理后台前后�
 mmtax-common：公共工具模块
 mmtax-framework：系统配置模块
 mmtax-generator：代码生成模块
-mmtax-merchant：商户端controller层代码
 mmtax-quartz：定时任务模块
 mmtax-system：service，dao，domain以及mapper文件存放模块
 
