@@ -78,7 +78,7 @@ public class PetInfoController extends BaseController
 	@RequiresPermissions("business:petInfo:add")
 	@PostMapping("/add")
 	@ResponseBody
-	public AjaxResult addSave(@RequestBody AddPetAndMasterInfoDTO dto)
+	public AjaxResult addSave(AddPetAndMasterInfoDTO dto)
 	{
 		try {
 			petInfoService.insertPetInfo(dto);
